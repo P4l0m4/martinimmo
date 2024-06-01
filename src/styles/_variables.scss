@@ -1,0 +1,44 @@
+$tablet-screen: 475px;
+$big-tablet-screen: 768px;
+$laptop-screen: 1024px;
+$desktop-screen: 1440px;
+$super-big-screen: 2400px;
+
+//COLORS
+$base-color: #f7f7f7;
+$primary-color: #fffdfa;
+$secondary-color: #06067c;
+$text-color: #232323;
+$text-color-alt: $primary-color;
+$error-color: #bb0025;
+$success-color: #00a86b;
+
+$text-color-faded: rgba($text-color, 0.3);
+$text-color-faded-strong: rgba($text-color, 0.6);
+$primary-color-faded: rgba($primary-color, 0.8);
+$secondary-color-faded: rgba($secondary-color, 0.2);
+
+//BORDERS
+$radius: 8px;
+
+//SHADOWS
+$shadow: 2px 2px 8px rgba(0, 0, 0, 0.02);
+$shadow-primary: 0px 0px 10px rgba($primary-color, 0.2);
+$shadow-secondary: 0px 0px 10px rgba($secondary-color, 0.2);
+$shadow-text: 0px 0px 2px $text-color;
+
+// TYPO
+$line-height: 1.15;
+$skinny: 400;
+$skinny-thick: 600;
+$thick: 800;
+
+//GOLDEN NUMBER
+$golden-number: 1.618;
+
+//FONT SIZES
+$small-text: 0.75rem;
+$subtitles: calc(1rem * $golden-number);
+$titles: calc($subtitles * $golden-number);
+
+$blur: 2px;
