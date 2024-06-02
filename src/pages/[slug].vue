@@ -151,9 +151,8 @@ function findFamily() {
 
 const displayFamilyButton = computed(() => {
   return (
-    (perplexityFetchingStatus.value === "" || "error") &&
-    filteredPersonFromDatabase.value.length === 0 &&
-    deliverableEmails.length === 0
+    filteredPersonFromDatabase.value.length >= 0 &&
+    deliverableEmails.value.length <= 0
   );
 });
 const displayFamilyResultsFromDatabase = computed(() => {
@@ -162,7 +161,10 @@ const displayFamilyResultsFromDatabase = computed(() => {
 
 const displaySteps = computed(() => {
   return (
-    displayFamilyButton.value === true || perplexityFetchingStatus.value !== ""
+    displayFamilyButton.value === true &&
+    (perplexityFetchingStatus.value === "loading" ||
+      perplexityFetchingStatus.value === "error" ||
+      perplexityFetchingStatus.value === "success")
   );
 });
 
@@ -274,20 +276,8 @@ onMounted(async () => {
       >
     </div>
 
-    <h2
-      v-if="
-        deliverableEmails.length > 0 && filteredPersonFromDatabase.length === 0
-      "
-      class="subtitles"
-    >
-      Contacts
-    </h2>
-    <div
-      v-if="
-        deliverableEmails.length > 0 && filteredPersonFromDatabase.length === 0
-      "
-      class="family-members"
-    >
+    <h2 v-if="deliverableEmails.length > 0" class="subtitles">Contacts</h2>
+    <div class="family-members">
       <FamilyMember
         v-for="deliverableEmail in deliverableEmails"
         :key="deliverableEmail"
