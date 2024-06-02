@@ -28,7 +28,7 @@ withDefaults(defineProps<Props>(), {
 }
 
 .spin {
-  animation: 4s spin infinite linear;
+  animation: 2s spin infinite linear;
 }
 
 .icon {

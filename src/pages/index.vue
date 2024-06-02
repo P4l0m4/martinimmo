@@ -93,6 +93,12 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 1rem;
+  white-space: nowrap;
+  overflow-x: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .cross {

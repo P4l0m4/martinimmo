@@ -10,6 +10,7 @@ import { fetchPerplexityData, httpGetAsync } from "~/utils/APIData";
 import { generateEmailAddresses } from "~/utils/emailPatterns";
 import { normalizeString } from "~/utils/normalize";
 import { removeMatchingNames } from "~/utils/dataSanitization";
+import { addUser, fetchPersons } from "@/utils/supabase";
 
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
@@ -91,6 +92,11 @@ function testEmailsValidity() {
   function processNextPerson() {
     if (personIndex >= emailAddresses.value.length) {
       emailsTestingStatus.value = "success";
+      addUser(
+        profile.value.firstnames,
+        profile.value.lastname,
+        deliverableEmails.value
+      );
       return;
     }
 
@@ -118,6 +124,7 @@ function testEmailsValidity() {
               person: person,
               email: email,
             });
+
             personIndex++;
             setTimeout(processNextPerson, delay); // Move to the next person
             return;
@@ -135,6 +142,47 @@ function testEmailsValidity() {
 
   processNextPerson();
 }
+
+function findFamily() {
+  getDataFromPerplexity()
+    .then(() => getEmailAdresses())
+    .then(() => testEmailsValidity());
+}
+
+const displayFamilyButton = computed(() => {
+  return (
+    (perplexityFetchingStatus.value === "" || "error") &&
+    filteredPersonFromDatabase.value.length === 0 &&
+    deliverableEmails.length === 0
+  );
+});
+const displayFamilyResultsFromDatabase = computed(() => {
+  return filteredPersonFromDatabase.value.length > 0;
+});
+
+const displaySteps = computed(() => {
+  return (
+    displayFamilyButton.value === true || perplexityFetchingStatus.value !== ""
+  );
+});
+
+const allPersonsFromDatabase = ref([]);
+
+async function loadPersons() {
+  const data = await fetchPersons();
+  allPersonsFromDatabase.value = data;
+}
+
+const filteredPersonFromDatabase = computed(() => {
+  if (!profile.value || !allPersonsFromDatabase.value) return [];
+
+  return allPersonsFromDatabase.value.filter((person) => {
+    return (
+      person.firstname === profile.value.firstnames &&
+      person.lastname === profile.value.lastname
+    );
+  });
+});
 
 onMounted(async () => {
   await deathStore.fetchData();
@@ -155,53 +203,12 @@ onMounted(async () => {
   formattedBirthDate.value = dayjs(profile.value.birth_date).format(
     "DD MMMM YYYY"
   );
+
+  await loadPersons();
 });
 </script>
 
 <template>
-  <Container>
-    <div class="steps">
-      <PrimaryButton
-        button-type="dark"
-        :button-state="perplexityFetchingStatus"
-        @click="getDataFromPerplexity()"
-      >
-        Fetch perplexity data
-      </PrimaryButton>
-
-      <Transition>
-        <PrimaryButton
-          v-if="perplexityFetchingStatus === 'success'"
-          button-type="dark"
-          :button-state="emailsFetchingStatus"
-          @click="getEmailAdresses()"
-        >
-          Generate email addresses
-        </PrimaryButton>
-      </Transition>
-
-      <Transition>
-        <PrimaryButton
-          v-if="emailsFetchingStatus === 'success'"
-          button-type="dark"
-          :button-state="emailsTestingStatus"
-          @click="testEmailsValidity()"
-        >
-          Test email addresses
-        </PrimaryButton></Transition
-      >
-    </div>
-  </Container>
-  <Container v-if="deliverableEmails.length > 0">
-    <h2 class="subtitles">{{ deliverableEmails.length }} proches trouvés</h2>
-    <div class="family-members">
-      <FamilyMember
-        v-for="deliverableEmail in deliverableEmails"
-        :key="deliverableEmail"
-        :email="deliverableEmail.email"
-        :name="`${deliverableEmail.person.first_name} ${deliverableEmail.person.last_name}`"
-      /></div
-  ></Container>
   <Container>
     <h1 class="subtitles">
       Informations sur {{ profile?.firstnames }} {{ profile?.lastname }}
@@ -226,17 +233,95 @@ onMounted(async () => {
         }}), à l'âge de {{ profile?.age }} ans
       </li>
     </ul>
+
+    <PrimaryButton
+      v-if="displayFamilyButton"
+      class="scale-on-hover"
+      button-type="dark"
+      @click="findFamily()"
+    >
+      Trouver des proches</PrimaryButton
+    >
+
+    <div class="steps" v-if="displaySteps">
+      <Transition>
+        <SecondaryButton
+          button-type="dark"
+          :button-state="perplexityFetchingStatus"
+        >
+          Recherche des membres de la famille
+        </SecondaryButton></Transition
+      >
+
+      <Transition>
+        <SecondaryButton
+          v-if="perplexityFetchingStatus === 'success'"
+          button-type="dark"
+          :button-state="emailsFetchingStatus"
+        >
+          Génération des adresses mail
+        </SecondaryButton>
+      </Transition>
+
+      <Transition>
+        <SecondaryButton
+          v-if="emailsFetchingStatus === 'success'"
+          button-type="dark"
+          :button-state="emailsTestingStatus"
+        >
+          Vérification des adresses mail
+        </SecondaryButton></Transition
+      >
+    </div>
+
+    <h2
+      v-if="
+        deliverableEmails.length > 0 && filteredPersonFromDatabase.length === 0
+      "
+      class="subtitles"
+    >
+      Contacts
+    </h2>
+    <div
+      v-if="
+        deliverableEmails.length > 0 && filteredPersonFromDatabase.length === 0
+      "
+      class="family-members"
+    >
+      <FamilyMember
+        v-for="deliverableEmail in deliverableEmails"
+        :key="deliverableEmail"
+        :email="deliverableEmail.email"
+        :name="`${deliverableEmail.person.first_name} ${deliverableEmail.person.last_name}`"
+      />
+    </div>
+
+    <div class="family-members" v-if="displayFamilyResultsFromDatabase">
+      <FamilyMember
+        v-for="(member, i) in filteredPersonFromDatabase[0]?.family"
+        :key="i"
+        :email="member.email"
+        :name="`${member.person.first_name} ${member.person.last_name}`"
+      />
+    </div>
   </Container>
 </template>
 <style lang="scss" scoped>
 .steps {
   display: flex;
   gap: 0.5rem;
+  flex-direction: column;
+
+  @media (min-width: $big-tablet-screen) {
+    gap: 1rem;
+    flex-direction: row;
+  }
 }
 
 .family-members {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
 }
 
 .dead-profile {

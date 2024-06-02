@@ -7,7 +7,7 @@ defineProps({
 <template>
   <button
     v-if="buttonType === 'dark'"
-    class="button primary--dark scale-on-hover"
+    class="button primary--dark"
     :class="buttonState"
   >
     <slot></slot>

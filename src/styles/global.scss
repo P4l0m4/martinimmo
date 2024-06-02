@@ -149,6 +149,10 @@ input[type="search"]::-webkit-search-results-decoration {
   @media (min-width: $big-tablet-screen) {
     width: fit-content;
   }
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .disabled {
@@ -157,7 +161,7 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .scale-on-hover {
-  transition: transform 0.4s;
+  transition: transform 0.5s;
 
   &:hover {
     transform: scale(1.02) !important;
@@ -165,7 +169,7 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .shadow-on-hover {
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.5s;
 
   &:hover {
     box-shadow: $shadow-black;

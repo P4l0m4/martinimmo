@@ -87,6 +87,7 @@ onMounted(async () => {
         @click="(displayRegion = !displayRegion), (displayDepartement = false)"
         >{{ regionLabel }}</span
       >
+
       <div class="filtering__dropdown__list" v-if="displayRegion">
         <span
           class="filtering__dropdown__list__element"
@@ -140,6 +141,7 @@ onMounted(async () => {
       padding: 0.5rem 1rem;
       border: 2px solid transparent;
       border-radius: $radius;
+      width: 200px;
 
       &--active {
         color: $secondary-color;
@@ -148,16 +150,22 @@ onMounted(async () => {
     }
 
     &__list {
+      z-index: 1;
       background-color: $primary-color;
       margin-top: 2rem;
       position: absolute;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+      width: 200px;
+      max-height: 200px;
+      overflow-y: scroll;
 
       &__element {
         cursor: pointer;
         padding: 0.5rem 1rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }

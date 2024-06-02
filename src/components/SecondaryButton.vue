@@ -14,24 +14,20 @@ defineProps({
     <IconComponent
       v-if="buttonState === 'loading'"
       :icon="`loader`"
-      color="#fffdfa"
+      color="#9600de"
     />
     <IconComponent
       v-if="buttonState === 'success'"
       :icon="`check-circle`"
-      color="#fffdfa"
+      color="#00a86b"
     />
     <IconComponent
       v-if="buttonState === 'error'"
       :icon="`x-circle`"
-      color="#fffdfa"
+      color="#bb0025"
     />
   </button>
-  <button
-    v-else
-    class="button secondary--light scale-on-hover"
-    :class="buttonState"
-  >
+  <button v-else class="button secondary--light" :class="buttonState">
     <slot></slot>
     <IconComponent
       v-if="buttonState === 'loading'"
@@ -68,19 +64,19 @@ defineProps({
     box-shadow: $shadow-success;
     background-color: transparent;
     border-color: $success-color;
-    color: $text-color-alt;
+    color: $success-color;
   }
   &.error {
     box-shadow: $shadow-error;
     background-color: transparent;
     border-color: $error-color;
-    color: $text-color-alt;
+    color: $error-color;
   }
   &.loading {
     box-shadow: $shadow-loading;
     background-color: transparent;
     border-color: $loading-color;
-    color: $text-color-alt;
+    color: $loading-color;
   }
 }
 </style>

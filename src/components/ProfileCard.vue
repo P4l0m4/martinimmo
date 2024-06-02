@@ -37,7 +37,10 @@ const profileLink = computed(() => {
 </script>
 <template>
   <Transition>
-    <NuxtLink class="profile-card scale-on-hover" :to="profileLink">
+    <NuxtLink
+      class="profile-card scale-on-hover shadow-on-hover"
+      :to="profileLink"
+    >
       <div class="profile-card__death">
         <span class="profile-card__death__date"
           ><IconComponent icon="clock" color="#232323" />{{
@@ -68,7 +71,6 @@ const profileLink = computed(() => {
   flex-direction: column;
   padding: 1rem;
   gap: 1rem;
-  box-shadow: $shadow-black;
   background-color: $primary-color;
   border-radius: $radius;
 
