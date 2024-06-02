@@ -22,6 +22,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       PERPLEXITY_API_KEY: process.env.PERPLEXITY_API_KEY,
+      ABSTRACT_API_KEY: process.env.ABSTRACT_API_KEY,
     },
   },
   dayjs: {

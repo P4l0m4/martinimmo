@@ -11,20 +11,29 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <span class="icon" :style="{ color, fontSize: size }">{{ icon }}</span>
+  <span
+    class="icon"
+    :class="{ spin: icon === 'loader' }"
+    :style="{ color, fontSize: size }"
+    >{{ icon }}</span
+  >
 </template>
 <style scoped>
 @font-face {
-  font-family: "sofar-icons";
-  src: url("@/assets/fonts/icons.woff?tskar8") format("woff");
+  font-family: "icomoon";
+  src: url("@/assets/fonts/icomoon.woff?tskar8") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: block;
 }
 
+.spin {
+  animation: 4s spin infinite linear;
+}
+
 .icon {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: "sofar-icons" !important;
+  font-family: "icomoon" !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -45,5 +54,13 @@ withDefaults(defineProps<Props>(), {
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes spin {
+  from {
+  }
+  to {
+    transform: rotate(180deg);
+  }
 }
 </style>

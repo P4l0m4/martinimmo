@@ -48,6 +48,7 @@ onMounted(async () => {
 });
 </script>
 <template>
+  <Skeleton />
   <Container>
     <div class="sorting-and-filtering">
       <Sorting @sort-by="handleSort" :order="sortOrder" />
@@ -105,6 +106,6 @@ onMounted(async () => {
   justify-content: center;
   padding: 0.5rem;
   border-radius: 50%;
-  box-shadow: $shadow;
+  box-shadow: $shadow-black;
 }
 </style>

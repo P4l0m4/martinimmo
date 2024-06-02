@@ -54,7 +54,7 @@ const handleSort = (order: string) => {
     color: $text-color;
     cursor: pointer;
     padding: 0.5rem 1rem;
-    box-shadow: $shadow;
+    box-shadow: $shadow-black;
 
     &--active {
       color: $secondary-color;

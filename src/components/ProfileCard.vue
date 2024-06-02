@@ -20,8 +20,8 @@ type Death = {
 };
 
 const props = defineProps<{
-  death: Death;
-  sex: "M" | "F";
+  death?: Death;
+  sex?: "M" | "F";
   name: Name;
 }>();
 
@@ -68,7 +68,7 @@ const profileLink = computed(() => {
   flex-direction: column;
   padding: 1rem;
   gap: 1rem;
-  box-shadow: $shadow;
+  box-shadow: $shadow-black;
   background-color: $primary-color;
   border-radius: $radius;
 

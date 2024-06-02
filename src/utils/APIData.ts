@@ -1,5 +1,6 @@
 const config = useRuntimeConfig();
-const APIKey = config.public.PERPLEXITY_API_KEY;
+const perplexityAPIKey = config.public.PERPLEXITY_API_KEY;
+const abstractAPIKey = config.public.ABSTRACT_API_KEY;
 
 export function fetchPerplexityData(profile: any): Promise<any> {
   const options = {
@@ -7,7 +8,7 @@ export function fetchPerplexityData(profile: any): Promise<any> {
     headers: {
       accept: "application/json",
       "content-type": "application/json",
-      authorization: `Bearer ${APIKey}`,
+      authorization: `Bearer ${perplexityAPIKey}`,
     },
     body: JSON.stringify({
       model: "llama-3-sonar-small-32k-online",
@@ -15,10 +16,10 @@ export function fetchPerplexityData(profile: any): Promise<any> {
         { role: "system", content: "Be precise and concise." },
         {
           role: "user",
-          content: `Write me a list of possible family members of this person: ${profile}, I want this list in a JSON format as the following example: {
+          content: `Write me a list of five possible family members of this person: ${profile}, I want this list in a JSON format as the following example: {
             "first_name": "John",
             "last_name": "Doe"
-          }. To guide your search, you can look at the obytuary of this person if it exist. If it does exist, you will consider the familly members on this document as the primary and most reliable ones.
+          }. To guide your search, you can look at the obytuary of this person if it exist. If it does exist, you will consider the familly members on this document as the primary and most reliable ones. Don't add any ancestor to the list (grandparents for example) and don't add anyone who is dead either. Don't add the person itself to the list, this is important.
 `,
         },
       ],
@@ -36,4 +37,24 @@ export function fetchPerplexityData(profile: any): Promise<any> {
       console.error("Error fetching data:", err);
       throw err;
     });
+}
+
+//abstract api for email validation
+export function httpGetAsync(email, callback) {
+  const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${abstractAPIKey}&email=${email}`;
+  const xmlHttp = new XMLHttpRequest();
+  xmlHttp.onreadystatechange = function () {
+    if (xmlHttp.readyState === 4) {
+      if (xmlHttp.status === 200) {
+        callback(null, xmlHttp.responseText);
+      } else {
+        callback(
+          new Error(`Request failed with status ${xmlHttp.status}`),
+          null
+        );
+      }
+    }
+  };
+  xmlHttp.open("GET", url, true); // true for asynchronous
+  xmlHttp.send(null);
 }

@@ -12,20 +12,26 @@ $text-color: #232323;
 $text-color-alt: $primary-color;
 $error-color: #bb0025;
 $success-color: #00a86b;
+$loading-color: rgb(150, 0, 222);
 
-$text-color-faded: rgba($text-color, 0.3);
-$text-color-faded-strong: rgba($text-color, 0.6);
-$primary-color-faded: rgba($primary-color, 0.8);
-$secondary-color-faded: rgba($secondary-color, 0.2);
+$text-color-faded: rgba($text-color, 0.4);
+$primary-color-faded: rgba($primary-color, 0.4);
+$secondary-color-faded: rgba($secondary-color, 0.4);
+$error-color-faded: rgba($error-color, 0.4);
+$success-color-faded: rgba($success-color, 0.4);
+$loading-color-faded: rgba($loading-color, 0.4);
 
 //BORDERS
 $radius: 8px;
 
 //SHADOWS
-$shadow: 2px 2px 8px rgba(0, 0, 0, 0.02);
-$shadow-primary: 0px 0px 10px rgba($primary-color, 0.2);
-$shadow-secondary: 0px 0px 10px rgba($secondary-color, 0.2);
+$shadow-black: 0px 0px 10px rgba(0, 0, 0, 0.05);
+$shadow-primary: 0px 0px 10px rgba($primary-color, 0.05);
+$shadow-secondary: 0px 0px 10px rgba($secondary-color, 0.05);
 $shadow-text: 0px 0px 2px $text-color;
+$shadow-success: 0px 0px 10px rgba($success-color, 0.05);
+$shadow-error: 0px 0px 10px rgba($error-color, 0.05);
+$shadow-loading: 0px 0px 10px rgba($loading-color, 0.05);
 
 // TYPO
 $line-height: 1.15;
@@ -38,7 +44,7 @@ $golden-number: 1.618;
 
 //FONT SIZES
 $small-text: 0.75rem;
-$subtitles: calc(1rem * $golden-number);
+$subtitles: calc($small-text * $golden-number);
 $titles: calc($subtitles * $golden-number);
 
 $blur: 2px;
