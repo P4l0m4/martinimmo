@@ -3,10 +3,14 @@ defineProps<{
   email: String;
   name: String;
 }>();
+
+function copyEmailToClipboard(email: string) {
+  navigator.clipboard.writeText(email);
+}
 </script>
 <template>
   <Transition>
-    <div class="family-member">
+    <div class="family-member" @click="copyEmailToClipboard(email as string)">
       <span>{{ name }}</span>
       <span class="family-member__email"
         ><IconComponent icon="mail" />{{ email }}</span
