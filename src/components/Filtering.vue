@@ -3,76 +3,37 @@ import { ref, onMounted, watch } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
 const deathStore = useDeathStore();
 
-const regionsList = ref([]);
-const departmentsList = ref([]);
+const regionsList = deathStore.regions;
 
 const displayRegion = ref(false);
-const displayDepartement = ref(false);
 
 const filterBy = ref("default");
-const emit = defineEmits(["filter-by"]);
 
-const props = defineProps(["order"]);
+const regionLabel = ref("Filtrer par région");
 
-watch(
-  () => props.order,
-  (value) => {
-    if (value === "default") {
-      regionLabel.value = "Filtrer par région";
-      departementLabel.value = "Filtrer par département";
-    } else {
-      if (regionsList.value.includes(value)) {
-        regionLabel.value = value;
-        departementLabel.value = "Filtrer par département";
-      } else {
-        departementLabel.value = value;
-        regionLabel.value = "Filtrer par région";
-      }
-    }
-  }
-);
-
-const handleFilter = (order: string, type) => {
-  displayDepartement.value = false;
+const handleFilter = (region) => {
   displayRegion.value = false;
-  if (filterBy.value === "default") {
-    filterBy.value = order;
-    emit("filter-by", filterBy.value);
+  if (filterBy.value === "default" || filterBy.value !== region.region_name) {
+    filterBy.value = region;
+    regionLabel.value = region.region_name;
 
-    if (type === "region") {
-      regionLabel.value = order;
-      departementLabel.value = "Filtrer par département";
-    } else {
-      departementLabel.value = order;
-      regionLabel.value = "Filtrer par région";
-    }
+    const regionData = {
+      region_name: region.region_name,
+      url_part: region.url_part,
+    };
+    deathStore.setRegion(regionData);
   } else {
-    filterBy.value = "default";
-
-    emit("filter-by", filterBy.value);
-
-    if (type === "region") {
-      regionLabel.value = "Filtrer par région";
-    } else {
-      departementLabel.value = "Filtrer par département";
-    }
+    regionLabel.value = "Filtrer par région";
   }
 };
 
-const regionLabel = ref("Filtrer par région");
-const departementLabel = ref("Filtrer par département");
+// function closeDropdown() {
+//   displayRegion.value = false;
+//   console.log("closeDropdown");
+// }
 
 onMounted(async () => {
   await deathStore.fetchData();
-  regionsList.value = deathStore.records.map(
-    (record) => record.current_death_reg_name
-  );
-  departmentsList.value = deathStore.records.map((record) => {
-    return {
-      name: record.current_death_dep_name,
-      code: record.current_death_dep_code,
-    };
-  });
 });
 </script>
 <template>
@@ -84,21 +45,25 @@ onMounted(async () => {
           'filtering__dropdown__label--active':
             regionLabel !== 'Filtrer par région',
         }"
-        @click="(displayRegion = !displayRegion), (displayDepartement = false)"
+        @click="displayRegion = !displayRegion"
         >{{ regionLabel }}</span
       >
-
-      <div class="filtering__dropdown__list" v-if="displayRegion">
-        <span
-          class="filtering__dropdown__list__element"
-          v-for="region in regionsList"
-          :key="region"
-          @click="handleFilter(region, 'region')"
-          >{{ region }}</span
-        >
+      <div class="wrapper" v-if="displayRegion">
+        <div class="list">
+          <span
+            class="list__element"
+            v-for="region in regionsList"
+            :key="region.region_name"
+            :class="{
+              disabled: filterBy.region_name === region.region_name,
+            }"
+            @click="handleFilter(region)"
+            >{{ region.region_name }}</span
+          >
+        </div>
       </div>
     </div>
-    <div class="filtering__dropdown">
+    <!-- <div class="filtering__dropdown">
       <span
         class="filtering__dropdown__label"
         :class="{
@@ -119,7 +84,7 @@ onMounted(async () => {
           >{{ department.name }} ({{ department.code }})</span
         >
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 <style scoped lang="scss">
@@ -137,35 +102,38 @@ onMounted(async () => {
 
     &__label {
       cursor: pointer;
-      position: relative;
       padding: 0.5rem 1rem;
       border: 2px solid transparent;
       border-radius: $radius;
-      width: 200px;
+      width: 230px;
 
       &--active {
         color: $secondary-color;
         border: 2px solid $secondary-color;
       }
     }
-
-    &__list {
-      z-index: 1;
-      background-color: $primary-color;
-      margin-top: 2rem;
-      position: absolute;
+    .wrapper {
       display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      width: 200px;
-      max-height: 200px;
-      overflow-y: scroll;
+      position: fixed;
+      margin-top: 2.5rem;
+      z-index: 1;
 
-      &__element {
-        cursor: pointer;
-        padding: 0.5rem 1rem;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+      .list {
+        background-color: $primary-color;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 230px;
+        max-height: 50svh;
+        overflow-y: scroll;
+        box-shadow: $shadow-black;
+
+        &__element {
+          cursor: pointer;
+          padding: 0.5rem 1rem;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
     }
   }

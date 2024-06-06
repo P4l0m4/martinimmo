@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watchEffect } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
 
 const deathStore = useDeathStore();
@@ -13,57 +13,44 @@ const filterOrder = ref("default");
 function handleSort(order: string) {
   sortOrder.value = order;
   if (order === "default") {
-    sortedRecords.value = records.value;
+    sortedRecords.value = [...records.value];
   } else if (order === "date-latest") {
-    sortedRecords.value = records.value.sort((a, b) =>
+    sortedRecords.value = [...records.value].sort((a, b) =>
       a.death_date > b.death_date ? -1 : 1
     );
   } else if (order === "date-oldest") {
-    sortedRecords.value = records.value.sort((a, b) =>
+    sortedRecords.value = [...records.value].sort((a, b) =>
       a.death_date < b.death_date ? -1 : 1
     );
   }
 }
 
-function handleFilter(order: string) {
-  filterOrder.value = order;
-  sortedRecords.value = records.value.filter((record) => {
-    return (
-      record.current_death_reg_name === order ||
-      record.current_death_dep_name === order
-    );
-  });
-}
-
-function resetFiltersAndSort() {
-  sortOrder.value = "default";
-  filterOrder.value = "default";
-  sortedRecords.value = records.value;
-}
+watchEffect(() => {
+  records.value = deathStore.records;
+  sortedRecords.value = [...records.value];
+  handleSort(sortOrder.value); // Apply the current sort order to the new records
+});
 
 onMounted(async () => {
   await deathStore.fetchData();
-  records.value = deathStore.records;
-  sortedRecords.value = records.value;
 });
 </script>
 <template>
   <Skeleton />
   <Container>
     <div class="sorting-and-filtering">
+      <Filtering />
       <Sorting @sort-by="handleSort" :order="sortOrder" />
-      <Filtering @filter-by="handleFilter" :order="filterOrder" />
 
-      <Transition>
+      <!-- <Transition>
         <button
           v-if="sortOrder !== 'default' || filterOrder !== 'default'"
           class="cross"
           @click="resetFiltersAndSort()"
         >
           <IconComponent icon="plus" /></button
-      ></Transition></div
-  ></Container>
-  <Container>
+      ></Transition> -->
+    </div>
     <div class="cards">
       <ProfileCard
         v-for="(sortedRecord, i) in sortedRecords"
@@ -77,9 +64,8 @@ onMounted(async () => {
           departmentName: sortedRecord.current_death_dep_name,
           regionName: sortedRecord.current_death_reg_name,
         }"
-      />
-    </div>
-  </Container>
+      /></div
+  ></Container>
 </template>
 <style scoped lang="scss">
 .cards {

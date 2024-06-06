@@ -5,7 +5,29 @@ const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkanhsbXF0ZGR3cnVvZGF3am54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTczMzkxMjgsImV4cCI6MjAzMjkxNTEyOH0.SpAXPR_f3_rdjyR3CwVIDQWSERXt-teZvjqn_4FWMJ0";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export async function addUser(firstname, lastname, family) {
+export async function addUser(
+  firstname: string,
+  lastname: string,
+  family: any
+) {
+  // Check if the user already exists
+  const { data: existingUsers, error: fetchError } = await supabase
+    .from("persons")
+    .select("*")
+    .eq("firstname", firstname)
+    .eq("lastname", lastname);
+
+  if (fetchError) {
+    console.error("Error checking for existing user:", fetchError);
+    return;
+  }
+
+  if (existingUsers && existingUsers.length > 0) {
+    console.log("User already exists. Skipping insert.");
+    return;
+  }
+
+  // Insert the new user
   const { data, error } = await supabase.from("persons").insert([
     {
       firstname,
@@ -16,10 +38,23 @@ export async function addUser(firstname, lastname, family) {
 
   if (error) {
     console.error("Error inserting data:", error);
-  } else {
-    console.log("Data inserted successfully:", data);
   }
 }
+// export async function addUser(firstname, lastname, family) {
+//   const { data, error } = await supabase.from("persons").insert([
+//     {
+//       firstname,
+//       lastname,
+//       family,
+//     },
+//   ]);
+
+//   if (error) {
+//     console.error("Error inserting data:", error);
+//   } else {
+//     console.log("Data inserted successfully:", data);
+//   }
+// }
 
 export async function fetchPersons() {
   const { data, error } = await supabase.from("persons").select("*");

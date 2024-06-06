@@ -1,0 +1,52 @@
+{
+  "regions": [
+    {
+      "region_name": "Rhône alpes",
+      "url_part": "&refine=current_death_reg_name%3A%22Auvergne-Rh%C3%B4ne-Alpes%22"
+    },
+    {
+      "region_name": "Bretagne",
+      "url_part": "&refine=current_death_reg_name%3A%22Bretagne%22"
+    },
+    {
+      "region_name": "Île de France",
+      "url_part": "&refine=current_death_reg_name%3A%22%C3%8Ele-de-France%22"
+    },
+    {
+      "region_name": "Bourgogne Franche Comté",
+      "url_part": "&refine=current_death_reg_name%3A%22Bourgogne-Franche-Comt%C3%A9%22"
+    },
+    {
+      "region_name": "Centre-Val de Loire",
+      "url_part": "&refine=current_death_reg_name%3A%22Centre-Val%20de%20Loire%22"
+    },
+    {
+      "region_name": "Grand Est",
+      "url_part": "&refine=current_death_reg_name%3A%22Grand%20Est%22"
+    },
+    {
+      "region_name": "Hauts de France",
+      "url_part": "&refine=current_death_reg_name%3A%22Hauts-de-France%22"
+    },
+    {
+      "region_name": "Normandie",
+      "url_part": "&refine=current_death_reg_name%3A%22Normandie%22"
+    },
+    {
+      "region_name": "Nouvelle-Aquitaine",
+      "url_part": "&refine=current_death_reg_name%3A%22Nouvelle-Aquitaine%22"
+    },
+    {
+      "region_name": "Occitanie",
+      "url_part": "&refine=current_death_reg_name%3A%22Occitanie%22"
+    },
+    {
+      "region_name": "Pays de la Loire",
+      "url_part": "&refine=current_death_reg_name%3A%22Pays%20de%20la%20Loire%22"
+    },
+    {
+      "region_name": "Provence Alpes Côte d’Azur",
+      "url_part": "&refine=current_death_reg_name%3A%22Provence-Alpes-C%C3%B4te%20d%27Azur%22"
+    }
+  ]
+}

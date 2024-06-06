@@ -70,12 +70,13 @@ function getEmailAdresses() {
         normalizeString(name.first_name),
         normalizeString(name.last_name)
       );
-      emailsFetchingStatus.value = "success";
+
       return {
         person: name,
         emails: emails,
       };
     });
+    emailsFetchingStatus.value = "success";
   } else {
     console.error("sanitizedAPIData.value is not an array:");
     emailsFetchingStatus.value = "error";
@@ -149,25 +150,6 @@ function findFamily() {
     .then(() => testEmailsValidity());
 }
 
-const displayFamilyButton = computed(() => {
-  return (
-    filteredPersonFromDatabase.value.length >= 0 &&
-    deliverableEmails.value.length <= 0
-  );
-});
-const displayFamilyResultsFromDatabase = computed(() => {
-  return filteredPersonFromDatabase.value.length > 0;
-});
-
-const displaySteps = computed(() => {
-  return (
-    displayFamilyButton.value === true &&
-    (perplexityFetchingStatus.value === "loading" ||
-      perplexityFetchingStatus.value === "error" ||
-      perplexityFetchingStatus.value === "success")
-  );
-});
-
 const allPersonsFromDatabase = ref([]);
 
 async function loadPersons() {
@@ -184,6 +166,27 @@ const filteredPersonFromDatabase = computed(() => {
       person.lastname === profile.value.lastname
     );
   });
+});
+
+const displayFamilyResultsFromDatabase = computed(() => {
+  return filteredPersonFromDatabase.value.length > 0;
+});
+
+const displayFamilyButton = computed(() => {
+  return (
+    filteredPersonFromDatabase.value.length >= 0 &&
+    deliverableEmails.value.length <= 0 &&
+    displayFamilyResultsFromDatabase.value === false
+  );
+});
+
+const displaySteps = computed(() => {
+  return (
+    displayFamilyButton.value === true &&
+    (perplexityFetchingStatus.value === "loading" ||
+      perplexityFetchingStatus.value === "error" ||
+      perplexityFetchingStatus.value === "success")
+  );
 });
 
 onMounted(async () => {
@@ -235,14 +238,15 @@ onMounted(async () => {
         }}), à l'âge de {{ profile?.age }} ans
       </li>
     </ul>
-
-    <PrimaryButton
-      v-if="displayFamilyButton"
-      class="scale-on-hover"
-      button-type="dark"
-      @click="findFamily()"
-    >
-      Trouver des proches</PrimaryButton
+    <Transition>
+      <PrimaryButton
+        v-if="displayFamilyButton"
+        class="scale-on-hover"
+        button-type="dark"
+        @click="findFamily()"
+      >
+        Trouver des proches</PrimaryButton
+      ></Transition
     >
 
     <div class="steps" v-if="displaySteps">
@@ -276,8 +280,13 @@ onMounted(async () => {
       >
     </div>
 
-    <h2 v-if="deliverableEmails.length > 0" class="subtitles">Contacts</h2>
-    <div class="family-members">
+    <h2
+      v-if="deliverableEmails.length > 0 || displayFamilyResultsFromDatabase"
+      class="subtitles"
+    >
+      Contacts
+    </h2>
+    <div class="family-members" v-if="deliverableEmails.length > 0">
       <FamilyMember
         v-for="deliverableEmail in deliverableEmails"
         :key="deliverableEmail"
