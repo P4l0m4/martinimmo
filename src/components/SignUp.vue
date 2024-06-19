@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { onClickOutside } from "@vueuse/core";
-// import { sendInvitation } from "@/utils/supabase";
+import { sendInvitation } from "@/utils/supabase";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email, sameAs, minLength } from "@vuelidate/validators";
 

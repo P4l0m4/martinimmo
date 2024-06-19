@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watchEffect } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
-// import { checkExistingToken } from "@/utils/supabase";
+import { checkExistingToken } from "@/utils/supabase";
 
 const deathStore = useDeathStore();
 
@@ -11,7 +11,6 @@ const records = ref([]);
 const sortedRecords = ref([]);
 
 const sortOrder = ref("default");
-const filterOrder = ref("default");
 
 function handleSort(order: string) {
   sortOrder.value = order;

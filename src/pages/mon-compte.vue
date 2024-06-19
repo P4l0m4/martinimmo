@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-// import { checkExistingToken, signOut } from "@/utils/supabase";
+import { checkExistingToken, signOut } from "@/utils/supabase";
 
 const isUserLoggedIn = ref();
 

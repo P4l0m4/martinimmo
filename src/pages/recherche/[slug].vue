@@ -10,7 +10,7 @@ import { fetchPerplexityData, httpGetAsync } from "~/utils/APIData";
 import { generateEmailAddresses } from "~/utils/emailPatterns";
 import { normalizeString } from "~/utils/normalize";
 import { removeMatchingNames } from "~/utils/dataSanitization";
-// import { addUser, fetchPersons } from "@/utils/supabase";
+import { addUser, fetchPersons } from "@/utils/supabase";
 
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
