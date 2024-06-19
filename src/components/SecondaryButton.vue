@@ -48,18 +48,6 @@ defineProps({
 </template>
 <style scoped lang="scss">
 .button {
-  &.secondary--dark {
-    box-shadow: $shadow-secondary;
-    background-color: transparent;
-    border-color: $secondary-color;
-    color: $secondary-color;
-  }
-  &.secondary--light {
-    box-shadow: $shadow-primary;
-    background-color: transparent;
-    border-color: $primary-color;
-    color: $text-color-alt;
-  }
   &.success {
     box-shadow: $shadow-success;
     background-color: transparent;

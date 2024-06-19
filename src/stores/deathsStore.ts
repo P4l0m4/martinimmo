@@ -6,13 +6,15 @@ export const useDeathStore = defineStore({
   state: () => ({
     records: [],
     region: "",
+    department: "",
+    param: "",
     regions: regions.regions,
   }),
   actions: {
     async fetchData() {
       try {
         const response = await fetch(
-          `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/liste-des-personnes-decedees-en-france/records?limit=40&refine=death_date%3A%222024%2F04%22${this.region}
+          `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/liste-des-personnes-decedees-en-france/records?limit=100&refine=death_date%3A%222024%2F04%22${this.param}
 `
         );
         const data = await response.json();
@@ -23,8 +25,19 @@ export const useDeathStore = defineStore({
     },
     setRegion(region: any) {
       this.region = region ? region.url_part : "";
+      this.setParam();
+    },
+    setDepartment(department: any) {
+      this.department = department ? department.url_part : "";
+      this.setParam();
+    },
+    setParam() {
+      if (this.region !== "" && this.department !== "") {
+        this.param = this.department;
+      } else if (this.region !== "" && this.department === "") {
+        this.param = this.region;
+      }
       this.fetchData();
-      console.log(this.region);
     },
   },
 });

@@ -2,51 +2,455 @@
   "regions": [
     {
       "region_name": "Rhône alpes",
-      "url_part": "&refine=current_death_reg_name%3A%22Auvergne-Rh%C3%B4ne-Alpes%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Auvergne-Rh%C3%B4ne-Alpes%22",
+      "departments": [
+        {
+          "department_name": "Haute Savoie",
+          "url_part": "&refine=current_death_dep_name%3A%22Haute-Savoie%22"
+        },
+        {
+          "department_name": "Savoie",
+          "url_part": "&refine=current_death_dep_name%3A%22Savoie%22"
+        },
+        {
+          "department_name": "Isère",
+          "url_part": "&refine=current_death_dep_name%3A%22Is%C3%A8re%22"
+        },
+        {
+          "department_name": "Ain",
+          "url_part": "&refine=current_death_dep_name%3A%22Ain%22"
+        },
+        {
+          "department_name": "Rhône",
+          "url_part": "&refine=current_death_dep_name%3A%22Rh%C3%B4ne%22"
+        },
+        {
+          "department_name": "Loire",
+          "url_part": "&refine=current_death_dep_name%3A%22Loire%22"
+        },
+        {
+          "department_name": "Ardèche",
+          "url_part": "&refine=current_death_dep_name%3A%22Ard%C3%A8che%22"
+        },
+        {
+          "department_name": "Drôme",
+          "url_part": "&refine=current_death_dep_name%3A%22Dr%C3%B4me%22"
+        },
+        {
+          "department_name": "Haute Loire",
+          "url_part": "&refine=current_death_dep_name%3A%22Haute-Loire%22"
+        },
+        {
+          "department_name": "Puy de Dôme",
+          "url_part": "&refine=current_death_dep_name%3A%22Puy-de-D%C3%B4me%22"
+        },
+        {
+          "department_name": "Cantal",
+          "url_part": "&refine=current_death_dep_name%3A%22Cantal%22"
+        },
+        {
+          "department_name": "Allier",
+          "url_part": "&refine=current_death_dep_name%3A%22Allier%22"
+        }
+      ]
     },
     {
       "region_name": "Bretagne",
-      "url_part": "&refine=current_death_reg_name%3A%22Bretagne%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Bretagne%22",
+      "departments": [
+        {
+          "department_name": "Côtes d'Armor",
+          "url_part": "&refine=current_death_dep_name%3A%22C%C3%B4tes-d%27Armor%22"
+        },
+        {
+          "department_name": "Finistère",
+          "url_part": "&refine=current_death_dep_name%3A%22Finist%C3%A8re%22"
+        },
+        {
+          "department_name": "Ille et Vilaine",
+          "url_part": "&refine=current_death_dep_name%3A%22Ille-et-Vilaine%22"
+        },
+        {
+          "department_name": "Morbihan",
+          "url_part": "&refine=current_death_dep_name%3A%22Morbihan%22"
+        }
+      ]
     },
     {
       "region_name": "Île de France",
-      "url_part": "&refine=current_death_reg_name%3A%22%C3%8Ele-de-France%22"
+      "url_part": "&refine=current_death_reg_name%3A%22%C3%8Ele-de-France%22",
+      "departments": [
+        {
+          "department_name": "Paris",
+          "url_part": "&refine=current_death_dep_name%3A%22Paris%22"
+        },
+        {
+          "department_name": "Seine et Marne",
+          "url_part": "&refine=current_death_dep_name%3A%22Seine-et-Marne%22"
+        },
+        {
+          "department_name": "Yvelines",
+          "url_part": "&refine=current_death_dep_name%3A%22Yvelines%22"
+        },
+        {
+          "department_name": "Essonne",
+          "url_part": "&refine=current_death_dep_name%3A%22Essonne%22"
+        },
+        {
+          "department_name": "Hauts de Seine",
+          "url_part": "&refine=current_death_dep_name%3A%22Hauts-de-Seine%22"
+        },
+        {
+          "department_name": "Seine Saint Denis",
+          "url_part": "&refine=current_death_dep_name%3A%22Seine-Saint-Denis%22"
+        },
+        {
+          "department_name": "Val de Marne",
+          "url_part": "&refine=current_death_dep_name%3A%22Val-de-Marne%22"
+        },
+        {
+          "department_name": "Val d'Oise",
+          "url_part": "&refine=current_death_dep_name%3A%22Val-d%27Oise%22"
+        }
+      ]
     },
     {
       "region_name": "Bourgogne Franche Comté",
-      "url_part": "&refine=current_death_reg_name%3A%22Bourgogne-Franche-Comt%C3%A9%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Bourgogne-Franche-Comt%C3%A9%22",
+      "departments": [
+        {
+          "department_name": "Côte d'Or",
+          "url_part": "&refine=current_death_dep_name%3A%22C%C3%B4te-d%27Or%22"
+        },
+        {
+          "department_name": "Doubs",
+          "url_part": "&refine=current_death_dep_name%3A%22Doubs%22"
+        },
+        {
+          "department_name": "Jura",
+          "url_part": "&refine=current_death_dep_name%3A%22Jura%22"
+        },
+        {
+          "department_name": "Nièvre",
+          "url_part": "&refine=current_death_dep_name%3A%22Ni%C3%A8vre%22"
+        },
+        {
+          "department_name": "Haute Saône",
+          "url_part": "&refine=current_death_dep_name%3A%22Haute-Sa%C3%B4ne%22"
+        },
+        {
+          "department_name": "Saône et Loire",
+          "url_part": "&refine=current_death_dep_name%3A%22Sa%C3%B4ne-et-Loire%22"
+        },
+        {
+          "department_name": "Yonne",
+          "url_part": "&refine=current_death_dep_name%3A%22Yonne%22"
+        },
+        {
+          "department_name": "Territoire de Belfort",
+          "url_part": "&refine=current_death_dep_name%3A%22Territoire-de-Belfort%22"
+        }
+      ]
     },
     {
       "region_name": "Centre-Val de Loire",
-      "url_part": "&refine=current_death_reg_name%3A%22Centre-Val%20de%20Loire%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Centre-Val%20de%20Loire%22",
+      "departments": [
+        {
+          "department_name": "Cher",
+          "url_part": "&refine=current_death_dep_name%3A%22Cher%22"
+        },
+        {
+          "department_name": "Eure et Loir",
+          "url_part": "&refine=current_death_dep_name%3A%22Eure-et-Loir%22"
+        },
+        {
+          "department_name": "Indre",
+          "url_part": "&refine=current_death_dep_name%3A%22Indre%22"
+        },
+        {
+          "department_name": "Indre et Loire",
+          "url_part": "&refine=current_death_dep_name%3A%22Indre-et-Loire%22"
+        },
+        {
+          "department_name": "Loir et Cher",
+          "url_part": "&refine=current_death_dep_name%3A%22Loir-et-Cher%22"
+        },
+        {
+          "department_name": "Loiret",
+          "url_part": "&refine=current_death_dep_name%3A%22Loiret%22"
+        }
+      ]
     },
     {
       "region_name": "Grand Est",
-      "url_part": "&refine=current_death_reg_name%3A%22Grand%20Est%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Grand%20Est%22",
+      "departments": [
+        {
+          "department_name": "Ardennes",
+          "url_part": "&refine=current_death_dep_name%3A%22Ardennes%22"
+        },
+        {
+          "department_name": "Aube",
+          "url_part": "&refine=current_death_dep_name%3A%22Aube%22"
+        },
+        {
+          "department_name": "Marne",
+          "url_part": "&refine=current_death_dep_name%3A%22Marne%22"
+        },
+        {
+          "department_name": "Haute Marne",
+          "url_part": "&refine=current_death_dep_name%3A%22Haute-Marne%22"
+        },
+        {
+          "department_name": "Meurthe et Moselle",
+          "url_part": "&refine=current_death_dep_name%3A%22Meurthe-et-Moselle%22"
+        },
+        {
+          "department_name": "Meuse",
+          "url_part": "&refine=current_death_dep_name%3A%22Meuse%22"
+        },
+        {
+          "department_name": "Moselle",
+          "url_part": "&refine=current_death_dep_name%3A%22Moselle%22"
+        },
+        {
+          "department_name": "Bas Rhin",
+          "url_part": "&refine=current_death_dep_name%3A%22Bas-Rhin%22"
+        },
+        {
+          "department_name": "Haut Rhin",
+          "url_part": "&refine=current_death_dep_name%3A%22Haut-Rhin%22"
+        },
+        {
+          "department_name": "Vosges",
+          "url_part": "&refine=current_death_dep_name%3A%22Vosges%22"
+        }
+      ]
     },
     {
       "region_name": "Hauts de France",
-      "url_part": "&refine=current_death_reg_name%3A%22Hauts-de-France%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Hauts-de-France%22",
+      "departments": [
+        {
+          "department_name": "Aisne",
+          "url_part": "&refine=current_death_dep_name%3A%22Aisne%22"
+        },
+        {
+          "department_name": "Nord",
+          "url_part": "&refine=current_death_dep_name%3A%22Nord%22"
+        },
+        {
+          "department_name": "Oise",
+          "url_part": "&refine=current_death_dep_name%3A%22Oise%22"
+        },
+        {
+          "department_name": "Pas de Calais",
+          "url_part": "&refine=current_death_dep_name%3A%22Pas-de-Calais%22"
+        },
+        {
+          "department_name": "Somme",
+          "url_part": "&refine=current_death_dep_name%3A%22Somme%22"
+        }
+      ]
     },
     {
       "region_name": "Normandie",
-      "url_part": "&refine=current_death_reg_name%3A%22Normandie%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Normandie%22",
+      "departments": [
+        {
+          "department_name": "Calvados",
+          "url_part": "&refine=current_death_dep_name%3A%22Calvados%22"
+        },
+        {
+          "department_name": "Eure",
+          "url_part": "&refine=current_death_dep_name%3A%22Eure%22"
+        },
+        {
+          "department_name": "Manche",
+          "url_part": "&refine=current_death_dep_name%3A%22Manche%22"
+        },
+        {
+          "department_name": "Orne",
+          "url_part": "&refine=current_death_dep_name%3A%22Orne%22"
+        },
+        {
+          "department_name": "Seine Maritime",
+          "url_part": "&refine=current_death_dep_name%3A%22Seine-Maritime%22"
+        }
+      ]
     },
     {
       "region_name": "Nouvelle-Aquitaine",
-      "url_part": "&refine=current_death_reg_name%3A%22Nouvelle-Aquitaine%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Nouvelle-Aquitaine%22",
+      "departments": [
+        {
+          "department_name": "Charente",
+          "url_part": "&refine=current_death_dep_name%3A%22Charente%22"
+        },
+        {
+          "department_name": "Charente Maritime",
+          "url_part": "&refine=current_death_dep_name%3A%22Charente-Maritime%22"
+        },
+        {
+          "department_name": "Corrèze",
+          "url_part": "&refine=current_death_dep_name%3A%22Corr%C3%A8ze%22"
+        },
+        {
+          "department_name": "Creuse",
+          "url_part": "&refine=current_death_dep_name%3A%22Creuse%22"
+        },
+        {
+          "department_name": "Dordogne",
+          "url_part": "&refine=current_death_dep_name%3A%22Dordogne%22"
+        },
+        {
+          "department_name": "Gironde",
+          "url_part": "&refine=current_death_dep_name%3A%22Gironde%22"
+        },
+        {
+          "department_name": "Landes",
+          "url_part": "&refine=current_death_dep_name%3A%22Landes%22"
+        },
+        {
+          "department_name": "Lot et Garonne",
+          "url_part": "&refine=current_death_dep_name%3A%22Lot-et-Garonne%22"
+        },
+        {
+          "department_name": "Pyrénées Atlantiques",
+          "url_part": "&refine=current_death_dep_name%3A%22Pyr%C3%A9n%C3%A9es-Atlantiques%22"
+        },
+        {
+          "department_name": "Deux Sèvres",
+          "url_part": "&refine=current_death_dep_name%3A%22Deux-S%C3%A8vres%22"
+        },
+        {
+          "department_name": "Vienne",
+          "url_part": "&refine=current_death_dep_name%3A%22Vienne%22"
+        },
+        {
+          "department_name": "Haute Vienne",
+          "url_part": "&refine=current_death_dep_name%3A%22Haute-Vienne%22"
+        }
+      ]
     },
     {
       "region_name": "Occitanie",
-      "url_part": "&refine=current_death_reg_name%3A%22Occitanie%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Occitanie%22",
+      "departments": [
+        {
+          "department_name": "Ariège",
+          "url_part": "&refine=current_death_dep_name%3A%22Ari%C3%A8ge%22"
+        },
+        {
+          "department_name": "Aude",
+          "url_part": "&refine=current_death_dep_name%3A%22Aude%22"
+        },
+        {
+          "department_name": "Aveyron",
+          "url_part": "&refine=current_death_dep_name%3A%22Aveyron%22"
+        },
+        {
+          "department_name": "Gard",
+          "url_part": "&refine=current_death_dep_name%3A%22Gard%22"
+        },
+        {
+          "department_name": "Haute Garonne",
+          "url_part": "&refine=current_death_dep_name%3A%22Haute-Garonne%22"
+        },
+        {
+          "department_name": "Gers",
+          "url_part": "&refine=current_death_dep_name%3A%22Gers%22"
+        },
+        {
+          "department_name": "Hérault",
+          "url_part": "&refine=current_death_dep_name%3A%22H%C3%A9rault%22"
+        },
+        {
+          "department_name": "Lot",
+          "url_part": "&refine=current_death_dep_name%3A%22Lot%22"
+        },
+        {
+          "department_name": "Lozère",
+          "url_part": "&refine=current_death_dep_name%3A%22Loz%C3%A8re%22"
+        },
+        {
+          "department_name": "Hautes Pyrénées",
+          "url_part": "&refine=current_death_dep_name%3A%22Hautes-Pyr%C3%A9n%C3%A9es%22"
+        },
+        {
+          "department_name": "Pyrénées Orientales",
+          "url_part": "&refine=current_death_dep_name%3A%22Pyr%C3%A9n%C3%A9es-Orientales%22"
+        },
+        {
+          "department_name": "Tarn",
+          "url_part": "&refine=current_death_dep_name%3A%22Tarn%22"
+        },
+        {
+          "department_name": "Tarn et Garonne",
+          "url_part": "&refine=current_death_dep_name%3A%22Tarn-et-Garonne%22"
+        },
+        {
+          "department_name": "Aveyron",
+          "url_part": "&refine=current_death_dep_name%3A%22Aveyron%22"
+        }
+      ]
     },
     {
       "region_name": "Pays de la Loire",
-      "url_part": "&refine=current_death_reg_name%3A%22Pays%20de%20la%20Loire%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Pays%20de%20la%20Loire%22",
+      "departments": [
+        {
+          "department_name": "Loire Atlantique",
+          "url_part": "&refine=current_death_dep_name%3A%22Loire-Atlantique%22"
+        },
+        {
+          "department_name": "Maine et Loire",
+          "url_part": "&refine=current_death_dep_name%3A%22Maine-et-Loire%22"
+        },
+        {
+          "department_name": "Mayenne",
+          "url_part": "&refine=current_death_dep_name%3A%22Mayenne%22"
+        },
+        {
+          "department_name": "Sarthe",
+          "url_part": "&refine=current_death_dep_name%3A%22Sarthe%22"
+        },
+        {
+          "department_name": "Vendée",
+          "url_part": "&refine=current_death_dep_name%3A%22Vend%C3%A9e%22"
+        }
+      ]
     },
     {
       "region_name": "Provence Alpes Côte d’Azur",
-      "url_part": "&refine=current_death_reg_name%3A%22Provence-Alpes-C%C3%B4te%20d%27Azur%22"
+      "url_part": "&refine=current_death_reg_name%3A%22Provence-Alpes-C%C3%B4te%20d%27Azur%22",
+      "departments": [
+        {
+          "department_name": "Alpes de Haute Provence",
+          "url_part": "&refine=current_death_dep_name%3A%22Alpes-de-Haute-Provence%22"
+        },
+        {
+          "department_name": "Hautes Alpes",
+          "url_part": "&refine=current_death_dep_name%3A%22Hautes-Alpes%22"
+        },
+        {
+          "department_name": "Alpes Maritimes",
+          "url_part": "&refine=current_death_dep_name%3A%22Alpes-Maritimes%22"
+        },
+        {
+          "department_name": "Bouches du Rhône",
+          "url_part": "&refine=current_death_dep_name%3A%22Bouches-du-Rh%C3%B4ne%22"
+        },
+        {
+          "department_name": "Var",
+          "url_part": "&refine=current_death_dep_name%3A%22Var%22"
+        },
+        {
+          "department_name": "Vaucluse",
+          "url_part": "&refine=current_death_dep_name%3A%22Vaucluse%22"
+        }
+      ]
     }
   ]
 }

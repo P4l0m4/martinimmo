@@ -23,6 +23,8 @@ export default defineNuxtConfig({
     public: {
       PERPLEXITY_API_KEY: process.env.PERPLEXITY_API_KEY,
       ABSTRACT_API_KEY: process.env.ABSTRACT_API_KEY,
+      SUPABASE_KEY: process.env.SUPABASE_KEY,
+      SUPABASE_URL: process.env.SUPABASE_URL,
     },
   },
   dayjs: {

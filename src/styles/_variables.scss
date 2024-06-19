@@ -7,19 +7,23 @@ $super-big-screen: 2400px;
 //COLORS
 $base-color: #f7f7f7;
 $primary-color: #fffdfa;
-$secondary-color: #06067c;
+$secondary-color: #6800ba;
 $text-color: #232323;
 $text-color-alt: $primary-color;
 $error-color: #bb0025;
 $success-color: #00a86b;
 $loading-color: #9600de;
+$pink-color: #ff91af;
+$blue-color: #008ed5;
 
 $text-color-faded: rgba($text-color, 0.4);
 $primary-color-faded: rgba($primary-color, 0.4);
 $secondary-color-faded: rgba($secondary-color, 0.4);
-$error-color-faded: rgba($error-color, 0.4);
+$error-color-faded: rgba($error-color, 0.2);
 $success-color-faded: rgba($success-color, 0.4);
 $loading-color-faded: rgba($loading-color, 0.4);
+$pink-color-faded: rgba($pink-color, 0.6);
+$blue-color-faded: rgba($blue-color, 0.6);
 
 //BORDERS
 $radius: 8px;
@@ -44,7 +48,7 @@ $golden-number: 1.618;
 
 //FONT SIZES
 $small-text: 0.75rem;
-$subtitles: calc($small-text * $golden-number);
+$subtitles: calc(1rem * $golden-number);
 $titles: calc($subtitles * $golden-number);
 
 $blur: 2px;

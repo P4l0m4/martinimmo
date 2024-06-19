@@ -7,7 +7,7 @@ defineProps({
 <template>
   <button
     v-if="buttonType === 'dark'"
-    class="button primary--dark"
+    class="button primary--dark scale-on-hover"
     :class="buttonState"
   >
     <slot></slot>
@@ -52,18 +52,6 @@ defineProps({
 </template>
 <style scoped lang="scss">
 .button {
-  &.primary--dark {
-    box-shadow: $shadow-secondary;
-    background-color: $secondary-color;
-    border-color: $secondary-color;
-    color: $text-color-alt;
-  }
-  &.primary--light {
-    box-shadow: $shadow-primary;
-    background-color: $primary-color;
-    border-color: $primary-color;
-    color: $secondary-color;
-  }
   &.success {
     box-shadow: $shadow-success;
     background-color: $success-color;

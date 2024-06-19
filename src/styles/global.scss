@@ -53,6 +53,7 @@ button {
   border: 1px solid transparent;
   background-color: transparent;
   font-size: 1rem;
+  cursor: pointer;
 }
 
 input,
@@ -134,30 +135,101 @@ input[type="search"]::-webkit-search-results-decoration {
   display: none;
 }
 
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none !important;
+  width: 1.5rem;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+  background-color: $primary-color;
+  box-shadow: $shadow-black;
+  transition: background-color 0.2s;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+
+  &:checked {
+    background-color: $secondary-color;
+
+    &::after {
+      content: "✔";
+      font-size: 1rem;
+      color: $primary-color;
+    }
+  }
+}
+.shake {
+  animation: shake 0.25s;
+  color: $error-color;
+
+  &::after {
+    content: "";
+    background-color: $error-color-faded;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    text-align: center;
+  }
+}
+
 .button {
   display: flex;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem;
   gap: 0.5rem;
   border-style: solid;
   border-width: 1px;
   width: 100%;
+  max-width: 350px;
   border-radius: 50px;
   justify-content: center;
   align-items: center;
   white-space: nowrap;
-
-  @media (min-width: $big-tablet-screen) {
-    width: fit-content;
-  }
-
-  &:hover {
-    cursor: pointer;
-  }
 }
 
 .disabled {
   pointer-events: none;
   opacity: 0.5;
+}
+
+.button {
+  &.primary--dark {
+    box-shadow: $shadow-secondary;
+    background-color: $secondary-color;
+    border-color: $secondary-color;
+    color: $text-color-alt;
+  }
+  &.primary--light {
+    box-shadow: $shadow-primary;
+    background-color: $primary-color;
+    border-color: $primary-color;
+    color: $secondary-color;
+  }
+
+  &.secondary--dark {
+    box-shadow: $shadow-secondary;
+    background-color: transparent;
+    border-color: $secondary-color;
+    color: $secondary-color;
+  }
+  &.secondary--light {
+    box-shadow: $shadow-primary;
+    background-color: transparent;
+    border-color: $primary-color;
+    color: $text-color-alt;
+  }
+
+  &--tertiary-light {
+    color: $primary-color;
+    text-decoration: underline;
+  }
+  &--tertiary-dark {
+    color: $secondary-color;
+    text-decoration: underline;
+  }
 }
 
 .scale-on-hover {
@@ -174,6 +246,16 @@ input[type="search"]::-webkit-search-results-decoration {
   &:hover {
     box-shadow: $shadow-black;
   }
+}
+
+.secondary-color {
+  color: $secondary-color;
+}
+
+.centered-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 //SCROLLBAR
@@ -218,11 +300,14 @@ details > summary::-webkit-details-marker /* Safari */ {
 }
 
 .titles {
-  font-size: calc($titles - 0.5rem);
+  font-size: calc($titles - 0.7rem);
   font-weight: $thick;
 
   @media (min-width: $tablet-screen) {
     font-size: $titles;
+  }
+  @media (min-width: $laptop-screen) {
+    font-size: calc($titles + 1rem);
   }
 }
 
@@ -245,6 +330,10 @@ details > summary::-webkit-details-marker /* Safari */ {
     font-size: 1.1rem;
     line-height: 1.5;
   }
+}
+
+.small-text {
+  font-size: $small-text;
 }
 
 .sr-only {
@@ -328,5 +417,23 @@ details > summary::-webkit-details-marker /* Safari */ {
   }
   to {
     transform: rotate(0deg);
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
   }
 }

@@ -1,19 +1,36 @@
-<script setup>
+<script setup lang="ts">
+// import { useRoute } from "vue-router";
+// import { computed } from "vue";
+
+// const route = useRoute();
+
+// const checkIfRouteContainsExpiredEmailLink = computed(() => {
+//   return route.fullPath.includes("Email+link+is+invalid+or+has+expired");
+// });
 defineProps(["error"]);
 </script>
 
 <template>
+  <HeaderComponent />
   <div class="error">
     <div class="error__message">
-      <h1 class="titles">Oooops... error {{ error.statusCode }}</h1>
-
-      <h2 class="subtitles">We didn't find the page you where looking for.</h2>
-      <NuxtLink
-        to="/"
-        class="button-primary"
-        aria-label="retour à la page d'accueil"
-        >Go back to home page</NuxtLink
-      >
+      <h1 class="subtitles">Oooops... error {{ error.statusCode }}</h1>
+      <template v-if="error === 404">
+        <h2 class="paragraphs">
+          We didn't find the page you where looking for.
+        </h2>
+        <NuxtLink to="/" class="button primary--dark"
+          >Retour à la page d'accueil</NuxtLink
+        >
+      </template>
+      <template v-else-if="error === 403">
+        <h2 class="paragraphs">
+          Le lien de confirmation de votre email a expiré.
+        </h2>
+        <NuxtLink to="/" class="button primary--dark"
+          >Retour à la page d'accueil</NuxtLink
+        >
+      </template>
     </div>
   </div>
 </template>

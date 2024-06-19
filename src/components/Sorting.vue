@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 
-const sortBy = ref("default");
-const emit = defineEmits(["sort-by"]);
-const props = defineProps(["order"]);
+type SortOrder = "default" | "date-latest" | "date-oldest";
+
+const sortBy = ref<SortOrder>("default");
+
+const emit = defineEmits<{ (e: "sort-by", order: SortOrder): void }>();
+
+const props = defineProps<{ order: SortOrder }>();
 
 watch(
   () => props.order,
@@ -12,14 +16,9 @@ watch(
   }
 );
 
-const handleSort = (order: string) => {
-  if (sortBy.value === "default") {
-    sortBy.value = order;
-    emit("sort-by", sortBy.value);
-  } else {
-    sortBy.value = "default";
-    emit("sort-by", sortBy.value);
-  }
+const handleSort = (order: SortOrder) => {
+  sortBy.value = sortBy.value === order ? "default" : order;
+  emit("sort-by", sortBy.value);
 };
 </script>
 
@@ -41,6 +40,7 @@ const handleSort = (order: string) => {
     </button>
   </div>
 </template>
+
 <style scoped lang="scss">
 .sorting {
   display: flex;
@@ -54,6 +54,8 @@ const handleSort = (order: string) => {
     color: $text-color;
     cursor: pointer;
     padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease,
+      color 0.3s ease;
 
     &--active {
       color: $secondary-color;

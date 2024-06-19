@@ -30,7 +30,7 @@ const formattedDeathDate = computed(() => {
 });
 
 const profileLink = computed(() => {
-  return `/${stringToSlug(
+  return `/recherche/${stringToSlug(
     `${props.name?.first} ${props.name?.last} ${props.death.date} ${props.death?.departmentName}`
   )}`;
 });
@@ -56,11 +56,9 @@ const profileLink = computed(() => {
         <span class="profile-card__names__name">{{ name.first }}</span>
 
         <span class="profile-card__names__name">{{ name.last }}</span
-        ><IconComponent
-          class="icon"
-          :icon="sex === 'F' ? 'female' : 'male'"
-          :color="sex === 'F' ? 'pink' : 'blue'"
-        />
+        ><span class="sex-circle" :class="{ 'sex-circle--m': sex === 'M' }">{{
+          sex === "F" ? "F" : "H"
+        }}</span>
       </div>
     </NuxtLink>
   </Transition>
@@ -81,7 +79,7 @@ const profileLink = computed(() => {
 
     &__location {
       display: flex;
-      align-items: center;
+      align-items: top;
       gap: 0.5rem;
 
       &__flag {
@@ -92,24 +90,44 @@ const profileLink = computed(() => {
 
     &__date {
       display: flex;
-      align-items: center;
+      align-items: top;
       gap: 0.5rem;
     }
   }
 
   &__names {
     display: flex;
-    align-items: end;
+    align-items: center;
     gap: 0.5rem;
     margin-top: auto;
 
     &__name {
       text-wrap: balance;
+      font-size: $small-text;
     }
 
     & .icon {
       margin-left: auto;
     }
+  }
+}
+
+.sex-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  border-radius: 50%;
+  background-color: $pink-color-faded;
+  font-size: $small-text;
+  color: $text-color-alt;
+  font-weight: $thick;
+  margin-left: auto;
+
+  &--m {
+    background-color: $blue-color-faded;
   }
 }
 </style>
