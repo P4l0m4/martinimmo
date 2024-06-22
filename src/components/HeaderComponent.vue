@@ -1,11 +1,22 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { checkExistingToken } from "@/utils/supabase";
+import { useAccountStore } from "@/stores/accountStore";
 
+const accountStore = useAccountStore();
 const isUserLoggedIn = ref();
+
+const credits = computed(() => accountStore.credits);
 
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
+
+  if (isUserLoggedIn.value) {
+    accountStore.updateAccountType(
+      isUserLoggedIn.value.user.user_metadata.accountType
+    );
+    accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
+  }
 });
 </script>
 <template>
@@ -23,7 +34,14 @@ onMounted(async () => {
           v-if="isUserLoggedIn?.user.aud"
           class="header__nav__ul__li circle-link"
         >
-          <NuxtLink to="/mon-compte" exact aria-label="Mon compte"
+          <span class="credits"
+            >{{ credits }}<IconComponent icon="credit-card" color="#6800ba"
+          /></span>
+          <NuxtLink
+            to="/mon-compte"
+            exact
+            aria-label="Mon compte"
+            v-tooltip:bottom="'Mon compte'"
             ><IconComponent icon="user" color="#232323"
           /></NuxtLink>
         </li>
@@ -53,6 +71,17 @@ onMounted(async () => {
 
       &__li.circle-link {
         margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        .credits {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: $thick;
+          border-radius: $radius;
+          color: $secondary-color;
+        }
         a {
           display: flex;
           padding: 0.75rem;

@@ -10,7 +10,7 @@ export function initSupabase(s: any) {
   supabase = s;
 }
 
-export async function addUser(
+export async function addPerson(
   firstname: string,
   lastname: string,
   family: any
@@ -125,5 +125,185 @@ export async function signOut() {
     window.location.reload();
 
     return;
+  }
+}
+
+export async function addUser(user_id: string, last_credit_update: any) {
+  const { data: existingUsers, error: fetchError } = await supabase
+    .from("users")
+    .select("*")
+    .eq("user_id", user_id)
+    .single();
+
+  if (fetchError) {
+    // console.error("Error checking for existing user:", fetchError);
+    const isUserLoggedIn = await checkExistingToken();
+    //check account type
+    const accountType = await isUserLoggedIn.user.user_metadata.accountType;
+    let defaultCredits;
+
+    if (accountType === "gratuit") {
+      defaultCredits = 10;
+    } else if (accountType === "premium") {
+      defaultCredits = 100;
+    }
+    console.log("adding user to db", defaultCredits);
+    const { data, error } = await supabase.from("users").insert([
+      {
+        user_id,
+        last_credit_update,
+        credits: defaultCredits,
+      },
+    ]);
+    if (error) {
+      console.error("Error inserting data:", error);
+    }
+    return;
+  } else if (existingUsers && existingUsers.length > 0) {
+    return;
+  }
+}
+
+export async function fetchUserById(user_id: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("")
+    .eq("user_id", user_id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
+export async function updateUser(user_id: string, creditsToAdd: number) {
+  const { data, error } = await supabase
+    .from("users")
+    .update({ credits: creditsToAdd })
+    .eq("user_id", user_id);
+
+  if (error) {
+    console.error("Error updating data:", error);
+  }
+}
+
+export async function removeOneCredit(user_id: string) {
+  let user = await fetchUserById(user_id);
+
+  const newCredits = user.credits - 1;
+  if (newCredits <= 0) {
+    console.error("Not enough credits to remove one.");
+    return;
+  } else {
+    const { data, error: updateError } = await supabase
+      .from("users")
+      .update({ credits: newCredits })
+      .eq("user_id", user_id)
+      .single();
+
+    if (updateError) {
+      console.error("Error updating data:", updateError.message);
+    } else {
+      // console.log("User updated successfully:", data);
+    }
+  }
+}
+
+let membersToAddToDB: any = [];
+
+export async function addFamillyMemberInfoToDB(user_id: string, member: any) {
+  try {
+    const data = await fetchFamillyMemberInfoFromDB(user_id);
+
+    let currentMembers = Array.isArray(data[0]?.unlocked_info)
+      ? data[0].unlocked_info
+      : [];
+
+    // Use a Set to ensure unique members
+    const memberSet = new Set(
+      currentMembers.map((m: any) => JSON.stringify(m))
+    );
+    memberSet.add(JSON.stringify(member));
+
+    // Convert the set back to an array of objects
+    membersToAddToDB = Array.from(memberSet).map((m: any) => JSON.parse(m));
+
+    const { data: updateData, error } = await supabase
+      .from("users")
+      .update({ unlocked_info: membersToAddToDB })
+      .eq("user_id", user_id)
+      .single();
+
+    if (error) {
+      console.error("Error inserting unlocked info data:", error);
+    }
+    // else {
+    //   console.log("User updated successfully:", membersToAddToDB);
+    // }
+  } catch (error) {
+    console.error("Error fetching or updating family member info:", error);
+  }
+}
+
+export async function fetchFamillyMemberInfoFromDB(user_id: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("unlocked_info")
+    .eq("user_id", user_id);
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
+export async function removeFamillyMemberInfoFromDB(
+  user_id: string,
+  email: string
+) {
+  try {
+    const data = await fetchFamillyMemberInfoFromDB(user_id);
+
+    let currentMembers = Array.isArray(data[0]?.unlocked_info)
+      ? data[0].unlocked_info
+      : [];
+
+    // Remove the member with the given email
+    const updatedMembers = currentMembers.filter(
+      (member: any) => member.email !== email
+    );
+
+    const { data: updateData, error } = await supabase
+      .from("users")
+      .update({ unlocked_info: updatedMembers })
+      .eq("user_id", user_id)
+      .single();
+
+    if (error) {
+      console.error("Error removing member from unlocked info data:", error);
+    } else {
+      location.reload();
+    }
+  } catch (error) {
+    console.error("Error fetching or updating family member info:", error);
+  }
+}
+
+export async function deleteAllUnlockedInfo(user_id: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .update({ unlocked_info: [] })
+    .eq("user_id", user_id)
+    .single();
+
+  if (error) {
+    console.error("Error deleting data:", error);
+  } else {
+    location.reload();
   }
 }

@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
-import { stringToSlug } from "~/utils/slugify";
+import { stringToSlug } from "@/utils/slugify";
 import { useRoute } from "vue-router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import isBetween from "dayjs/plugin/isBetween";
-import { fetchPerplexityData, httpGetAsync } from "~/utils/APIData";
-import { generateEmailAddresses } from "~/utils/emailPatterns";
-import { normalizeString } from "~/utils/normalize";
-import { removeMatchingNames } from "~/utils/dataSanitization";
-import { addUser, fetchPersons } from "@/utils/supabase";
+import { fetchPerplexityData, httpGetAsync } from "@/utils/APIData";
+import { generateEmailAddresses } from "@/utils/emailPatterns";
+import { normalizeString } from "@/utils/normalize";
+import { removeMatchingNames } from "@/utils/dataSanitization";
+import {
+  addPerson,
+  fetchPersons,
+  removeOneCredit,
+  checkExistingToken,
+  addFamillyMemberInfoToDB,
+} from "@/utils/supabase";
 
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
 
+const isUserLoggedIn = ref();
 const deathStore = useDeathStore();
 const records = ref([]);
 const route = useRoute();
@@ -93,7 +100,7 @@ function testEmailsValidity() {
   function processNextPerson() {
     if (personIndex >= emailAddresses.value.length) {
       emailsTestingStatus.value = "success";
-      addUser(
+      addPerson(
         profile.value.firstnames,
         profile.value.lastname,
         deliverableEmails.value
@@ -124,6 +131,7 @@ function testEmailsValidity() {
             deliverableEmails.value.push({
               person: person,
               email: email,
+              views: 0,
             });
 
             personIndex++;
@@ -189,6 +197,35 @@ const displaySteps = computed(() => {
   );
 });
 
+// function removeCreditAndUnlock(member: any) {
+//   const formattedMember = {
+//     first_name: member.person.first_name as String,
+//     last_name: member.person.last_name as String,
+//     email: member.email as String,
+//   };
+//   addFamillyMemberInfoToDB(isUserLoggedIn.value.user.id, formattedMember);
+
+//   removeOneCredit(isUserLoggedIn.value.user.id);
+// }
+
+async function removeCreditAndUnlock(member: any) {
+  const formattedMember = {
+    first_name: member.person.first_name as String,
+    last_name: member.person.last_name as String,
+    email: member.email as String,
+  };
+
+  try {
+    await addFamillyMemberInfoToDB(
+      isUserLoggedIn.value.user.id,
+      formattedMember
+    );
+    removeOneCredit(isUserLoggedIn.value.user.id);
+  } catch (error) {
+    console.error("Failed to add family member info:", error);
+  }
+}
+
 onMounted(async () => {
   await deathStore.fetchData();
   records.value = deathStore.records;
@@ -202,6 +239,7 @@ onMounted(async () => {
   });
 
   formattedDeathDateFromNow.value = dayjs(profile.value.death_date).fromNow();
+
   formattedDeathDate.value = dayjs(profile.value.death_date).format(
     "DD MMMM YYYY"
   );
@@ -210,6 +248,7 @@ onMounted(async () => {
   );
 
   await loadPersons();
+  isUserLoggedIn.value = await checkExistingToken();
 });
 </script>
 
@@ -285,13 +324,24 @@ onMounted(async () => {
       class="subtitles"
     >
       Contacts
+      <IconComponent
+        :icon="'loader'"
+        v-if="
+          deliverableEmails.length < 5 &&
+          filteredPersonFromDatabase[0].family.length < 5
+        "
+      />
     </h2>
+
     <div class="family-members" v-if="deliverableEmails.length > 0">
       <FamilyMember
         v-for="deliverableEmail in deliverableEmails"
         :key="deliverableEmail"
         :email="deliverableEmail.email"
         :name="`${deliverableEmail.person.first_name} ${deliverableEmail.person.last_name}`"
+        :views="deliverableEmail.views"
+        :userId="isUserLoggedIn?.user.id"
+        @click="removeCreditAndUnlock(deliverableEmail)"
       />
     </div>
 
@@ -301,6 +351,9 @@ onMounted(async () => {
         :key="i"
         :email="member.email"
         :name="`${member.person.first_name} ${member.person.last_name}`"
+        :views="member.views"
+        :userId="isUserLoggedIn?.user.id"
+        @click="removeCreditAndUnlock(member)"
       />
     </div>
   </Container>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
 import { onClickOutside } from "@vueuse/core";
 const target = ref(null);
