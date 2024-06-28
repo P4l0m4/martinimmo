@@ -197,55 +197,40 @@ const displaySteps = computed(() => {
   );
 });
 
-// function removeCreditAndUnlock(member: any) {
+// async function removeCreditAndUnlock(member: any) {
 //   const formattedMember = {
 //     first_name: member.person.first_name as String,
 //     last_name: member.person.last_name as String,
 //     email: member.email as String,
 //   };
-//   addFamillyMemberInfoToDB(isUserLoggedIn.value.user.id, formattedMember);
 
-//   removeOneCredit(isUserLoggedIn.value.user.id);
+//   console.log("Formatted member:", formattedMember);
+
+//   try {
+//     await addFamillyMemberInfoToDB(
+//       isUserLoggedIn.value.user.id,
+//       formattedMember
+//     );
+//     removeOneCredit(isUserLoggedIn.value.user.id);
+//   } catch (error) {
+//     console.error("Failed to add family member info:", error);
+//   }
 // }
 
-async function removeCreditAndUnlock(member: any) {
-  const formattedMember = {
-    first_name: member.person.first_name as String,
-    last_name: member.person.last_name as String,
-    email: member.email as String,
-  };
-
-  try {
-    await addFamillyMemberInfoToDB(
-      isUserLoggedIn.value.user.id,
-      formattedMember
-    );
-    removeOneCredit(isUserLoggedIn.value.user.id);
-  } catch (error) {
-    console.error("Failed to add family member info:", error);
-  }
-}
-
 onMounted(async () => {
-  await deathStore.fetchData();
-  records.value = deathStore.records;
+  await deathStore.fetchData().then(() => {
+    records.value = deathStore.records;
 
-  profile.value = records.value.find((p) => {
-    const generatedSlug = `${stringToSlug(
-      `${p.firstnames} ${p.lastname} ${p.death_date} ${p.current_death_dep_name}`
-    )}`;
-
-    return generatedSlug === profileSlug;
+    profile.value = records.value.find((p: any) => {
+      const generatedSlug = `${stringToSlug(
+        `${p.firstnames} ${p.lastname} ${p.death_date} ${p.current_death_dep_name}`
+      )}`;
+      formattedDeathDateFromNow.value = dayjs(p.death_date).fromNow();
+      formattedDeathDate.value = dayjs(p.death_date).format("DD MMMM YYYY");
+      formattedBirthDate.value = dayjs(p.birth_date).format("DD MMMM YYYY");
+      return generatedSlug === profileSlug;
+    });
   });
-
-  formattedDeathDateFromNow.value = dayjs(profile.value.death_date).fromNow();
-
-  formattedDeathDate.value = dayjs(profile.value.death_date).format(
-    "DD MMMM YYYY"
-  );
-  formattedBirthDate.value = dayjs(profile.value.birth_date).format(
-    "DD MMMM YYYY"
-  );
 
   await loadPersons();
   isUserLoggedIn.value = await checkExistingToken();
@@ -338,10 +323,10 @@ onMounted(async () => {
         v-for="deliverableEmail in deliverableEmails"
         :key="deliverableEmail"
         :email="deliverableEmail.email"
-        :name="`${deliverableEmail.person.first_name} ${deliverableEmail.person.last_name}`"
+        :firstname="deliverableEmail.person.first_name"
+        :lastname="deliverableEmail.person.last_name"
         :views="deliverableEmail.views"
         :userId="isUserLoggedIn?.user.id"
-        @click="removeCreditAndUnlock(deliverableEmail)"
       />
     </div>
 
@@ -350,10 +335,10 @@ onMounted(async () => {
         v-for="(member, i) in filteredPersonFromDatabase[0]?.family"
         :key="i"
         :email="member.email"
-        :name="`${member.person.first_name} ${member.person.last_name}`"
+        :firstname="member.person.first_name"
+        :lastname="member.person.last_name"
         :views="member.views"
         :userId="isUserLoggedIn?.user.id"
-        @click="removeCreditAndUnlock(member)"
       />
     </div>
   </Container>

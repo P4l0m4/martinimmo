@@ -77,9 +77,10 @@ export async function sendInvitation(
     } else {
       throw new Error("Error sending invitation: " + error.message);
     }
-  } else {
-    console.log("Invitation sent successfully!");
   }
+  // else {
+  //   console.log("Invitation sent successfully!");
+  // }
 }
 
 export async function authenticateUser(email: string, password: string) {
@@ -147,7 +148,7 @@ export async function addUser(user_id: string, last_credit_update: any) {
     } else if (accountType === "premium") {
       defaultCredits = 100;
     }
-    console.log("adding user to db", defaultCredits);
+
     const { data, error } = await supabase.from("users").insert([
       {
         user_id,
@@ -190,6 +191,21 @@ export async function updateUser(user_id: string, creditsToAdd: number) {
   }
 }
 
+export async function getCredits(user_id: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("credits")
+    .eq("user_id", user_id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
 export async function removeOneCredit(user_id: string) {
   let user = await fetchUserById(user_id);
 
@@ -208,6 +224,7 @@ export async function removeOneCredit(user_id: string) {
       console.error("Error updating data:", updateError.message);
     } else {
       // console.log("User updated successfully:", data);
+      location.reload();
     }
   }
 }
@@ -222,7 +239,14 @@ export async function addFamillyMemberInfoToDB(user_id: string, member: any) {
       ? data[0].unlocked_info
       : [];
 
-    // Use a Set to ensure unique members
+    //check if member already exists
+    const memberExists = currentMembers.some(
+      (m: any) => m.email === member.email
+    );
+    if (memberExists) {
+      return false;
+    }
+
     const memberSet = new Set(
       currentMembers.map((m: any) => JSON.stringify(m))
     );

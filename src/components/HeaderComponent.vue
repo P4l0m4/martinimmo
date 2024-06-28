@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref } from "vue";
 import { checkExistingToken } from "@/utils/supabase";
 import { useAccountStore } from "@/stores/accountStore";
+import { debounce } from "@/utils/debounce";
 
 const accountStore = useAccountStore();
 const isUserLoggedIn = ref();
 
-const credits = computed(() => accountStore.credits);
+const credits = ref(0);
+
+const updateCredits = debounce(async () => {
+  credits.value = await getCredits(isUserLoggedIn.value.user.id);
+}, 600);
+
+document.addEventListener("click", updateCredits);
 
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
@@ -16,6 +23,7 @@ onMounted(async () => {
       isUserLoggedIn.value.user.user_metadata.accountType
     );
     accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
+    credits.value = await getCredits(isUserLoggedIn.value.user.id);
   }
 });
 </script>
@@ -35,7 +43,8 @@ onMounted(async () => {
           class="header__nav__ul__li circle-link"
         >
           <span class="credits"
-            >{{ credits }}<IconComponent icon="credit-card" color="#6800ba"
+            >{{ credits?.credits
+            }}<IconComponent icon="credit-card" color="#6800ba"
           /></span>
           <NuxtLink
             to="/mon-compte"
@@ -97,3 +106,4 @@ onMounted(async () => {
   margin-left: auto;
 }
 </style>
+~/utils/debounce

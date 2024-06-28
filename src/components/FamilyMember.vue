@@ -1,38 +1,47 @@
 <script setup lang="ts">
-import { fetchFamillyMemberInfoFromDB } from "@/utils/supabase";
+import {
+  fetchFamillyMemberInfoFromDB,
+  getCredits,
+  addFamillyMemberInfoToDB,
+  removeOneCredit,
+} from "@/utils/supabase";
 import { computed, ref, onMounted } from "vue";
-
-const emailIsClicked = ref(false);
-
+import { useToggle, computedAsync } from "@vueuse/core";
 const props = defineProps<{
   email: string;
-  name: string;
-  views: number;
+  firstname: string;
+  lastname: string;
+  views: number | null;
   userId: string;
 }>();
 
-const emailsInDB = ref<any[]>([]);
+const evaluating = ref(false);
 
-async function getEmailsFromDB() {
+const emailsInDB = computedAsync(async () => {
   const data = await fetchFamillyMemberInfoFromDB(props.userId);
-  if (!data[0]) return false;
-  else {
-    emailsInDB.value = data[0].unlocked_info;
-  }
-}
+  return data;
+}, []);
 
-function checkIfEmailIsUnlocked(email: string) {
-  getEmailsFromDB();
-  if (!emailsInDB.value.length) return false;
-  return emailsInDB.value.some((el) => el.email === email);
-}
+const [showCreditsPopUp, toggleCreditsPopUp] = useToggle();
+
+const emailIsClicked = ref(false);
+
+const isEmailUnlocked = computed(() => {
+  if (emailsInDB.value === null || evaluating.value === true) {
+    return;
+  }
+
+  return emailsInDB.value[0]?.unlocked_info.some(
+    (el) => el.email === props.email
+  );
+});
 
 function copyEmailToClipboard(email: string) {
   navigator.clipboard.writeText(email);
 }
 
 const iconColor = computed(() => {
-  if (props.views > 2) {
+  if (props.views && props.views > 2) {
     return "red";
   }
   switch (props.views) {
@@ -45,40 +54,54 @@ const iconColor = computed(() => {
   }
 });
 
-async function handleEmailClick() {
-  emailIsClicked.value = true;
-  const startTime = performance.now();
-  const timeout = setTimeout(() => {
-    window.location.reload();
-  }, 5000); // Set timeout to 5 seconds
+async function removeCreditAndUnlock() {
+  const formattedMember = {
+    first_name: props.firstname as String,
+    last_name: props.lastname as String,
+    email: props.email as String,
+  };
 
-  await getEmailsFromDB();
-
-  clearTimeout(timeout);
-  const endTime = performance.now();
-  const duration = endTime - startTime;
-
-  console.log(`Function execution time: ${duration} milliseconds`);
-
-  if (duration > 5000) {
-    window.location.reload();
+  try {
+    await addFamillyMemberInfoToDB(props.userId, formattedMember);
+    if (
+      (await addFamillyMemberInfoToDB(props.userId, formattedMember)) === false
+    ) {
+      return;
+    } else {
+      await removeOneCredit(props.userId);
+    }
+  } catch (error) {
+    console.error("Failed to add family member info:", error);
   }
 }
 
-onMounted(async () => {
-  await getEmailsFromDB();
-});
-</script>
+async function handleEmailClick() {
+  emailIsClicked.value = true;
 
+  const credits = await getCredits(props.userId);
+
+  if (credits.credits > 0) {
+    await removeCreditAndUnlock();
+  } else {
+    toggleCreditsPopUp();
+  }
+
+  emailIsClicked.value = false;
+}
+
+// onMounted(async () => {
+//   await getEmailsFromDB();
+// });
+</script>
 <template>
   <Transition>
     <div class="family-member">
-      <span>{{ name }}</span>
+      <span>{{ firstname }} {{ lastname }}</span>
       <div class="family-member__data">
         <div class="family-member__data__mail">
           <span style="opacity: 0.6"><IconComponent icon="mail" /></span>
           <span
-            v-if="!checkIfEmailIsUnlocked(email)"
+            v-if="!isEmailUnlocked"
             class="family-member__data__mail__blur"
             v-tooltip:top="'Utiliser un crédit pour dévoiler l\'adresse mail'"
             @click="handleEmailClick"
@@ -86,26 +109,37 @@ onMounted(async () => {
           >
           <IconComponent
             icon="loader"
-            v-if="
-              emailIsClicked === true && checkIfEmailIsUnlocked(email) === false
-            "
+            v-if="emailIsClicked === true && !isEmailUnlocked"
           />
-          <span v-if="checkIfEmailIsUnlocked(email)" class="unlocked-email"
-            >{{ email }}
+          <span v-if="isEmailUnlocked" class="unlocked-email">
+            {{ email }}
             <IconComponent
               icon="copy"
               @click="copyEmailToClipboard(email)"
               style="cursor: pointer"
               v-tooltip:top="'Copier l\'adresse mail'"
-          /></span>
+            />
+          </span>
         </div>
-        <span v-if="views > 0" class="family-member__data__views"
-          >{{ views }}<IconComponent icon="eye" :color="iconColor"
-        /></span>
+        <span v-if="views > 0" class="family-member__data__views">
+          {{ views }}<IconComponent icon="eye" :color="iconColor" />
+        </span>
       </div>
     </div>
   </Transition>
+  <ConfirmationPopUp
+    v-if="showCreditsPopUp"
+    @close-confirmation="toggleCreditsPopUp"
+  >
+    Plus de crédits disponibles
+    <template #button>
+      <PrimaryButton button-type="dark" @click="location.reload()">
+        Acheter des crédits
+      </PrimaryButton>
+    </template>
+  </ConfirmationPopUp>
 </template>
+
 <style lang="scss" scoped>
 .family-member {
   display: flex;

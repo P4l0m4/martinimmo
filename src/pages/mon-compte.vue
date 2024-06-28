@@ -4,8 +4,12 @@ import {
   checkExistingToken,
   signOut,
   deleteAllUnlockedInfo,
+  fetchFamillyMemberInfoFromDB,
 } from "@/utils/supabase";
 import { useAccountStore } from "@/stores/accountStore";
+import { useToggle } from "@vueuse/core";
+
+const [showConfirmation, toggleConfirmation] = useToggle();
 
 const accountStore = useAccountStore();
 
@@ -14,6 +18,7 @@ const isUserLoggedIn = ref();
 const emailsInDB = ref<any[]>([]);
 
 async function getEmailsFromDB() {
+  if (!isUserLoggedIn.value) return;
   const data = await fetchFamillyMemberInfoFromDB(isUserLoggedIn.value.user.id);
   if (!data[0]) return false;
   else {
@@ -43,21 +48,21 @@ onMounted(async () => {
           </div>
           <li class="account-info__element">
             <span class="account-info__element__icon"
-              ><IconComponent icon="credit-card" color="#232323" /></span
+              ><IconComponent icon="credit-card" /></span
             >{{ accountStore.$state.credits }}
             Crédits disponibles
           </li>
 
           <li class="account-info__element">
             <span class="account-info__element__icon"
-              ><IconComponent icon="star" color="#232323"
+              ><IconComponent icon="star"
             /></span>
             Compte
             {{ isUserLoggedIn?.user.user_metadata.accountType }}
           </li>
           <li class="account-info__element">
             <span class="account-info__element__icon"
-              ><IconComponent icon="mail" color="#232323"
+              ><IconComponent icon="mail"
             /></span>
             {{ isUserLoggedIn?.user.email }}
           </li>
@@ -74,12 +79,21 @@ onMounted(async () => {
             class="header"
             style="justify-content: end"
           >
-            <button
-              class="button--tertiary-dark"
-              @click="deleteAllUnlockedInfo(isUserLoggedIn?.user.id)"
-            >
+            <button class="button--tertiary-dark" @click="toggleConfirmation">
               Tout supprimer <IconComponent icon="trash" />
             </button>
+            <ConfirmationPopUp
+              v-if="showConfirmation"
+              @close-confirmation="toggleConfirmation"
+              >Êtes-vous sûr(e) de vouloir supprimer touts les contacts
+              débloqués ?<template #button
+                ><PrimaryButton
+                  button-type="dark"
+                  @click="deleteAllUnlockedInfo(isUserLoggedIn?.user.id)"
+                  >Oui, supprimer</PrimaryButton
+                ></template
+              >
+            </ConfirmationPopUp>
           </div>
           <TableRow
             v-for="email in emailsInDB"
