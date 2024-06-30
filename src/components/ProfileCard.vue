@@ -28,18 +28,19 @@ const props = defineProps<{
 const formattedDeathDate = computed(() => {
   return dayjs(props.death?.date).fromNow();
 });
-
-const profileLink = computed(() => {
-  return `/recherche/${stringToSlug(
-    `${props.name?.first} ${props.name?.last} ${props.death.date} ${props.death?.departmentName}`
-  )}`;
-});
 </script>
 <template>
   <Transition>
     <NuxtLink
       class="profile-card scale-on-hover shadow-on-hover"
-      :to="profileLink"
+      :to="{
+        name: 'recherche-slug',
+        params: {
+          slug: stringToSlug(
+            `${name?.first} ${name?.last} ${death?.date} ${death?.departmentName}`
+          ),
+        },
+      }"
     >
       <div class="profile-card__death">
         <span class="profile-card__death__date"

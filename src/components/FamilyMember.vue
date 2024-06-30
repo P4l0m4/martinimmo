@@ -32,7 +32,7 @@ const isEmailUnlocked = computed(() => {
   }
 
   return emailsInDB.value[0]?.unlocked_info.some(
-    (el) => el.email === props.email
+    (el: { email: string }) => el.email === props.email
   );
 });
 
@@ -56,16 +56,18 @@ const iconColor = computed(() => {
 
 async function removeCreditAndUnlock() {
   const formattedMember = {
-    first_name: props.firstname as String,
-    last_name: props.lastname as String,
-    email: props.email as String,
+    first_name: props.firstname,
+    last_name: props.lastname,
+    email: props.email,
   };
 
   try {
-    await addFamillyMemberInfoToDB(props.userId, formattedMember);
-    if (
-      (await addFamillyMemberInfoToDB(props.userId, formattedMember)) === false
-    ) {
+    const response = await addFamillyMemberInfoToDB(
+      props.userId,
+      formattedMember
+    );
+
+    if (response === false) {
       return;
     } else {
       await removeOneCredit(props.userId);

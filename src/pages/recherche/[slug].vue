@@ -6,7 +6,7 @@ import { useRoute } from "vue-router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import isBetween from "dayjs/plugin/isBetween";
-import { fetchPerplexityData, httpGetAsync } from "@/utils/APIData";
+import { fetchPerplexityData, validateEmail } from "@/utils/APIData";
 import { generateEmailAddresses } from "@/utils/emailPatterns";
 import { normalizeString } from "@/utils/normalize";
 import { removeMatchingNames } from "@/utils/dataSanitization";
@@ -17,6 +17,7 @@ import {
   checkExistingToken,
   addFamillyMemberInfoToDB,
 } from "@/utils/supabase";
+import { sleep } from "@/utils/sleep";
 
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
@@ -30,12 +31,46 @@ const profile = ref();
 const formattedDeathDateFromNow = ref();
 const formattedDeathDate = ref();
 const formattedBirthDate = ref();
+const loading = ref(false);
 
 const perplexityFetchingStatus = ref("");
 const emailsFetchingStatus = ref("");
 const emailsTestingStatus = ref("");
 
 const APIData = ref([]);
+
+onMounted(async () => {
+  loading.value = true;
+  isUserLoggedIn.value = await checkExistingToken();
+  if (isUserLoggedIn.value === null) {
+    await navigateTo({ path: "/" });
+  }
+
+  await deathStore.fetchData();
+  records.value = deathStore.records;
+  await initProfileData();
+  loading.value = false;
+});
+
+async function initProfileData() {
+  profile.value = records.value.find((p: any) => {
+    const generatedSlug = `${stringToSlug(
+      `${p.firstnames} ${p.lastname} ${p.death_date} ${p.current_death_dep_name}`
+    )}`;
+    formattedDeathDateFromNow.value = dayjs(p.death_date).fromNow();
+    formattedDeathDate.value = dayjs(p.death_date).format("DD MMMM YYYY");
+    formattedBirthDate.value = dayjs(p.birth_date).format("DD MMMM YYYY");
+    return generatedSlug === profileSlug;
+  });
+
+  await loadPersons();
+}
+
+async function findFamily() {
+  await getDataFromPerplexity();
+  getEmailAdresses();
+  await testEmailsValidity();
+}
 
 async function getDataFromPerplexity() {
   perplexityFetchingStatus.value = "loading";
@@ -55,31 +90,28 @@ async function getDataFromPerplexity() {
   }
 }
 
-const sanitizedAPIData = computed(() => {
-  if (profile.value) {
-    return removeMatchingNames(
-      APIData.value,
-      profile.value.firstnames,
-      profile.value.lastname
-    );
-  }
-  return;
+const sanitizedAPIData = computed<[]>(() => {
+  if (!profile.value) return [];
+  return removeMatchingNames(
+    JSON.parse(JSON.stringify(APIData.value)),
+    profile.value.firstnames,
+    profile.value.lastname
+  );
 });
 
-const emailAddresses = ref([]);
+const familyMember = ref([]);
 
 function getEmailAdresses() {
   emailsFetchingStatus.value = "loading";
-  if (Array.isArray(sanitizedAPIData.value)) {
-    const names = sanitizedAPIData.value;
-    emailAddresses.value = names.map((name) => {
+  if (sanitizedAPIData.value.length > 0) {
+    familyMember.value = sanitizedAPIData.value.map((person) => {
       const emails = generateEmailAddresses(
-        normalizeString(name.first_name),
-        normalizeString(name.last_name)
+        normalizeString(person.first_name),
+        normalizeString(person.last_name)
       );
 
       return {
-        person: name,
+        person,
         emails: emails,
       };
     });
@@ -90,72 +122,35 @@ function getEmailAdresses() {
   }
 }
 
-const deliverableEmails = ref([]);
-
-function testEmailsValidity() {
+async function testEmailsValidity() {
   emailsTestingStatus.value = "loading";
-  const delay = 1000; // 1 second delay between requests
-  let personIndex = 0;
-
-  function processNextPerson() {
-    if (personIndex >= emailAddresses.value.length) {
-      emailsTestingStatus.value = "success";
-      addPerson(
-        profile.value.firstnames,
-        profile.value.lastname,
-        deliverableEmails.value
-      );
-      return;
-    }
-
-    const personEmails = emailAddresses.value[personIndex];
-    const person = personEmails.person;
-    const emails = personEmails.emails;
-    let emailIndex = 0;
-
-    function processEmail() {
-      if (emailIndex >= emails.length) {
-        personIndex++;
-        setTimeout(processNextPerson, delay); // Move to the next person
-        return;
-      }
-
-      const email = emails[emailIndex];
-      httpGetAsync(email, function (error, response) {
-        if (error) {
-          console.error("Error:", error);
-          emailsFetchingStatus.value = "error";
-        } else {
-          const data = JSON.parse(response);
-          if (data.deliverability === "DELIVERABLE") {
-            deliverableEmails.value.push({
-              person: person,
-              email: email,
-              views: 0,
-            });
-
-            personIndex++;
-            setTimeout(processNextPerson, delay); // Move to the next person
-            return;
-          }
-          // console.log("Response:", response);
+  const familyMembers = [];
+  for (const member of familyMember.value) {
+    for (let i = 0; i < member.emails.length; i++) {
+      try {
+        const response = await validateEmail(member.emails[i]);
+        if (response.deliverability === "DELIVERABLE") {
+          familyMembers.push({
+            person: member.person,
+            email: member.emails[i],
+            views: 0,
+          });
+          break;
         }
-
-        emailIndex++;
-        setTimeout(processEmail, delay); // Check the next email for the same person
-      });
+        await sleep(1000);
+      } catch (error) {
+        console.error("Error:", error);
+        emailsTestingStatus.value = "error";
+      }
     }
-
-    processEmail();
   }
-
-  processNextPerson();
-}
-
-function findFamily() {
-  getDataFromPerplexity()
-    .then(() => getEmailAdresses())
-    .then(() => testEmailsValidity());
+  await addPerson(
+    profile.value.firstnames,
+    profile.value.lastname,
+    familyMembers
+  );
+  emailsTestingStatus.value = "success";
+  await loadPersons();
 }
 
 const allPersonsFromDatabase = ref([]);
@@ -181,11 +176,7 @@ const displayFamilyResultsFromDatabase = computed(() => {
 });
 
 const displayFamilyButton = computed(() => {
-  return (
-    filteredPersonFromDatabase.value.length >= 0 &&
-    deliverableEmails.value.length <= 0 &&
-    displayFamilyResultsFromDatabase.value === false
-  );
+  return filteredPersonFromDatabase.value.length === 0;
 });
 
 const displaySteps = computed(() => {
@@ -196,49 +187,11 @@ const displaySteps = computed(() => {
       perplexityFetchingStatus.value === "success")
   );
 });
-
-// async function removeCreditAndUnlock(member: any) {
-//   const formattedMember = {
-//     first_name: member.person.first_name as String,
-//     last_name: member.person.last_name as String,
-//     email: member.email as String,
-//   };
-
-//   console.log("Formatted member:", formattedMember);
-
-//   try {
-//     await addFamillyMemberInfoToDB(
-//       isUserLoggedIn.value.user.id,
-//       formattedMember
-//     );
-//     removeOneCredit(isUserLoggedIn.value.user.id);
-//   } catch (error) {
-//     console.error("Failed to add family member info:", error);
-//   }
-// }
-
-onMounted(async () => {
-  await deathStore.fetchData().then(() => {
-    records.value = deathStore.records;
-
-    profile.value = records.value.find((p: any) => {
-      const generatedSlug = `${stringToSlug(
-        `${p.firstnames} ${p.lastname} ${p.death_date} ${p.current_death_dep_name}`
-      )}`;
-      formattedDeathDateFromNow.value = dayjs(p.death_date).fromNow();
-      formattedDeathDate.value = dayjs(p.death_date).format("DD MMMM YYYY");
-      formattedBirthDate.value = dayjs(p.birth_date).format("DD MMMM YYYY");
-      return generatedSlug === profileSlug;
-    });
-  });
-
-  await loadPersons();
-  isUserLoggedIn.value = await checkExistingToken();
-});
 </script>
 
 <template>
-  <Container>
+  <div v-if="loading">Loading...</div>
+  <Container v-else>
     <h1 class="subtitles">
       Informations sur {{ profile?.firstnames }} {{ profile?.lastname }}
     </h1>
@@ -304,31 +257,13 @@ onMounted(async () => {
       >
     </div>
 
-    <h2
-      v-if="deliverableEmails.length > 0 || displayFamilyResultsFromDatabase"
-      class="subtitles"
-    >
+    <h2 v-if="displayFamilyResultsFromDatabase" class="subtitles">
       Contacts
       <IconComponent
         :icon="'loader'"
-        v-if="
-          deliverableEmails.length < 5 &&
-          filteredPersonFromDatabase[0].family.length < 5
-        "
+        v-if="filteredPersonFromDatabase[0].family.length < 5"
       />
     </h2>
-
-    <div class="family-members" v-if="deliverableEmails.length > 0">
-      <FamilyMember
-        v-for="deliverableEmail in deliverableEmails"
-        :key="deliverableEmail"
-        :email="deliverableEmail.email"
-        :firstname="deliverableEmail.person.first_name"
-        :lastname="deliverableEmail.person.last_name"
-        :views="deliverableEmail.views"
-        :userId="isUserLoggedIn?.user.id"
-      />
-    </div>
 
     <div class="family-members" v-if="displayFamilyResultsFromDatabase">
       <FamilyMember

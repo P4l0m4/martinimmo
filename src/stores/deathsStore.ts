@@ -23,21 +23,17 @@ export const useDeathStore = defineStore({
         console.error("Error fetching data:", error);
       }
     },
-    setRegion(region: any) {
+    async setRegion(region: any) {
       this.region = region ? region.url_part : "";
-      this.setParam();
+      await this.setParam(this.region);
     },
-    setDepartment(department: any) {
+    async setDepartment(department: any) {
       this.department = department ? department.url_part : "";
-      this.setParam();
+      await this.setParam(this.department);
     },
-    setParam() {
-      if (this.region !== "" && this.department !== "") {
-        this.param = this.department;
-      } else if (this.region !== "" && this.department === "") {
-        this.param = this.region;
-      }
-      this.fetchData();
+    async setParam(param: string) {
+      this.param = param;
+      await this.fetchData();
     },
   },
 });

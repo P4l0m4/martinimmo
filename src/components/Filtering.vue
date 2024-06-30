@@ -1,13 +1,30 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useDeathStore } from "@/stores/deathsStore";
+import { ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
+
+interface Props {
+  regions: any;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  (
+    e: "setDepartment",
+    payload: { department_name: string; url_part: string }
+  ): void;
+  (
+    e: "setRegion",
+    payload: {
+      region_name: string;
+      url_part: string;
+    }
+  ): void;
+}>();
+
 const target = ref(null);
 
-const deathStore = useDeathStore();
-
-const regionsList = deathStore.regions;
-
+const regionsList = ref(props.regions);
 const selectedRegion = ref();
 
 const departmentsList = ref();
@@ -24,7 +41,6 @@ const handleRegion = (region: any) => {
   displayRegion.value = false;
   selectedRegion.value = region;
   departmentLabel.value = "Filtrer par département";
-  deathStore.setDepartment({ department_name: "", url_part: "" });
   departmentsList.value = selectedRegion.value.departments;
   if (filterBy.value === "default" || filterBy.value !== region.region_name) {
     filterBy.value = region;
@@ -34,7 +50,7 @@ const handleRegion = (region: any) => {
       region_name: region.region_name,
       url_part: region.url_part,
     };
-    deathStore.setRegion(regionData);
+    emit("setRegion", regionData);
   } else {
     regionLabel.value = "Filtrer par région";
   }
@@ -53,7 +69,7 @@ const handleDepartment = (department: any) => {
       department_name: department.department_name,
       url_part: department.url_part,
     };
-    deathStore.setDepartment(departmentData);
+    emit("setDepartment", departmentData);
   } else {
     departmentLabel.value = "Filtrer par département";
   }
@@ -61,10 +77,6 @@ const handleDepartment = (department: any) => {
 
 onClickOutside(target, (event) => (displayRegion.value = false));
 onClickOutside(target, (event) => (displayDepartment.value = false));
-
-onMounted(async () => {
-  await deathStore.fetchData();
-});
 </script>
 <template>
   <div class="filtering">

@@ -12,6 +12,16 @@ const sortedRecords = ref([]);
 
 const sortOrder = ref("default");
 
+onMounted(async () => {
+  isUserLoggedIn.value = await checkExistingToken();
+  if (isUserLoggedIn.value === null) {
+    await navigateTo({ path: "/" });
+  }
+  await deathStore.fetchData();
+  records.value = deathStore.records;
+  sortedRecords.value = deathStore.records;
+});
+
 function handleSort(order: string) {
   sortOrder.value = order;
   if (order === "default") {
@@ -27,16 +37,23 @@ function handleSort(order: string) {
   }
 }
 
-watchEffect(() => {
+async function handleDepartmentFilter(filter: {
+  department_name: string;
+  url_part: string;
+}) {
+  await deathStore.setDepartment(filter);
   records.value = deathStore.records;
-  sortedRecords.value = [...records.value];
-  handleSort(sortOrder.value); // Apply the current sort order to the new records
-});
+  sortedRecords.value = deathStore.records;
+}
 
-onMounted(async () => {
-  await deathStore.fetchData();
-  isUserLoggedIn.value = await checkExistingToken();
-});
+async function handleRegionFilter(filter: {
+  region_name: string;
+  url_part: string;
+}) {
+  await deathStore.setRegion(filter);
+  records.value = deathStore.records;
+  sortedRecords.value = deathStore.records;
+}
 </script>
 
 <template>
@@ -44,8 +61,12 @@ onMounted(async () => {
     <Skeleton />
     <Container>
       <div class="sorting-and-filtering">
-        <Filtering />
-        <Sorting @sort-by="handleSort" :order="sortOrder" />
+        <Filtering
+          :regions="deathStore.regions"
+          @set-department="handleDepartmentFilter"
+          @set-region="handleRegionFilter"
+        />
+        <Sorting :order="sortOrder" @sort-by="handleSort" />
 
         <!-- <Transition>
         <button
@@ -60,6 +81,7 @@ onMounted(async () => {
         <ProfileCard
           v-for="(sortedRecord, i) in sortedRecords"
           :key="i"
+          :id="sortedRecord.id"
           :sex="sortedRecord.sex"
           :name="{
             first: sortedRecord.firstnames,
@@ -74,7 +96,7 @@ onMounted(async () => {
           }"
         /></div></Container
   ></template>
-  <template v-else><MustBeAuthenticated /></template>
+  <template v-else> Loading... </template>
 </template>
 
 <style scoped lang="scss">

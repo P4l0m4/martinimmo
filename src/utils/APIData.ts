@@ -40,21 +40,17 @@ export function fetchPerplexityData(profile: any): Promise<any> {
 }
 
 //abstract api for email validation
-export function httpGetAsync(email, callback) {
+export function validateEmail(email: string) {
   const url = `https://emailvalidation.abstractapi.com/v1/?api_key=${abstractAPIKey}&email=${email}`;
-  const xmlHttp = new XMLHttpRequest();
-  xmlHttp.onreadystatechange = function () {
-    if (xmlHttp.readyState === 4) {
-      if (xmlHttp.status === 200) {
-        callback(null, xmlHttp.responseText);
-      } else {
-        callback(
-          new Error(`Request failed with status ${xmlHttp.status}`),
-          null
-        );
+  return fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    }
-  };
-  xmlHttp.open("GET", url, true); // true for asynchronous
-  xmlHttp.send(null);
+      return response.json();
+    })
+    .catch((err) => {
+      console.error("Error fetching emails:", err);
+      throw err;
+    });
 }

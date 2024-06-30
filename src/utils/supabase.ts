@@ -102,17 +102,12 @@ export async function authenticateUser(email: string, password: string) {
 
 export async function checkExistingToken() {
   const token = localStorage.getItem("sb-ddjxlmqtddwruodawjnx-auth-token");
-  if (token) {
-    const { data, error } = await supabase.auth.getUser(token.access_token);
-    if (error) {
-      console.error("Invalid token", error);
+  if (!token) return null;
 
-      return;
-    } else {
-      // console.log("Valid token", data);
-      return data;
-    }
-  }
+  const { data, error } = await supabase.auth.getUser(token.access_token);
+  if (error) return null;
+
+  return data;
 }
 
 export async function signOut() {
