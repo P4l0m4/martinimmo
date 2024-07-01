@@ -96,7 +96,7 @@ async function handleRegionFilter(filter: {
           }"
         /></div></Container
   ></template>
-  <template v-else> Loading... </template>
+  <SkeletonsSearchSkeleton v-else />
 </template>
 
 <style scoped lang="scss">

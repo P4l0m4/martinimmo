@@ -10,13 +10,7 @@ import { fetchPerplexityData, validateEmail } from "@/utils/APIData";
 import { generateEmailAddresses } from "@/utils/emailPatterns";
 import { normalizeString } from "@/utils/normalize";
 import { removeMatchingNames } from "@/utils/dataSanitization";
-import {
-  addPerson,
-  fetchPersons,
-  removeOneCredit,
-  checkExistingToken,
-  addFamillyMemberInfoToDB,
-} from "@/utils/supabase";
+import { addPerson, fetchPersons, checkExistingToken } from "@/utils/supabase";
 import { sleep } from "@/utils/sleep";
 
 dayjs.extend(relativeTime);
@@ -190,7 +184,8 @@ const displaySteps = computed(() => {
 </script>
 
 <template>
-  <div v-if="loading">Loading...</div>
+  <SkeletonsSlugSkeleton v-if="loading" />
+
   <Container v-else>
     <h1 class="subtitles">
       Informations sur {{ profile?.firstnames }} {{ profile?.lastname }}
@@ -261,7 +256,9 @@ const displaySteps = computed(() => {
       Contacts
       <IconComponent
         :icon="'loader'"
-        v-if="filteredPersonFromDatabase[0].family.length < 5"
+        v-if="
+          displayFamilyResultsFromDatabase && emailsTestingStatus === 'loading'
+        "
       />
     </h2>
 

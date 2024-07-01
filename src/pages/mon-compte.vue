@@ -17,6 +17,8 @@ const isUserLoggedIn = ref();
 
 const emailsInDB = ref<any[]>([]);
 
+const loading = ref(false);
+
 async function getEmailsFromDB() {
   if (!isUserLoggedIn.value) return;
   const data = await fetchFamillyMemberInfoFromDB(isUserLoggedIn.value.user.id);
@@ -27,7 +29,9 @@ async function getEmailsFromDB() {
 }
 
 onMounted(async () => {
+  loading.value = true;
   isUserLoggedIn.value = await checkExistingToken();
+  loading.value = false;
   if (isUserLoggedIn.value) {
     accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
   }
@@ -35,6 +39,7 @@ onMounted(async () => {
 });
 </script>
 <template>
+  <SkeletonsMyAccountSkeleton v-if="loading" />
   <template v-if="isUserLoggedIn?.user.aud">
     <Container>
       <h1 class="subtitles">Mon compte</h1>
@@ -111,7 +116,7 @@ onMounted(async () => {
       </div>
     </Container>
   </template>
-  <template v-else>
+  <template v-if="!isUserLoggedIn?.user.aud">
     <MustBeAuthenticated />
   </template>
 </template>
