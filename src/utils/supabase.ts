@@ -230,8 +230,8 @@ export async function addFamillyMemberInfoToDB(user_id: string, member: any) {
   try {
     const data = await fetchFamillyMemberInfoFromDB(user_id);
 
-    let currentMembers = Array.isArray(data[0]?.unlocked_info)
-      ? data[0].unlocked_info
+    let currentMembers = Array.isArray(data[0]?.saved_contacts)
+      ? data[0].saved_contacts
       : [];
 
     //check if member already exists
@@ -252,12 +252,12 @@ export async function addFamillyMemberInfoToDB(user_id: string, member: any) {
 
     const { data: updateData, error } = await supabase
       .from("users")
-      .update({ unlocked_info: membersToAddToDB })
+      .update({ saved_contacts: membersToAddToDB })
       .eq("user_id", user_id)
       .single();
 
     if (error) {
-      console.error("Error inserting unlocked info data:", error);
+      console.error("Error inserting saved_contacts data:", error);
     }
     // else {
     //   console.log("User updated successfully:", membersToAddToDB);
@@ -270,7 +270,7 @@ export async function addFamillyMemberInfoToDB(user_id: string, member: any) {
 export async function fetchFamillyMemberInfoFromDB(user_id: string) {
   const { data, error } = await supabase
     .from("users")
-    .select("unlocked_info")
+    .select("saved_contacts")
     .eq("user_id", user_id);
 
   if (error) {
@@ -288,8 +288,8 @@ export async function removeFamillyMemberInfoFromDB(
   try {
     const data = await fetchFamillyMemberInfoFromDB(user_id);
 
-    let currentMembers = Array.isArray(data[0]?.unlocked_info)
-      ? data[0].unlocked_info
+    let currentMembers = Array.isArray(data[0]?.saved_contacts)
+      ? data[0].saved_contacts
       : [];
 
     // Remove the member with the given email
@@ -299,12 +299,12 @@ export async function removeFamillyMemberInfoFromDB(
 
     const { data: updateData, error } = await supabase
       .from("users")
-      .update({ unlocked_info: updatedMembers })
+      .update({ saved_contacts: updatedMembers })
       .eq("user_id", user_id)
       .single();
 
     if (error) {
-      console.error("Error removing member from unlocked info data:", error);
+      console.error("Error removing member from saved_contacts data:", error);
     } else {
       location.reload();
     }
@@ -313,10 +313,10 @@ export async function removeFamillyMemberInfoFromDB(
   }
 }
 
-export async function deleteAllUnlockedInfo(user_id: string) {
+export async function deleteAllSavedContacts(user_id: string) {
   const { data, error } = await supabase
     .from("users")
-    .update({ unlocked_info: [] })
+    .update({ saved_contacts: [] })
     .eq("user_id", user_id)
     .single();
 

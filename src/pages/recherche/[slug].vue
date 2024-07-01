@@ -127,7 +127,6 @@ async function testEmailsValidity() {
           familyMembers.push({
             person: member.person,
             email: member.emails[i],
-            views: 0,
           });
           break;
         }
@@ -269,7 +268,6 @@ const displaySteps = computed(() => {
         :email="member.email"
         :firstname="member.person.first_name"
         :lastname="member.person.last_name"
-        :views="member.views"
         :userId="isUserLoggedIn?.user.id"
       />
     </div>

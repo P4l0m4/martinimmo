@@ -34,9 +34,6 @@ function copyEmailToClipboard(email: string) {
           v-tooltip:top="'Supprimer'"
           @click="removeFamillyMemberInfoFromDB(userId, email)"
         />
-        <!-- <span v-if="views > 0" class="family-member__data__views"
-          >{{ views }}<IconComponent icon="eye" :color="iconColor"
-        /></span> -->
       </div>
     </li>
   </Transition>
@@ -73,13 +70,6 @@ function copyEmailToClipboard(email: string) {
         filter: blur(4px);
         cursor: pointer;
       }
-    }
-
-    &__views {
-      display: flex;
-      align-items: start;
-      gap: 0.5rem;
-      margin-left: auto;
     }
   }
 }

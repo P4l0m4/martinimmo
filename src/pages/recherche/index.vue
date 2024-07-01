@@ -67,15 +67,6 @@ async function handleRegionFilter(filter: {
           @set-region="handleRegionFilter"
         />
         <Sorting :order="sortOrder" @sort-by="handleSort" />
-
-        <!-- <Transition>
-        <button
-          v-if="sortOrder !== 'default' || filterOrder !== 'default'"
-          class="cross"
-          @click="resetFiltersAndSort()"
-        >
-          <IconComponent icon="plus" /></button
-      ></Transition> -->
       </div>
       <div class="cards">
         <ProfileCard

@@ -3,7 +3,7 @@ import { onMounted, ref } from "vue";
 import {
   checkExistingToken,
   signOut,
-  deleteAllUnlockedInfo,
+  deleteAllSavedContacts,
   fetchFamillyMemberInfoFromDB,
 } from "@/utils/supabase";
 import { useAccountStore } from "@/stores/accountStore";
@@ -24,8 +24,21 @@ async function getEmailsFromDB() {
   const data = await fetchFamillyMemberInfoFromDB(isUserLoggedIn.value.user.id);
   if (!data[0]) return false;
   else {
-    emailsInDB.value = data[0].unlocked_info;
+    emailsInDB.value = data[0].saved_contacts;
   }
+}
+
+function generateCSV() {
+  const csv = emailsInDB.value.map((row) => {
+    return `${row.first_name},${row.last_name},${row.email}`;
+  });
+  const csvArray = ["First Name,Last Name,Email"].concat(csv).join("\n");
+  const a = document.createElement("a");
+  a.href = "data:attachment/csv," + encodeURI(csvArray);
+  a.target = "_blank";
+  a.download = "contacts.csv";
+  document.body.appendChild(a);
+  a.click();
 }
 
 onMounted(async () => {
@@ -82,19 +95,31 @@ onMounted(async () => {
           <div
             v-if="emailsInDB.length"
             class="header"
-            style="justify-content: end"
+            style="justify-content: space-between"
           >
+            <span class="header__text"
+              ><span style="opacity: 0.6"
+                ><IconComponent icon="bookmark" /></span
+              >Vos contacts sauvegardés</span
+            ><SecondaryButton
+              button-type="dark"
+              @click="generateCSV()"
+              :button-state="loading"
+              ><IconComponent icon="download" /> Exporter au format
+              CSV</SecondaryButton
+            >
             <button class="button--tertiary-dark" @click="toggleConfirmation">
-              Tout supprimer <IconComponent icon="trash" />
+              <IconComponent icon="trash" /> Tout supprimer
             </button>
+
             <ConfirmationPopUp
               v-if="showConfirmation"
               @close-confirmation="toggleConfirmation"
               >Êtes-vous sûr(e) de vouloir supprimer touts les contacts
-              débloqués ?<template #button
+              sauvegardés ?<template #button
                 ><PrimaryButton
                   button-type="dark"
-                  @click="deleteAllUnlockedInfo(isUserLoggedIn?.user.id)"
+                  @click="deleteAllSavedContacts(isUserLoggedIn?.user.id)"
                   >Oui, supprimer</PrimaryButton
                 ></template
               >

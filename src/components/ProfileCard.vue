@@ -61,6 +61,11 @@ const formattedDeathDate = computed(() => {
           sex === "F" ? "F" : "H"
         }}</span>
       </div>
+      <Transition
+        ><div class="blur">
+          <IconComponent icon="unlock" color="#fffdfa" size="1.8rem" />Débloquer
+        </div></Transition
+      >
     </NuxtLink>
   </Transition>
 </template>
@@ -72,6 +77,14 @@ const formattedDeathDate = computed(() => {
   gap: 1rem;
   background-color: $primary-color;
   border-radius: $radius;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    .blur {
+      display: flex;
+    }
+  }
 
   &__death {
     display: flex;
@@ -130,5 +143,24 @@ const formattedDeathDate = computed(() => {
   &--m {
     background-color: $blue-color-faded;
   }
+}
+
+.blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  background-color: $secondary-color-faded;
+  backdrop-filter: blur(2px);
+  z-index: 1;
+  border-radius: $radius;
+  font-size: 1.25rem;
+  color: $text-color-alt;
+  text-shadow: $shadow-text-secondary;
 }
 </style>
