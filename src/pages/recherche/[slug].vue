@@ -12,6 +12,7 @@ import { normalizeString } from "@/utils/normalize";
 import { removeMatchingNames } from "@/utils/dataSanitization";
 import { addPerson, fetchPersons, checkExistingToken } from "@/utils/supabase";
 import { sleep } from "@/utils/sleep";
+import type { Member } from "~/components/FamilyMember.vue";
 
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
@@ -33,6 +34,8 @@ const emailsTestingStatus = ref("");
 
 const APIData = ref([]);
 
+const savedMembers = ref<Member[]>([]);
+
 onMounted(async () => {
   loading.value = true;
   isUserLoggedIn.value = await checkExistingToken();
@@ -43,6 +46,9 @@ onMounted(async () => {
   await deathStore.fetchData();
   records.value = deathStore.records;
   await initProfileData();
+  savedMembers.value = await fetchFamillyMemberInfoFromDB(
+    isUserLoggedIn.value.user.id
+  );
   loading.value = false;
 });
 
@@ -180,6 +186,30 @@ const displaySteps = computed(() => {
       perplexityFetchingStatus.value === "success")
   );
 });
+
+async function handleSaveContact(member: Member) {
+  try {
+    savedMembers.value = await addFamillyMemberInfoToDB(
+      isUserLoggedIn?.value.user.id,
+      member,
+      savedMembers.value
+    );
+  } catch (error) {
+    console.error("Failed to add family member info:", error);
+  }
+}
+
+async function handleUnsaveContact(member: Member) {
+  try {
+    savedMembers.value = await removeFamillyMemberInfoFromDB(
+      isUserLoggedIn?.value.user.id,
+      member,
+      savedMembers.value
+    );
+  } catch (error) {
+    console.error("Failed to remove family member info:", error);
+  }
+}
 </script>
 
 <template>
@@ -265,10 +295,11 @@ const displaySteps = computed(() => {
       <FamilyMember
         v-for="(member, i) in filteredPersonFromDatabase[0]?.family"
         :key="i"
-        :email="member.email"
-        :firstname="member.person.first_name"
-        :lastname="member.person.last_name"
+        :member="member"
+        :saved-members="savedMembers"
         :userId="isUserLoggedIn?.user.id"
+        @save-contact="handleSaveContact"
+        @unsave-contact="handleUnsaveContact"
       />
     </div>
   </Container>

@@ -22,9 +22,9 @@ const loading = ref(false);
 async function getEmailsFromDB() {
   if (!isUserLoggedIn.value) return;
   const data = await fetchFamillyMemberInfoFromDB(isUserLoggedIn.value.user.id);
-  if (!data[0]) return false;
+  if (data.length === 0) return false;
   else {
-    emailsInDB.value = data[0].saved_contacts;
+    emailsInDB.value = data;
   }
 }
 

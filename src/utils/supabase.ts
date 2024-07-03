@@ -4,6 +4,8 @@
 // const supabaseKey = config.public.SUPABASE_KEY;
 // const supabase = createClient(supabaseUrl, supabaseKey);
 
+import type { Member } from "~/components/FamilyMember.vue";
+
 let supabase: any;
 
 export function initSupabase(s: any) {
@@ -224,44 +226,33 @@ export async function removeOneCredit(user_id: string) {
   }
 }
 
-let membersToAddToDB: any = [];
-
-export async function addFamillyMemberInfoToDB(user_id: string, member: any) {
+export async function addFamillyMemberInfoToDB(
+  user_id: string,
+  member: Member,
+  savedMembers: Member[]
+) {
   try {
-    const data = await fetchFamillyMemberInfoFromDB(user_id);
-
-    let currentMembers = Array.isArray(data[0]?.saved_contacts)
-      ? data[0].saved_contacts
-      : [];
-
     //check if member already exists
-    const memberExists = currentMembers.some(
-      (m: any) => m.email === member.email
+    const memberExists = savedMembers.some(
+      (m: Member) => m.email === member.email
     );
     if (memberExists) {
       return false;
     }
 
-    const memberSet = new Set(
-      currentMembers.map((m: any) => JSON.stringify(m))
-    );
-    memberSet.add(JSON.stringify(member));
+    const membersToAddToDB = [...new Set(savedMembers), member];
 
-    // Convert the set back to an array of objects
-    membersToAddToDB = Array.from(memberSet).map((m: any) => JSON.parse(m));
-
-    const { data: updateData, error } = await supabase
+    const { data, error } = await supabase
       .from("users")
       .update({ saved_contacts: membersToAddToDB })
       .eq("user_id", user_id)
-      .single();
+      .select();
 
     if (error) {
       console.error("Error inserting saved_contacts data:", error);
+      return [];
     }
-    // else {
-    //   console.log("User updated successfully:", membersToAddToDB);
-    // }
+    return data[0]?.saved_contacts || [];
   } catch (error) {
     console.error("Error fetching or updating family member info:", error);
   }
@@ -276,38 +267,32 @@ export async function fetchFamillyMemberInfoFromDB(user_id: string) {
   if (error) {
     console.error("Error fetching data:", error);
     return [];
-  } else {
-    return data;
   }
+  return data[0]?.saved_contacts || [];
 }
 
 export async function removeFamillyMemberInfoFromDB(
   user_id: string,
-  email: string
+  member: Member,
+  savedMembers: Member[]
 ) {
   try {
-    const data = await fetchFamillyMemberInfoFromDB(user_id);
-
-    let currentMembers = Array.isArray(data[0]?.saved_contacts)
-      ? data[0].saved_contacts
-      : [];
-
     // Remove the member with the given email
-    const updatedMembers = currentMembers.filter(
-      (member: any) => member.email !== email
+    const updatedMembers = savedMembers.filter(
+      (m: Member) => m.email !== member.email
     );
 
-    const { data: updateData, error } = await supabase
+    const { data, error } = await supabase
       .from("users")
       .update({ saved_contacts: updatedMembers })
       .eq("user_id", user_id)
-      .single();
+      .select();
 
     if (error) {
       console.error("Error removing member from saved_contacts data:", error);
-    } else {
-      location.reload();
+      return [];
     }
+    return data[0]?.saved_contacts || [];
   } catch (error) {
     console.error("Error fetching or updating family member info:", error);
   }

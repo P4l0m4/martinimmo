@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import {
-  fetchFamillyMemberInfoFromDB,
-  getCredits,
-  addFamillyMemberInfoToDB,
-  removeOneCredit,
-  removeFamillyMemberInfoFromDB,
-} from "@/utils/supabase";
-import { computed, ref, onMounted } from "vue";
-import { useToggle, computedAsync } from "@vueuse/core";
-const props = defineProps<{
-  email: string;
-  firstname: string;
-  lastname: string;
-  userId: string;
-}>();
+import { computed, ref } from "vue";
 
-const evaluating = ref(false);
+export type Member = {
+  email: string;
+  person: {
+    first_name: string;
+    last_name: string;
+  };
+};
+
+interface Props {
+  member: Member;
+  savedMembers: Member[];
+  userId: string;
+}
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  (e: "saveContact", payload: Member): void;
+  (e: "unsaveContact", payload: Member): void;
+}>();
 
 const savingStatus = computed(() => {
   return isEmailSaved.value;
@@ -23,22 +27,13 @@ const savingStatus = computed(() => {
 
 const copyingStatus = ref("");
 
-const emailsInDB = computedAsync(async () => {
-  const data = await fetchFamillyMemberInfoFromDB(props.userId);
-  return data;
-}, []);
-
-const [showCreditsPopUp, toggleCreditsPopUp] = useToggle();
-
-const emailIsClicked = ref(false);
-
 const isEmailSaved = computed(() => {
-  if (emailsInDB.value === null || evaluating.value === true) {
-    return;
+  if (props.savedMembers.length === 0) {
+    return false;
   }
 
-  return emailsInDB.value[0]?.saved_contacts.some(
-    (el: { email: string }) => el.email === props.email
+  return props.savedMembers.some(
+    (el: { email: string }) => el.email === props.member.email
   );
 });
 
@@ -48,41 +43,19 @@ const savingTooltipText = computed(() => {
     : "Sauvegarder le contact";
 });
 
-function copyEmailToClipboard(email: string) {
-  navigator.clipboard.writeText(email);
+function copyEmailToClipboard() {
+  navigator.clipboard.writeText(props.member.email);
   copyingStatus.value = "success";
   setTimeout(() => {
     copyingStatus.value = "";
   }, 1000);
 }
 
-async function SaveContact() {
-  const formattedMember = {
-    first_name: props.firstname,
-    last_name: props.lastname,
-    email: props.email,
-  };
-  try {
-    const response = await addFamillyMemberInfoToDB(
-      props.userId,
-      formattedMember
-    );
-    if (response === false) {
-      return;
-    }
-    setTimeout(() => {
-      location.reload();
-    }, 1000);
-  } catch (error) {
-    console.error("Failed to add family member info:", error);
-  }
-}
-
 function handleSaveOrUnsave() {
   if (isEmailSaved.value) {
-    removeFamillyMemberInfoFromDB(props.userId, props.email);
+    emit("unsaveContact", props.member);
   } else {
-    SaveContact();
+    emit("saveContact", props.member);
   }
 }
 
@@ -131,14 +104,14 @@ function handleSaveOrUnsave() {
   <Transition>
     <div class="family-member">
       <div class="family-member__name">
-        {{ firstname }} {{ lastname }}
+        {{ member.person.first_name }} {{ member.person.last_name }}
         <span
           class="family-member__name__icon"
           :class="{ saved: savingStatus === true }"
         >
           <IconComponent
             icon="bookmark"
-            @click="handleSaveOrUnsave()"
+            @click="handleSaveOrUnsave"
             style="cursor: pointer"
             v-tooltip:top="savingTooltipText"
           />
@@ -147,20 +120,13 @@ function handleSaveOrUnsave() {
       <div class="family-member__data">
         <div class="family-member__data__mail">
           <span style="opacity: 0.6"><IconComponent icon="mail" /></span>
-          <!-- <span
-            v-if="!isEmailSaved"
-            class="family-member__data__mail__blur"
-            v-tooltip:top="'Utiliser un crédit pour dévoiler l\'adresse mail'"
-            @click="handleEmailClick"
-            >loremipsum@gmail.com</span
-          > -->
 
           <span class="unlocked-content">
-            {{ email }}
+            {{ member.email }}
             <IconComponent
               v-if="copyingStatus === ''"
               icon="copy"
-              @click="copyEmailToClipboard(email)"
+              @click="copyEmailToClipboard"
               style="cursor: pointer; margin-left: auto"
               v-tooltip:top="'Copier l\'adresse mail'"
             /><IconComponent
@@ -174,7 +140,7 @@ function handleSaveOrUnsave() {
       </div>
     </div>
   </Transition>
-  <ConfirmationPopUp
+  <!-- <ConfirmationPopUp
     v-if="showCreditsPopUp"
     @close-confirmation="toggleCreditsPopUp"
   >
@@ -184,7 +150,7 @@ function handleSaveOrUnsave() {
         Acheter des crédits
       </PrimaryButton>
     </template>
-  </ConfirmationPopUp>
+  </ConfirmationPopUp> -->
 </template>
 
 <style lang="scss" scoped>
