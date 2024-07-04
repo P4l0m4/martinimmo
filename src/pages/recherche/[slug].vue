@@ -171,11 +171,17 @@ const filteredPersonFromDatabase = computed(() => {
 });
 
 const displayFamilyResultsFromDatabase = computed(() => {
-  return filteredPersonFromDatabase.value.length > 0;
+  if (!toRaw(filteredPersonFromDatabase.value[0])) {
+    return false;
+  }
+  return toRaw(filteredPersonFromDatabase.value[0].family.length) > 0;
 });
 
 const displayFamilyButton = computed(() => {
-  return filteredPersonFromDatabase.value.length === 0;
+  if (toRaw(filteredPersonFromDatabase.value[0]?.family.length) === 0) {
+    return false;
+  }
+  return true;
 });
 
 const displaySteps = computed(() => {

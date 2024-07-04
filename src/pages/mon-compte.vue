@@ -30,7 +30,7 @@ async function getEmailsFromDB() {
 
 function generateCSV() {
   const csv = emailsInDB.value.map((row) => {
-    return `${row.first_name},${row.last_name},${row.email}`;
+    return `${row.person.first_name},${row.person.last_name},${row.email}`;
   });
   const csvArray = ["First Name,Last Name,Email"].concat(csv).join("\n");
   const a = document.createElement("a");
@@ -105,12 +105,8 @@ onMounted(async () => {
               button-type="dark"
               @click="generateCSV()"
               :button-state="loading"
-              ><IconComponent icon="download" /> Exporter au format
-              CSV</SecondaryButton
+              ><IconComponent icon="download" /> Exporter</SecondaryButton
             >
-            <button class="button--tertiary-dark" @click="toggleConfirmation">
-              <IconComponent icon="trash" /> Tout supprimer
-            </button>
 
             <ConfirmationPopUp
               v-if="showConfirmation"
@@ -125,20 +121,26 @@ onMounted(async () => {
               >
             </ConfirmationPopUp>
           </div>
-          <TableRow
-            v-for="email in emailsInDB"
-            :key="email.email"
-            :first-name="email.first_name"
-            :last-name="email.last_name"
-            :email="email.email"
-            :userId="isUserLoggedIn?.user.id"
-          />
 
-          <li v-if="!emailsInDB.length" class="empty">
-            Lorsque vous débloquerez des contacts, ils apparaîtront ici
-          </li>
+          <div class="table-row-container">
+            <TableRow
+              v-for="email in emailsInDB"
+              :key="email.email"
+              :first-name="email.first_name"
+              :last-name="email.last_name"
+              :email="email.email"
+              :userId="isUserLoggedIn?.user.id"
+            />
+
+            <li v-if="!emailsInDB.length" class="empty">
+              Lorsque vous débloquerez des contacts, ils apparaîtront ici
+            </li>
+          </div>
         </ul>
       </div>
+      <button class="button--tertiary-dark" @click="toggleConfirmation">
+        <IconComponent icon="trash" /> Tout supprimer
+      </button>
     </Container>
   </template>
   <template v-if="!isUserLoggedIn?.user.aud">
@@ -180,7 +182,7 @@ onMounted(async () => {
   .unlocked-persons {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 2rem;
     width: 100%;
     list-style: none;
 
@@ -200,15 +202,36 @@ onMounted(async () => {
       gap: 1rem;
       background-color: $primary-color;
       padding: 1rem;
-      margin-bottom: 2rem;
       border-radius: $radius;
+      flex-wrap: wrap;
 
       &__text {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        white-space: nowrap;
       }
     }
   }
+
+  .account-info {
+    .header {
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+.table-row-container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 1rem;
+  padding-right: 1rem;
+  max-height: 40dvh;
+  overflow-y: scroll;
+}
+
+.button--tertiary-dark {
+  margin-left: auto;
 }
 </style>

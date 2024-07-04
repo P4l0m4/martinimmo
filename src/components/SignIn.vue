@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { onClickOutside } from "@vueuse/core";
-import { authenticateUser } from "@/utils/supabase";
+import { authenticateUser, checkExistingToken } from "@/utils/supabase";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 
@@ -10,6 +10,9 @@ const emailRef = ref("");
 const passwordRef = ref("");
 const target = ref<HTMLElement | null>(null);
 const invalidCredentialsMessage = ref(null as string | null);
+const isUserLoggedIn = ref();
+isUserLoggedIn.value = await checkExistingToken();
+
 const emit = defineEmits(["closeSignIn"]);
 
 onClickOutside(target, () => emit("closeSignIn"));
@@ -118,8 +121,8 @@ const buttonState = computed(() => {
 </script>
 
 <template>
-  <section class="sign-up">
-    <form class="sign-up__form" ref="target" @submit.prevent="submitForm">
+  <section class="sign-in">
+    <form class="sign-in__form" ref="target" @submit.prevent="submitForm">
       <InputField
         v-model="emailRef"
         id="email"
@@ -152,7 +155,7 @@ const buttonState = computed(() => {
   </section>
 </template>
 <style lang="scss" scoped>
-.sign-up {
+.sign-in {
   position: fixed;
   inset: 0;
   display: flex;

@@ -1,10 +1,11 @@
-// import { createClient } from "@supabase/supabase-js";
-// const config = useRuntimeConfig();
-// const supabaseUrl = config.public.SUPABASE_URL;
-// const supabaseKey = config.public.SUPABASE_KEY;
-// const supabase = createClient(supabaseUrl, supabaseKey);
-
 import type { Member } from "~/components/FamilyMember.vue";
+import { useAccountStore } from "@/stores/accountStore";
+let accountStore: any;
+export default {
+  asyncData({ $pinia }) {
+    accountStore = useAccountStore($pinia);
+  },
+};
 
 let supabase: any;
 
@@ -309,5 +310,20 @@ export async function deleteAllSavedContacts(user_id: string) {
     console.error("Error deleting data:", error);
   } else {
     location.reload();
+  }
+}
+
+export async function generateUser() {
+  console.log("Generating user...");
+  const isUserLoggedIn = await checkExistingToken();
+  const currentDate = new Date();
+  const dateISOString = currentDate.toISOString();
+  let user;
+  if (isUserLoggedIn.value.user.id) {
+    addUser(isUserLoggedIn.value.user.id, dateISOString);
+    user = await fetchUserById(isUserLoggedIn.value.user.id);
+    accountStore.updateLastCreditUpdate(user.last_credit_update);
+  } else {
+    console.log("No user logged in");
   }
 }

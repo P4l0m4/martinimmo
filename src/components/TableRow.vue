@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import { removeFamillyMemberInfoFromDB } from "@/utils/supabase";
-defineProps<{
+import { ref } from "vue";
+const props = defineProps<{
   firstName: string;
   lastName: string;
   email: string;
   userId: string;
 }>();
 
-function copyEmailToClipboard(email: string) {
-  navigator.clipboard.writeText(email);
+const copyingStatus = ref("");
+
+function copyEmailToClipboard() {
+  navigator.clipboard.writeText(props.email);
+  copyingStatus.value = "success";
+  setTimeout(() => {
+    copyingStatus.value = "";
+  }, 1000);
 }
 </script>
 <template>
@@ -22,10 +29,15 @@ function copyEmailToClipboard(email: string) {
           <span class="unlocked-email"
             >{{ email }}
             <IconComponent
+              v-if="copyingStatus === ''"
               icon="copy"
-              @click="copyEmailToClipboard(email)"
-              style="cursor: pointer"
-              v-tooltip:top="'Copier l\'adresse mail'"
+              @click="copyEmailToClipboard"
+              style="cursor: pointer; margin-left: auto"
+              v-tooltip:top="'Copier l\'adresse mail'" /><IconComponent
+              v-if="copyingStatus === 'success'"
+              icon="check-circle"
+              color="#00a86b"
+              style="margin-left: auto"
           /></span>
         </div>
         <IconComponent

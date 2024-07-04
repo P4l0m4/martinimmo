@@ -225,10 +225,12 @@ input[type="checkbox"] {
   &--tertiary-light {
     color: $primary-color;
     text-decoration: underline;
+    white-space: nowrap;
   }
   &--tertiary-dark {
     color: $secondary-color;
     text-decoration: underline;
+    white-space: nowrap;
   }
 }
 
