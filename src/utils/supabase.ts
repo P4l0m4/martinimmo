@@ -37,6 +37,20 @@ export async function fetchDeadPeopleByRegion(region: string) {
   }
 }
 
+export async function fetchDeadPersonById(id: string) {
+  const { data, error } = await supabase
+    .from("dead_people_list")
+    .select("*")
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
 // export async function fetchDeadPeopleByRangeAndRegion(
 //   slice: number[],
 //   region?: string
@@ -80,7 +94,8 @@ export async function addPerson(
   }
 
   if (existingUsers && existingUsers.length > 0) {
-    console.log("User already exists. Skipping insert.");
+    console.log("User already exists. Skipping insert.", existingUsers);
+
     return;
   }
 

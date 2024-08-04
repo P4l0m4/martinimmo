@@ -28,6 +28,7 @@ export function fetchPerplexityData(profile: any): Promise<any> {
 
   return fetch("https://api.perplexity.ai/chat/completions", options)
     .then((response) => {
+      // console.log("Response:", response);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

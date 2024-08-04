@@ -53,15 +53,16 @@ onMounted(async () => {
 });
 
 async function initProfileData() {
-  profile.value = records.value.find((p: any) => {
-    const generatedSlug = `${stringToSlug(
-      `${p.firstnames} ${p.lastname} ${p.death_date} ${p.current_death_dep_name}`
-    )}`;
-    formattedDeathDateFromNow.value = dayjs(p.death_date).fromNow();
-    formattedDeathDate.value = dayjs(p.death_date).format("DD MMMM YYYY");
-    formattedBirthDate.value = dayjs(p.birth_date).format("DD MMMM YYYY");
-    return generatedSlug === profileSlug;
-  });
+  profile.value = await fetchDeadPersonById(profileSlug as string);
+  formattedDeathDateFromNow.value = dayjs(
+    profile.value[0].death_date
+  ).fromNow();
+  formattedDeathDate.value = dayjs(profile.value[0].death_date).format(
+    "DD MMMM YYYY"
+  );
+  formattedBirthDate.value = dayjs(profile.value[0].birth_date).format(
+    "DD MMMM YYYY"
+  );
 
   await loadPersons();
 }
@@ -76,26 +77,56 @@ async function getDataFromPerplexity() {
   perplexityFetchingStatus.value = "loading";
   try {
     const data = await fetchPerplexityData(
-      `first name is ${profile.value.firstnames}, last name is ${profile.value.lastname}, death date is ${profile.value.death_date}, death departement/location is ${profile.value.current_death_dep_name}, death city is ${profile.value.current_death_com_name}, birth date is ${profile.value.birth_date}, birth departement/location is ${profile.value.current_birth_dep_name}, this person died at the age of ${profile.value.age} years old and was a french citizen.`
+      `first name is ${profile.value[0].firstnames}, last name is ${profile.value[0].lastname}, death date is ${profile.value[0].death_date}, death departement/location is ${profile.value[0].current_death_dep_name}, death city is ${profile.value[0].current_death_com_name}, birth date is ${profile.value[0].birth_date}, birth departement/location is ${profile.value[0].current_birth_dep_name}, this person died at the age of ${profile.value[0].age} years old and was a french citizen.`
     );
 
-    const jsonString = data.choices[0].message.content.match(
+    const match = data.choices[0].message.content.match(
       /```json\n([\s\S]*?)\n```/
-    )[1];
+    );
+
+    if (!match) {
+      throw new Error("JSON content not found in response");
+    }
+
+    const jsonString = match[1].trim();
+
+    const correctedJsonString = `[${jsonString}]`;
+
     perplexityFetchingStatus.value = "success";
-    APIData.value = JSON.parse(jsonString);
+    APIData.value = JSON.parse(correctedJsonString);
   } catch (error) {
     console.error("Error fetching data:", error);
     perplexityFetchingStatus.value = "error";
   }
 }
 
-const sanitizedAPIData = computed<[]>(() => {
-  if (!profile.value) return [];
+// async function getDataFromPerplexity() {
+//   perplexityFetchingStatus.value = "loading";
+//   try {
+//     const data = await fetchPerplexityData(
+//       `first name is ${profile.value[0].firstnames}, last name is ${profile.value[0].lastname}, death date is ${profile.value[0].death_date}, death departement/location is ${profile.value[0].current_death_dep_name}, death city is ${profile.value[0].current_death_com_name}, birth date is ${profile.value[0].birth_date}, birth departement/location is ${profile.value[0].current_birth_dep_name}, this person died at the age of ${profile.value[0].age} years old and was a french citizen.`
+//     );
+
+//     const jsonString = data.choices[0].message.content.match(
+//       /```json\n([\s\S]*?)\n```/
+//     )[1];
+//     console.log("jsonString:", jsonString);
+//     perplexityFetchingStatus.value = "success";
+//     APIData.value = JSON.parse(jsonString);
+//     console.log("APIData:", APIData.value);
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     perplexityFetchingStatus.value = "error";
+//   }
+// }
+
+const sanitizedAPIData = computed(() => {
+  if (!profile.value[0]) return [];
+
   return removeMatchingNames(
-    JSON.parse(JSON.stringify(APIData.value)),
-    profile.value.firstnames,
-    profile.value.lastname
+    [...JSON.parse(JSON.stringify(APIData.value))],
+    profile.value[0].firstnames,
+    profile.value[0].lastname
   );
 });
 
@@ -103,6 +134,7 @@ const familyMember = ref([]);
 
 function getEmailAdresses() {
   emailsFetchingStatus.value = "loading";
+
   if (sanitizedAPIData.value.length > 0) {
     familyMember.value = sanitizedAPIData.value.map((person) => {
       const emails = generateEmailAddresses(
@@ -117,12 +149,14 @@ function getEmailAdresses() {
     });
     emailsFetchingStatus.value = "success";
   } else {
-    console.error("sanitizedAPIData.value is not an array:");
+    console.error("sanitizedAPIData.value is not an array");
+
     emailsFetchingStatus.value = "error";
   }
 }
 
 async function testEmailsValidity() {
+  console.log("testing emails");
   emailsTestingStatus.value = "loading";
   const familyMembers = [];
   for (const member of familyMember.value) {
@@ -144,8 +178,8 @@ async function testEmailsValidity() {
     }
   }
   await addPerson(
-    profile.value.firstnames,
-    profile.value.lastname,
+    profile.value[0].firstnames,
+    profile.value[0].lastname,
     familyMembers
   );
   emailsTestingStatus.value = "success";
@@ -164,8 +198,8 @@ const filteredPersonFromDatabase = computed(() => {
 
   return allPersonsFromDatabase.value.filter((person) => {
     return (
-      person.firstname === profile.value.firstnames &&
-      person.lastname === profile.value.lastname
+      person.firstname === profile.value[0].firstnames &&
+      person.lastname === profile.value[0].lastname
     );
   });
 });
@@ -182,10 +216,9 @@ const displayFamilyButton = computed(() => {
     toRaw(filteredPersonFromDatabase.value[0]?.family.length) === 0 ||
     toRaw(filteredPersonFromDatabase.value[0]?.family.length) === undefined
   ) {
-    console.log(filteredPersonFromDatabase.value[0]?.family.length);
     return true;
   }
-  console.log(filteredPersonFromDatabase.value[0]?.family.length);
+
   return false;
 });
 
@@ -227,27 +260,27 @@ async function handleUnsaveContact(member: Member) {
   <SkeletonsSlugSkeleton v-if="loading" />
 
   <Container v-else>
-    <h1 class="subtitles">
-      Informations sur {{ profile?.firstnames }} {{ profile?.lastname }}
+    <h1 class="subtitles" v-if="profile">
+      Informations sur {{ profile[0].firstnames }} {{ profile[0].lastname }}
     </h1>
-    <ul class="dead-profile">
+    <ul class="dead-profile" v-if="profile">
       <li>
-        Né(e) à : {{ profile?.source_birth_com_name }},
-        {{ profile?.current_birth_dep_name }} ({{
-          profile?.source_birth_com_code
+        Né(e) à : {{ profile[0].source_birth_com_name }},
+        {{ profile[0].current_birth_dep_name }} ({{
+          profile[0].source_birth_com_code
         }})
       </li>
       <li>Né(e) le : {{ formattedBirthDate }}</li>
       <li>
-        Décédé(e) à: {{ profile?.current_death_com_name }},
-        {{ profile?.current_death_dep_name }} ({{
-          profile?.current_death_com_code
+        Décédé(e) à: {{ profile[0].current_death_com_name }},
+        {{ profile[0].current_death_dep_name }} ({{
+          profile[0].current_death_com_code
         }})
       </li>
       <li>
         Décédé(e) le : {{ formattedDeathDate }} ({{
           formattedDeathDateFromNow
-        }}), à l'âge de {{ profile?.age }} ans
+        }}), à l'âge de {{ profile[0].age }} ans
       </li>
     </ul>
     <Transition>

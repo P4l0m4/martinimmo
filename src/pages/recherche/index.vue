@@ -102,6 +102,7 @@ watch(
             departmentName: sortedRecord.current_death_dep_name,
             regionName: sortedRecord.current_death_reg_name,
           }"
+          :uuid="sortedRecord.id"
         /></div
     ></Container>
     <Container>

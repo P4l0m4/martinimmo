@@ -23,6 +23,7 @@ const props = defineProps<{
   death?: Death;
   sex?: "M" | "F";
   name: Name;
+  uuid: string;
 }>();
 
 const formattedDeathDate = computed(() => {
@@ -36,9 +37,7 @@ const formattedDeathDate = computed(() => {
       :to="{
         name: 'recherche-slug',
         params: {
-          slug: stringToSlug(
-            `${name?.first} ${name?.last} ${death?.date} ${death?.departmentName}`
-          ),
+          slug: props.uuid,
         },
       }"
     >

@@ -1,5 +1,5 @@
 export function removeMatchingNames(
-  personsList,
+  personsList: { first_name: string; last_name: string }[],
   givenFirstNames: string,
   givenLastName: string
 ) {
