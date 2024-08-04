@@ -1,7 +1,7 @@
 {
   "regions": [
     {
-      "region_name": "Rhône alpes",
+      "region_name": "Auvergne-Rhône-Alpes",
       "url_part": "&refine=current_death_reg_name%3A%22Auvergne-Rh%C3%B4ne-Alpes%22",
       "departments": [
         {
@@ -77,7 +77,7 @@
       ]
     },
     {
-      "region_name": "Île de France",
+      "region_name": "Île-de-France",
       "url_part": "&refine=current_death_reg_name%3A%22%C3%8Ele-de-France%22",
       "departments": [
         {
@@ -115,7 +115,7 @@
       ]
     },
     {
-      "region_name": "Bourgogne Franche Comté",
+      "region_name": "Bourgogne-Franche-Comté",
       "url_part": "&refine=current_death_reg_name%3A%22Bourgogne-Franche-Comt%C3%A9%22",
       "departments": [
         {
@@ -229,7 +229,7 @@
       ]
     },
     {
-      "region_name": "Hauts de France",
+      "region_name": "Hauts-de-France",
       "url_part": "&refine=current_death_reg_name%3A%22Hauts-de-France%22",
       "departments": [
         {
@@ -423,7 +423,7 @@
       ]
     },
     {
-      "region_name": "Provence Alpes Côte d’Azur",
+      "region_name": "Provence-Alpes-Côte d'Azur",
       "url_part": "&refine=current_death_reg_name%3A%22Provence-Alpes-C%C3%B4te%20d%27Azur%22",
       "departments": [
         {

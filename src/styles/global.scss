@@ -18,6 +18,12 @@
 //   font-weight: 800;
 // }
 
+@font-face {
+  font-family: "Figtree";
+  src: url(@/assets/fonts/Figtree.ttf) format("truetype");
+  font-display: swap;
+}
+
 *,
 :before,
 :after {
@@ -37,6 +43,8 @@ body {
   font-family: Arial, sans-serif;
   color: $text-color;
   overflow-x: hidden;
+  font-family: "Figtree", sans-serif;
+  font-weight: regular;
 }
 
 a {

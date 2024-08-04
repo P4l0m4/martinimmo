@@ -11,7 +11,7 @@ export function fetchPerplexityData(profile: any): Promise<any> {
       authorization: `Bearer ${perplexityAPIKey}`,
     },
     body: JSON.stringify({
-      model: "llama-3-sonar-small-32k-online",
+      model: "llama-3.1-sonar-small-128k-online",
       messages: [
         { role: "system", content: "Be precise and concise." },
         {

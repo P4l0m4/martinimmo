@@ -13,6 +13,56 @@ export function initSupabase(s: any) {
   supabase = s;
 }
 
+export async function fetchAllDeadPeople() {
+  const { data, error } = await supabase.from("dead_people_list").select("*");
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
+export async function fetchDeadPeopleByRegion(region: string) {
+  const { data, error } = await supabase
+    .from("dead_people_list")
+    .select("*")
+    .eq("current_death_reg_name", region);
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
+// export async function fetchDeadPeopleByRangeAndRegion(
+//   slice: number[],
+//   region?: string
+// ) {
+//   let query = supabase
+//     .from("dead_people_list")
+//     .select("*")
+//     .range(slice[0], slice[1]);
+
+//   if (region && region.length > 0) {
+//     query = query.eq("current_death_reg_name", region);
+//     console.log("Region:", region);
+//   }
+
+//   const { data, error } = await query;
+
+//   console.log("Data:", query);
+
+//   if (error) {
+//     console.error("Error fetching data:", error);
+//     return [];
+//   } else {
+//     return data;
+//   }
+// }
+
 export async function addPerson(
   firstname: string,
   lastname: string,

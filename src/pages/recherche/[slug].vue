@@ -178,10 +178,15 @@ const displayFamilyResultsFromDatabase = computed(() => {
 });
 
 const displayFamilyButton = computed(() => {
-  if (toRaw(filteredPersonFromDatabase.value[0]?.family.length) === 0) {
-    return false;
+  if (
+    toRaw(filteredPersonFromDatabase.value[0]?.family.length) === 0 ||
+    toRaw(filteredPersonFromDatabase.value[0]?.family.length) === undefined
+  ) {
+    console.log(filteredPersonFromDatabase.value[0]?.family.length);
+    return true;
   }
-  return true;
+  console.log(filteredPersonFromDatabase.value[0]?.family.length);
+  return false;
 });
 
 const displaySteps = computed(() => {
@@ -249,6 +254,7 @@ async function handleUnsaveContact(member: Member) {
       <PrimaryButton
         v-if="displayFamilyButton"
         class="scale-on-hover"
+        :class="{ disabled: displaySteps }"
         button-type="dark"
         @click="findFamily()"
       >

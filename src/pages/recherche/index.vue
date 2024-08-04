@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
 import { checkExistingToken } from "@/utils/supabase";
 
@@ -17,7 +17,8 @@ onMounted(async () => {
   if (isUserLoggedIn.value === null) {
     await navigateTo({ path: "/" });
   }
-  await deathStore.fetchData();
+  // await deathStore.fetchData();
+  await deathStore.getAllDeadPeople();
   records.value = deathStore.records;
   sortedRecords.value = deathStore.records;
 });
@@ -41,7 +42,7 @@ async function handleDepartmentFilter(filter: {
   department_name: string;
   url_part: string;
 }) {
-  await deathStore.setDepartment(filter);
+  await deathStore.setDepartment(filter.department_name);
   records.value = deathStore.records;
   sortedRecords.value = deathStore.records;
 }
@@ -50,15 +51,31 @@ async function handleRegionFilter(filter: {
   region_name: string;
   url_part: string;
 }) {
-  await deathStore.setRegion(filter);
+  await deathStore.setRegion(filter.region_name);
   records.value = deathStore.records;
   sortedRecords.value = deathStore.records;
 }
+
+function setSliceInStore(slice: [number, number]) {
+  deathStore.setSlice(slice);
+  records.value = deathStore.records;
+  sortedRecords.value = deathStore.records;
+}
+
+//watch for changes on the region of the store
+watch(
+  () => deathStore.records,
+  (newRegion) => {
+    if (newRegion) {
+      records.value = deathStore.records;
+      sortedRecords.value = deathStore.records;
+    }
+  }
+);
 </script>
 
 <template>
   <template v-if="isUserLoggedIn?.user.aud">
-    <Skeleton />
     <Container>
       <div class="sorting-and-filtering">
         <Filtering
@@ -85,15 +102,23 @@ async function handleRegionFilter(filter: {
             departmentName: sortedRecord.current_death_dep_name,
             regionName: sortedRecord.current_death_reg_name,
           }"
-        /></div></Container
-  ></template>
+        /></div
+    ></Container>
+    <Container>
+      <PaginationComponent
+        :totalDeadPeople="deathStore.totalDeadPeople"
+        @slice-selected="setSliceInStore"
+      />
+    </Container>
+  </template>
+
   <SkeletonsSearchSkeleton v-else />
 </template>
 
 <style scoped lang="scss">
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(343px, 1fr));
   width: 100%;
   gap: 1rem;
 }

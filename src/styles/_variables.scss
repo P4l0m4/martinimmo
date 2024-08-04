@@ -29,7 +29,7 @@ $blue-color-faded: rgba($blue-color, 0.6);
 $radius: 8px;
 
 //SHADOWS
-$shadow-black: 0px 0px 10px rgba(0, 0, 0, 0.05);
+$shadow-black: 0px 0px 10px rgba(0, 0, 0, 0.02);
 $shadow-primary: 0px 0px 10px rgba($primary-color, 0.05);
 $shadow-secondary: 0px 0px 10px rgba($secondary-color, 0.05);
 $shadow-text: 0px 0px 2px $text-color;
@@ -48,7 +48,7 @@ $thick: 800;
 $golden-number: 1.618;
 
 //FONT SIZES
-$small-text: 0.75rem;
+$small-text: 0.8rem;
 $subtitles: calc(1rem * $golden-number);
 $titles: calc($subtitles * $golden-number);
 
