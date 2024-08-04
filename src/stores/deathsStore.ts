@@ -75,6 +75,7 @@ export const useDeathStore = defineStore({
     },
     async getAllDeadPeople() {
       const data = await fetchAllDeadPeople();
+      this.records = data.slice(this.slice[0], this.slice[1]);
       this.totalDeadPeople = data.length;
     },
     setSlice(slice: [number, number]) {
