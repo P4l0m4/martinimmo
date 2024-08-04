@@ -27,14 +27,14 @@ onMounted(async () => {
   records.value = deathStore.records;
   sortedRecords.value = deathStore.records;
 
-  navigateTo(
-    `${route.path}?region=${deathStore.region}&department=${deathStore.department}`
-  );
-
   if (route.query.region) {
+    navigateTo(`${route.path}?region=${deathStore.region}`);
     deathStore.setRegion(route.query.region as string);
   }
   if (route.query.department) {
+    navigateTo(
+      `${route.path}?region=${deathStore.region}&department=${deathStore.department}`
+    );
     deathStore.setDepartment(route.query.department as string);
   }
 });
@@ -171,17 +171,28 @@ watch(
   grid-template-columns: repeat(auto-fit, minmax(343px, 1fr));
   width: 100%;
   gap: 1rem;
+  margin-top: 104px;
 }
 
 .sorting-and-filtering {
+  position: fixed;
+  z-index: 2;
+  top: 104px;
+  left: 0;
+  right: 0;
+  margin: auto;
   display: flex;
-  align-items: center;
   gap: 1rem;
   white-space: nowrap;
-  overflow-x: scroll;
+  background-color: $secondary-color;
+  padding: 1rem;
+  border-radius: $radius;
+  flex-direction: column;
+  width: calc(100% - 2rem);
 
-  &::-webkit-scrollbar {
-    display: none;
+  @media (min-width: $big-tablet-screen) {
+    flex-direction: row;
+    width: calc(100% - 4rem);
   }
 }
 

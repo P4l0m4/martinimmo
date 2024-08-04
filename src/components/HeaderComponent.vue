@@ -71,6 +71,7 @@ onMounted(async () => {
 
   &__nav {
     width: 100%;
+
     &__ul {
       list-style: none;
       display: flex;
@@ -83,6 +84,7 @@ onMounted(async () => {
         display: flex;
         align-items: center;
         gap: 1rem;
+
         .credits {
           display: flex;
           align-items: center;
@@ -98,6 +100,14 @@ onMounted(async () => {
           border-radius: 50%;
         }
       }
+
+      &__li a {
+        font-weight: $skinny-thick;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+      }
     }
   }
 }
@@ -106,4 +116,3 @@ onMounted(async () => {
   margin-left: auto;
 }
 </style>
-~/utils/debounce

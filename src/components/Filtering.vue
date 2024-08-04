@@ -140,6 +140,8 @@ onClickOutside(target, (event) => (displayDepartment.value = false));
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  width: 100%;
+  max-width: 400px;
 
   &__dropdown {
     display: flex;
@@ -147,31 +149,38 @@ onClickOutside(target, (event) => (displayDepartment.value = false));
     gap: 0.5rem;
     background-color: $primary-color;
     border-radius: $radius;
+    width: 100%;
+    max-width: 400px;
 
     &__label {
       cursor: pointer;
       padding: 0.5rem 1rem;
       border: 2px solid transparent;
       border-radius: $radius;
-      width: 230px;
+      width: 100%;
+      max-width: 400px;
 
       &--active {
         color: $secondary-color;
-        border: 2px solid $secondary-color;
+        border: 2px solid $primary-color;
+        font-weight: $skinny-thick;
       }
     }
+
     .wrapper {
       display: flex;
-      position: fixed;
-      margin-top: 2.5rem;
+      position: absolute;
+      margin-top: 2.05rem;
       z-index: 1;
+      width: 100%;
+      max-width: 400px;
 
       .list {
         background-color: $primary-color;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        width: 230px;
+        width: 100%;
         max-height: 50svh;
         overflow-y: scroll;
         box-shadow: $shadow-black;

@@ -47,6 +47,10 @@ const handleSort = (order: SortOrder) => {
   gap: 0.5rem;
   align-items: center;
 
+  @media (min-width: $big-tablet-screen) {
+    gap: 1rem;
+  }
+
   &__button {
     background-color: $primary-color;
     border: 2px solid $primary-color;
