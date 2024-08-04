@@ -22,6 +22,15 @@
       <SkeletonsSkeleton :height="82" />
       <SkeletonsSkeleton :height="82" />
       <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="82" />
     </div>
   </Container>
 </template>

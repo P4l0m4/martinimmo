@@ -65,6 +65,8 @@ export const useDeathStore = defineStore({
           this.totalDeadPeople = data.filter(
             (record: any) => record.current_death_dep_name === this.department
           ).length;
+        } else if (this.region.length < 1) {
+          this.getAllDeadPeople();
         } else {
           this.records = data.slice(this.slice[0], this.slice[1]);
           this.totalDeadPeople = data.length;

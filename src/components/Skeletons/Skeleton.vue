@@ -6,10 +6,12 @@ defineProps<{
 </script>
 
 <template>
-  <span
-    class="skeleton"
-    :style="{ height: `${height}px`, maxWidth: `${maxWidth}px` }"
-  ></span>
+  <Transition>
+    <span
+      class="skeleton"
+      :style="{ height: `${height}px`, maxWidth: `${maxWidth}px` }"
+    ></span
+  ></Transition>
 </template>
 
 <style scoped lang="scss">

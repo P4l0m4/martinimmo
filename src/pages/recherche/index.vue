@@ -12,6 +12,8 @@ const sortedRecords = ref([]);
 
 const sortOrder = ref("default");
 
+const reset = ref(false);
+
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
   if (isUserLoggedIn.value === null) {
@@ -72,6 +74,20 @@ watch(
     }
   }
 );
+
+//reset the pagination when the region changes
+watch(
+  () => deathStore.region,
+  () => {
+    deathStore.setSlice([0, 200]);
+    records.value = deathStore.records;
+    sortedRecords.value = deathStore.records;
+    reset.value = true;
+    setTimeout(() => {
+      reset.value = false;
+    }, 100);
+  }
+);
 </script>
 
 <template>
@@ -109,6 +125,7 @@ watch(
       <PaginationComponent
         :totalDeadPeople="deathStore.totalDeadPeople"
         @slice-selected="setSliceInStore"
+        v-if="deathStore.totalDeadPeople > 200 && !reset"
       />
     </Container>
   </template>

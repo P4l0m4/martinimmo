@@ -5,7 +5,7 @@
       "url_part": "&refine=current_death_reg_name%3A%22Auvergne-Rh%C3%B4ne-Alpes%22",
       "departments": [
         {
-          "department_name": "Haute Savoie",
+          "department_name": "Haute-Savoie",
           "url_part": "&refine=current_death_dep_name%3A%22Haute-Savoie%22"
         },
         {
@@ -37,11 +37,11 @@
           "url_part": "&refine=current_death_dep_name%3A%22Dr%C3%B4me%22"
         },
         {
-          "department_name": "Haute Loire",
+          "department_name": "Haute-Loire",
           "url_part": "&refine=current_death_dep_name%3A%22Haute-Loire%22"
         },
         {
-          "department_name": "Puy de Dôme",
+          "department_name": "Puy-de-Dôme",
           "url_part": "&refine=current_death_dep_name%3A%22Puy-de-D%C3%B4me%22"
         },
         {
@@ -59,7 +59,7 @@
       "url_part": "&refine=current_death_reg_name%3A%22Bretagne%22",
       "departments": [
         {
-          "department_name": "Côtes d'Armor",
+          "department_name": "Côtes-d'Armor",
           "url_part": "&refine=current_death_dep_name%3A%22C%C3%B4tes-d%27Armor%22"
         },
         {
@@ -67,7 +67,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Finist%C3%A8re%22"
         },
         {
-          "department_name": "Ille et Vilaine",
+          "department_name": "Ille-et-Vilaine",
           "url_part": "&refine=current_death_dep_name%3A%22Ille-et-Vilaine%22"
         },
         {
@@ -85,7 +85,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Paris%22"
         },
         {
-          "department_name": "Seine et Marne",
+          "department_name": "Seine-et-Marne",
           "url_part": "&refine=current_death_dep_name%3A%22Seine-et-Marne%22"
         },
         {
@@ -97,19 +97,19 @@
           "url_part": "&refine=current_death_dep_name%3A%22Essonne%22"
         },
         {
-          "department_name": "Hauts de Seine",
+          "department_name": "Hauts-de-Seine",
           "url_part": "&refine=current_death_dep_name%3A%22Hauts-de-Seine%22"
         },
         {
-          "department_name": "Seine Saint Denis",
+          "department_name": "Seine-Saint-Denis",
           "url_part": "&refine=current_death_dep_name%3A%22Seine-Saint-Denis%22"
         },
         {
-          "department_name": "Val de Marne",
+          "department_name": "Val-de-Marne",
           "url_part": "&refine=current_death_dep_name%3A%22Val-de-Marne%22"
         },
         {
-          "department_name": "Val d'Oise",
+          "department_name": "Val-d'Oise",
           "url_part": "&refine=current_death_dep_name%3A%22Val-d%27Oise%22"
         }
       ]
@@ -119,7 +119,7 @@
       "url_part": "&refine=current_death_reg_name%3A%22Bourgogne-Franche-Comt%C3%A9%22",
       "departments": [
         {
-          "department_name": "Côte d'Or",
+          "department_name": "Côte-d'Or",
           "url_part": "&refine=current_death_dep_name%3A%22C%C3%B4te-d%27Or%22"
         },
         {
@@ -135,11 +135,11 @@
           "url_part": "&refine=current_death_dep_name%3A%22Ni%C3%A8vre%22"
         },
         {
-          "department_name": "Haute Saône",
+          "department_name": "Haute-Saône",
           "url_part": "&refine=current_death_dep_name%3A%22Haute-Sa%C3%B4ne%22"
         },
         {
-          "department_name": "Saône et Loire",
+          "department_name": "Saône-et-Loire",
           "url_part": "&refine=current_death_dep_name%3A%22Sa%C3%B4ne-et-Loire%22"
         },
         {
@@ -161,7 +161,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Cher%22"
         },
         {
-          "department_name": "Eure et Loir",
+          "department_name": "Eure-et-Loir",
           "url_part": "&refine=current_death_dep_name%3A%22Eure-et-Loir%22"
         },
         {
@@ -169,11 +169,11 @@
           "url_part": "&refine=current_death_dep_name%3A%22Indre%22"
         },
         {
-          "department_name": "Indre et Loire",
+          "department_name": "Indre-et-Loire",
           "url_part": "&refine=current_death_dep_name%3A%22Indre-et-Loire%22"
         },
         {
-          "department_name": "Loir et Cher",
+          "department_name": "Loir-et-Cher",
           "url_part": "&refine=current_death_dep_name%3A%22Loir-et-Cher%22"
         },
         {
@@ -199,11 +199,11 @@
           "url_part": "&refine=current_death_dep_name%3A%22Marne%22"
         },
         {
-          "department_name": "Haute Marne",
+          "department_name": "Haute-Marne",
           "url_part": "&refine=current_death_dep_name%3A%22Haute-Marne%22"
         },
         {
-          "department_name": "Meurthe et Moselle",
+          "department_name": "Meurthe-et-Moselle",
           "url_part": "&refine=current_death_dep_name%3A%22Meurthe-et-Moselle%22"
         },
         {
@@ -215,11 +215,11 @@
           "url_part": "&refine=current_death_dep_name%3A%22Moselle%22"
         },
         {
-          "department_name": "Bas Rhin",
+          "department_name": "Bas-Rhin",
           "url_part": "&refine=current_death_dep_name%3A%22Bas-Rhin%22"
         },
         {
-          "department_name": "Haut Rhin",
+          "department_name": "Haut-Rhin",
           "url_part": "&refine=current_death_dep_name%3A%22Haut-Rhin%22"
         },
         {
@@ -245,7 +245,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Oise%22"
         },
         {
-          "department_name": "Pas de Calais",
+          "department_name": "Pas-de-Calais",
           "url_part": "&refine=current_death_dep_name%3A%22Pas-de-Calais%22"
         },
         {
@@ -275,7 +275,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Orne%22"
         },
         {
-          "department_name": "Seine Maritime",
+          "department_name": "Seine-Maritime",
           "url_part": "&refine=current_death_dep_name%3A%22Seine-Maritime%22"
         }
       ]
@@ -289,7 +289,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Charente%22"
         },
         {
-          "department_name": "Charente Maritime",
+          "department_name": "Charente-Maritime",
           "url_part": "&refine=current_death_dep_name%3A%22Charente-Maritime%22"
         },
         {
@@ -313,15 +313,15 @@
           "url_part": "&refine=current_death_dep_name%3A%22Landes%22"
         },
         {
-          "department_name": "Lot et Garonne",
+          "department_name": "Lot-et-Garonne",
           "url_part": "&refine=current_death_dep_name%3A%22Lot-et-Garonne%22"
         },
         {
-          "department_name": "Pyrénées Atlantiques",
+          "department_name": "Pyrénées-Atlantiques",
           "url_part": "&refine=current_death_dep_name%3A%22Pyr%C3%A9n%C3%A9es-Atlantiques%22"
         },
         {
-          "department_name": "Deux Sèvres",
+          "department_name": "Deux-Sèvres",
           "url_part": "&refine=current_death_dep_name%3A%22Deux-S%C3%A8vres%22"
         },
         {
@@ -329,7 +329,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Vienne%22"
         },
         {
-          "department_name": "Haute Vienne",
+          "department_name": "Haute-Vienne",
           "url_part": "&refine=current_death_dep_name%3A%22Haute-Vienne%22"
         }
       ]
@@ -355,7 +355,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Gard%22"
         },
         {
-          "department_name": "Haute Garonne",
+          "department_name": "Haute-Garonne",
           "url_part": "&refine=current_death_dep_name%3A%22Haute-Garonne%22"
         },
         {
@@ -375,11 +375,11 @@
           "url_part": "&refine=current_death_dep_name%3A%22Loz%C3%A8re%22"
         },
         {
-          "department_name": "Hautes Pyrénées",
+          "department_name": "Hautes-Pyrénées",
           "url_part": "&refine=current_death_dep_name%3A%22Hautes-Pyr%C3%A9n%C3%A9es%22"
         },
         {
-          "department_name": "Pyrénées Orientales",
+          "department_name": "Pyrénées-Orientales",
           "url_part": "&refine=current_death_dep_name%3A%22Pyr%C3%A9n%C3%A9es-Orientales%22"
         },
         {
@@ -387,7 +387,7 @@
           "url_part": "&refine=current_death_dep_name%3A%22Tarn%22"
         },
         {
-          "department_name": "Tarn et Garonne",
+          "department_name": "Tarn-et-Garonne",
           "url_part": "&refine=current_death_dep_name%3A%22Tarn-et-Garonne%22"
         },
         {
@@ -401,11 +401,11 @@
       "url_part": "&refine=current_death_reg_name%3A%22Pays%20de%20la%20Loire%22",
       "departments": [
         {
-          "department_name": "Loire Atlantique",
+          "department_name": "Loire-Atlantique",
           "url_part": "&refine=current_death_dep_name%3A%22Loire-Atlantique%22"
         },
         {
-          "department_name": "Maine et Loire",
+          "department_name": "Maine-et-Loire",
           "url_part": "&refine=current_death_dep_name%3A%22Maine-et-Loire%22"
         },
         {
@@ -427,19 +427,19 @@
       "url_part": "&refine=current_death_reg_name%3A%22Provence-Alpes-C%C3%B4te%20d%27Azur%22",
       "departments": [
         {
-          "department_name": "Alpes de Haute Provence",
+          "department_name": "Alpes-de-Haute-Provence",
           "url_part": "&refine=current_death_dep_name%3A%22Alpes-de-Haute-Provence%22"
         },
         {
-          "department_name": "Hautes Alpes",
+          "department_name": "Hautes-Alpes",
           "url_part": "&refine=current_death_dep_name%3A%22Hautes-Alpes%22"
         },
         {
-          "department_name": "Alpes Maritimes",
+          "department_name": "Alpes-Maritimes",
           "url_part": "&refine=current_death_dep_name%3A%22Alpes-Maritimes%22"
         },
         {
-          "department_name": "Bouches du Rhône",
+          "department_name": "Bouches-du-Rhône",
           "url_part": "&refine=current_death_dep_name%3A%22Bouches-du-Rh%C3%B4ne%22"
         },
         {
