@@ -2,6 +2,9 @@
 import { ref, onMounted, watch } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
 import { checkExistingToken } from "@/utils/supabase";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 const deathStore = useDeathStore();
 
@@ -23,6 +26,17 @@ onMounted(async () => {
   await deathStore.getAllDeadPeople();
   records.value = deathStore.records;
   sortedRecords.value = deathStore.records;
+
+  navigateTo(
+    `${route.path}?region=${deathStore.region}&department=${deathStore.department}`
+  );
+
+  if (route.query.region) {
+    deathStore.setRegion(route.query.region as string);
+  }
+  if (route.query.department) {
+    deathStore.setDepartment(route.query.department as string);
+  }
 });
 
 function handleSort(order: string) {
@@ -79,6 +93,24 @@ watch(
 watch(
   () => deathStore.region,
   () => {
+    navigateTo(`${route.path}?region=${deathStore.region}`);
+    deathStore.setDepartment("");
+    deathStore.setSlice([0, 200]);
+    records.value = deathStore.records;
+    sortedRecords.value = deathStore.records;
+    reset.value = true;
+    setTimeout(() => {
+      reset.value = false;
+    }, 100);
+  }
+);
+
+watch(
+  () => deathStore.department,
+  () => {
+    navigateTo(
+      `${route.path}?region=${deathStore.region}&department=${deathStore.department}`
+    );
     deathStore.setSlice([0, 200]);
     records.value = deathStore.records;
     sortedRecords.value = deathStore.records;

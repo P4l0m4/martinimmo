@@ -94,17 +94,19 @@ const formattedDeathDate = computed(() => {
       display: flex;
       align-items: top;
       gap: 0.5rem;
+      font-weight: $skinny-thick;
 
-      &__flag {
-        width: 1rem;
-        height: 1rem;
-      }
+      // &__flag {
+      //   width: 1rem;
+      //   height: 1rem;
+      // }
     }
 
     &__date {
       display: flex;
       align-items: top;
       gap: 0.5rem;
+      font-weight: $skinny-thick;
     }
   }
 
