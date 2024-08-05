@@ -46,4 +46,15 @@ main {
 .v-leave-to {
   opacity: 0;
 }
+
+.expand-enter-active,
+.expand-leave-active {
+  transition: transform 0.4s ease, border-radius 0.4s ease;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  transform: scale(0);
+  border-radius: 50%;
+}
 </style>

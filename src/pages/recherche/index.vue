@@ -16,6 +16,7 @@ const sortedRecords = ref([]);
 const sortOrder = ref("default");
 
 const reset = ref(false);
+const isDesktop = computed(() => window.innerWidth > 1024);
 
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
@@ -36,6 +37,10 @@ onMounted(async () => {
       `${route.path}?region=${deathStore.region}&department=${deathStore.department}`
     );
     deathStore.setDepartment(route.query.department as string);
+  }
+
+  if (window.innerWidth > 1024) {
+    showMenu.value = true;
   }
 });
 
@@ -120,19 +125,33 @@ watch(
     }, 100);
   }
 );
+import { useToggle, onClickOutside } from "@vueuse/core";
+const target = ref<HTMLElement | null>(null);
+onClickOutside(target, () => toggleMenu());
+
+const [showMenu, toggleMenu] = useToggle();
 </script>
 
 <template>
   <template v-if="isUserLoggedIn?.user.aud">
     <Container>
-      <div class="sorting-and-filtering">
-        <Filtering
-          :regions="deathStore.regions"
-          @set-department="handleDepartmentFilter"
-          @set-region="handleRegionFilter"
-        />
-        <Sorting :order="sortOrder" @sort-by="handleSort" />
-      </div>
+      <Transition>
+        <MenuButton v-if="!showMenu" @click="toggleMenu()" />
+      </Transition>
+      <Transition name="expand">
+        <div
+          class="sorting-and-filtering"
+          v-if="showMenu || isDesktop"
+          ref="target"
+        >
+          <Filtering
+            :regions="deathStore.regions"
+            @set-department="handleDepartmentFilter"
+            @set-region="handleRegionFilter"
+          />
+          <Sorting :order="sortOrder" @sort-by="handleSort" /></div
+      ></Transition>
+
       <div class="cards">
         <ProfileCard
           v-for="(sortedRecord, i) in sortedRecords"
@@ -171,16 +190,10 @@ watch(
   grid-template-columns: repeat(auto-fit, minmax(343px, 1fr));
   width: 100%;
   gap: 1rem;
-  margin-top: 104px;
 }
 
 .sorting-and-filtering {
-  position: fixed;
-  z-index: 2;
-  top: 104px;
-  left: 0;
-  right: 0;
-  margin: auto;
+  z-index: 1;
   display: flex;
   gap: 1rem;
   white-space: nowrap;
@@ -189,24 +202,14 @@ watch(
   border-radius: $radius;
   flex-direction: column;
   width: calc(100% - 2rem);
+  position: fixed;
+  top: 6rem;
 
   @media (min-width: $big-tablet-screen) {
     flex-direction: row;
-    width: calc(100% - 4rem);
+    width: 100%;
+    position: inherit;
+    top: inherit;
   }
-}
-
-.cross {
-  cursor: pointer;
-  transform: rotate(45deg);
-  background-color: $primary-color;
-  height: fit-content;
-  width: fit-content;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  border-radius: 50%;
-  box-shadow: $shadow-black;
 }
 </style>
