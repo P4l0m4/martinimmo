@@ -4,41 +4,152 @@ import {
   checkExistingToken,
   signOut,
   deleteAllSavedContacts,
-  fetchFamillyMemberInfoFromDB,
+  fetchDeadPersonInfoFromDB,
 } from "@/utils/supabase";
+import { fetchPerplexityData, validateEmail } from "@/utils/APIData";
 import { useAccountStore } from "@/stores/accountStore";
 import { useToggle } from "@vueuse/core";
+import { generateEmailAddresses } from "@/utils/emailPatterns";
+import { normalizeString } from "@/utils/normalize";
+import { removeMatchingNames } from "@/utils/dataSanitization";
+import { sleep } from "@/utils/sleep";
+import type { DeadPerson, FamilyMember } from "@/components/FamilyMember.vue";
 
 const [showConfirmation, toggleConfirmation] = useToggle();
 
 const accountStore = useAccountStore();
 
 const isUserLoggedIn = ref();
-
-const emailsInDB = ref<any[]>([]);
+const emailsInDB = ref([]);
+const familyMembersWithEmails = ref<FamilyMember[]>([]);
+const persons = ref<DeadPerson[]>([]);
 
 const loading = ref(false);
+const perplexityFetchingStatus = ref("");
+const emailsFetchingStatus = ref("");
+const emailsTestingStatus = ref("");
+const APIData = ref([]);
 
-async function getEmailsFromDB() {
-  if (!isUserLoggedIn.value) return;
-  const data = await fetchFamillyMemberInfoFromDB(isUserLoggedIn.value.user.id);
-  if (data.length === 0) return false;
-  else {
-    emailsInDB.value = data;
+async function getDataFromPerplexity(profile: DeadPerson) {
+  console.log("Fetching data from Perplexity for person:", profile);
+  perplexityFetchingStatus.value = "loading";
+  try {
+    const data = await fetchPerplexityData(
+      `first name is ${profile.firstnames}, last name is ${profile.lastname}, death date is ${profile.death_date}, death departement/location is ${profile.current_death_dep_name}, death city is ${profile.current_death_com_name}, birth date is ${profile.birth_date}, birth departement/location is ${profile.current_birth_dep_name}, this person died at the age of ${profile.age} years old and was a french citizen.`
+    );
+
+    const match = data.choices[0].message.content.match(
+      /```json\n([\s\S]*?)\n```/
+    );
+
+    if (!match) {
+      throw new Error("JSON content not found in response");
+    }
+
+    const jsonString = match[1].trim();
+    const correctedJsonString = `[${jsonString}]`;
+
+    perplexityFetchingStatus.value = "success";
+    APIData.value = JSON.parse(correctedJsonString);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    perplexityFetchingStatus.value = "error";
+    return;
   }
 }
 
-function generateCSV() {
-  const csv = emailsInDB.value.map((row) => {
-    return `${row.person.first_name},${row.person.last_name},${row.email}`;
+function sanitizeDataForPerson(person: DeadPerson) {
+  console.log("Sanitizing data for person:", person);
+  if (!APIData.value || APIData.value.length === 0) return [];
+
+  const sanitized = removeMatchingNames(
+    [...APIData.value],
+    person.firstnames,
+    person.lastname
+  );
+
+  // Add id to each family member
+  sanitized.forEach((member) => {
+    member.id_from_deceased = person.id;
   });
-  const csvArray = ["First Name,Last Name,Email"].concat(csv).join("\n");
-  const a = document.createElement("a");
-  a.href = "data:attachment/csv," + encodeURI(csvArray);
-  a.target = "_blank";
-  a.download = "contacts.csv";
-  document.body.appendChild(a);
-  a.click();
+
+  return sanitized.length > 0 ? sanitized : [];
+}
+
+async function generateEmailAddressesForFamilyMembers(
+  sanitizedFamilyMembers: any[]
+) {
+  emailsFetchingStatus.value = "loading";
+
+  for (const member of sanitizedFamilyMembers) {
+    const emails = generateEmailAddresses(
+      normalizeString(member.first_name),
+      normalizeString(member.last_name)
+    );
+
+    for (const email of emails) {
+      try {
+        const response = await validateEmail(email);
+        if (response.deliverability === "DELIVERABLE") {
+          familyMembersWithEmails.value.push({
+            ...member,
+            email,
+          });
+          break;
+        }
+        await sleep(1100);
+      } catch (error) {
+        console.error("Error validating email:", error);
+        emailsFetchingStatus.value = "error";
+      }
+    }
+  }
+  await updateRelativesCountOfDeceasedPerson(
+    person.id,
+    familyMembersWithEmails.value.length
+  );
+  for (const member of familyMembersWithEmails.value) {
+    try {
+      await addFamillyToDB(member);
+    } catch (error) {
+      console.error("Failed to add family member info:", error);
+    }
+  }
+
+  emailsFetchingStatus.value = "success";
+}
+
+async function findFamily() {
+  for (const deadPerson of persons.value) {
+    if (deadPerson.relatives_count === 0) {
+      // Fetch data for the current person
+      await getDataFromPerplexity(deadPerson);
+
+      // Sanitize the data for the current person
+      const sanitizedFamilyMembers = sanitizeDataForPerson(deadPerson);
+
+      if (sanitizedFamilyMembers.length === 0) {
+        console.log(
+          `No family members found for person with ID: ${deadPerson.id}`
+        );
+        continue; // Move on to the next person if no family members are found
+      }
+
+      // Generate email addresses for the family members of the current person
+      await generateEmailAddressesForFamilyMembers(sanitizedFamilyMembers);
+    }
+  }
+}
+
+async function getPersonsFromDB() {
+  if (!isUserLoggedIn.value) return;
+  const data = await fetchDeadPersonInfoFromDB(isUserLoggedIn.value.user.id);
+  if (data.length === 0) return;
+  console.log("Data:", data);
+
+  for (const person of data) {
+    persons.value.push(person);
+  }
 }
 
 onMounted(async () => {
@@ -48,7 +159,8 @@ onMounted(async () => {
   if (isUserLoggedIn.value) {
     accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
   }
-  getEmailsFromDB();
+  await getPersonsFromDB();
+  await findFamily();
 });
 </script>
 <template>
@@ -93,7 +205,7 @@ onMounted(async () => {
         </ul>
         <ul class="unlocked-persons">
           <div
-            v-if="emailsInDB.length"
+            v-if="persons.length"
             class="header"
             style="justify-content: space-between"
           >
@@ -121,21 +233,73 @@ onMounted(async () => {
               >
             </ConfirmationPopUp>
           </div>
+          <pre>{{ persons }}</pre>
+          <table class="table">
+            <tbody class="table__body">
+              <tr
+                class="table__body__row"
+                v-for="person in persons"
+                :key="person.id"
+                @click="navigateTo(person.id)"
+              >
+                <td class="table__body__row__td">
+                  <IconComponent icon="user" color="#232323" />
+                  {{ person.firstnames }}
+                </td>
+                <td class="table__body__row__td">
+                  <IconComponent icon="user" color="#232323" />
+                  {{ person.lastname }}
+                </td>
+                <td class="table__body__row__td">
+                  <IconComponent icon="map-pin" />
+                  {{ person.current_death_com_name }} ({{
+                    person.current_death_dep_code
+                  }})
+                </td>
 
-          <div class="table-row-container">
-            <TableRow
+                <td class="table__body__row__td">
+                  <span
+                    v-if="!person.relatives_count"
+                    v-tooltip:left="
+                      `Chargement des ${
+                        emailsFetchingStatus === 'loading'
+                          ? 'membres de la famille'
+                          : 'membres de la famille'
+                      }`
+                    "
+                    ><IconComponent icon="loader" color="#9600de" />{{
+                      person.relatives_count
+                    }}</span
+                  >
+
+                  <NuxtLink
+                    v-else
+                    :to="`/${person.id}`"
+                    class="button--tertiary-dark"
+                    v-tooltip:left="
+                      'Plus d\'infos sur cette personne et les membres de sa famille'
+                    "
+                    >Voir plus</NuxtLink
+                  >{{ person.relatives_count }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- <div class="table-row-container">
+            
+           <TableRow
               v-for="email in emailsInDB"
               :key="email.email"
               :first-name="email.first_name"
               :last-name="email.last_name"
               :email="email.email"
               :userId="isUserLoggedIn?.user.id"
-            />
+            /> 
 
             <li v-if="!emailsInDB.length" class="empty">
               Lorsque vous débloquerez des contacts, ils apparaîtront ici
             </li>
-          </div>
+          </div> -->
         </ul>
       </div>
       <button class="button--tertiary-dark" @click="toggleConfirmation">
@@ -185,6 +349,14 @@ onMounted(async () => {
     gap: 2rem;
     width: 100%;
     list-style: none;
+
+    .fetching-status-indicator {
+      display: flex;
+      width: 1.5rem;
+      height: 1.5rem;
+      justify-content: center;
+      align-items: center;
+    }
 
     .empty {
       display: flex;

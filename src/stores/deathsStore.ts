@@ -51,6 +51,7 @@ export const useDeathStore = defineStore({
     regions: regions.regions,
     slice: [0, 200],
     totalDeadPeople: 0,
+    selectedRecords: [],
   }),
   actions: {
     async fetchData() {
@@ -91,6 +92,9 @@ export const useDeathStore = defineStore({
     setDepartment(department: string) {
       this.department = department;
       this.fetchData();
+    },
+    setSelectedRecords(records: any) {
+      this.selectedRecords = records;
     },
   },
 });

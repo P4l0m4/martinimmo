@@ -9,6 +9,38 @@ export type Member = {
   };
 };
 
+export type FamilyMember = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  id_from_deceased: string;
+};
+
+export type DeadPerson = {
+  lastname: string;
+  firstnames: string;
+  sex: "M" | "F";
+  birthdate: string;
+  death_date: string;
+  source_birth_com_code: string;
+  source_death_com_name: string;
+  current_birth_com_code: string;
+  current_death_com_name: string;
+  current_birth_dep_code: string;
+  current_birth_dep_name: string;
+  current_birth_reg_name: string;
+  current_death_com_code: string;
+  age: string;
+  id: string;
+  unlocked: boolean;
+  relatives_count: number;
+};
+
+export type DeadPersonWihFamily = {
+  deadPerson: DeadPerson;
+  family: FamilyMember[];
+};
+
 interface Props {
   member: Member;
   savedMembers: Member[];

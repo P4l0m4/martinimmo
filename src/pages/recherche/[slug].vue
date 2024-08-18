@@ -46,7 +46,7 @@ onMounted(async () => {
   await deathStore.fetchData();
   records.value = deathStore.records;
   await initProfileData();
-  savedMembers.value = await fetchFamillyMemberInfoFromDB(
+  savedMembers.value = await fetchDeadPersonInfoFromDB(
     isUserLoggedIn.value.user.id
   );
   loading.value = false;

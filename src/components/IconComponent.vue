@@ -27,10 +27,6 @@ withDefaults(defineProps<Props>(), {
   font-display: block;
 }
 
-.spin {
-  animation: 2s spin infinite linear;
-}
-
 .icon {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: "icomoon" !important;
@@ -54,13 +50,5 @@ withDefaults(defineProps<Props>(), {
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-@keyframes spin {
-  from {
-  }
-  to {
-    transform: rotate(180deg);
-  }
 }
 </style>

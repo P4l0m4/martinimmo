@@ -42,6 +42,8 @@ onMounted(async () => {
   if (window.innerWidth > 1024) {
     showMenu.value = true;
   }
+
+  boxArray.value = Array(sortedRecords.value.length).fill(false);
 });
 
 function handleSort(order: string) {
@@ -130,6 +132,54 @@ const target = ref<HTMLElement | null>(null);
 onClickOutside(target, () => toggleMenu());
 
 const [showMenu, toggleMenu] = useToggle();
+
+const boxArray = ref<boolean[]>([]);
+
+function updateBox(index: number, newValue: boolean) {
+  boxArray.value.splice(index, 1, !newValue);
+}
+
+const isBoxChecked = ref(false);
+
+function selectTenBoxes() {
+  if (isBoxChecked.value === false) {
+    // Set the first 10 elements to true
+    boxArray.value = boxArray.value.map((_, i) =>
+      i < 10 ? true : boxArray.value[i]
+    );
+    isBoxChecked.value = true;
+  } else {
+    // Set the first 10 elements to false
+    boxArray.value = boxArray.value.map((_, i) =>
+      i < deathStore.slice[1] ? false : boxArray.value[i]
+    );
+    isBoxChecked.value = false;
+  }
+}
+
+const selectedRecords = computed(() =>
+  boxArray.value
+    .map((value, index) => (value ? sortedRecords.value[index] : null))
+    .filter((record) => record)
+);
+
+async function savePersons() {
+  if (!isUserLoggedIn?.value || selectedRecords.value.length === 0) {
+    return;
+  }
+  try {
+    await addDeadPersonInfoToDB(
+      isUserLoggedIn?.value.user.id,
+      selectedRecords.value
+    );
+  } catch (error) {
+    console.error("Failed to add family member info:", error);
+  }
+  for (let i = 0; i < selectedRecords.value.length; i++) {
+    await updateUnlockedStatusOfDeceasedPerson(selectedRecords.value[i].id);
+    console.log(selectedRecords.value[i].id);
+  }
+}
 </script>
 
 <template>
@@ -149,29 +199,70 @@ const [showMenu, toggleMenu] = useToggle();
             @set-department="handleDepartmentFilter"
             @set-region="handleRegionFilter"
           />
-          <Sorting :order="sortOrder" @sort-by="handleSort" /></div
-      ></Transition>
-
-      <div class="cards">
-        <ProfileCard
-          v-for="(sortedRecord, i) in sortedRecords"
-          :key="i"
-          :id="sortedRecord.id"
-          :sex="sortedRecord.sex"
-          :name="{
-            first: sortedRecord.firstnames,
-            last: sortedRecord.lastname,
-          }"
-          :death="{
-            age: sortedRecord.age,
-            date: sortedRecord.death_date,
-            departmentCode: sortedRecord.current_death_dep_code,
-            departmentName: sortedRecord.current_death_dep_name,
-            regionName: sortedRecord.current_death_reg_name,
-          }"
-          :uuid="sortedRecord.id"
-        /></div
-    ></Container>
+          <Sorting :order="sortOrder" @sort-by="handleSort" />
+          <PrimaryButton @click="savePersons"
+            >Débloquer {{ selectedRecords.length }} contact(s)</PrimaryButton
+          >
+        </div></Transition
+      >
+    </Container>
+    <Container>
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="table__header">
+              <span
+                class="checkbox"
+                :class="{ 'checkbox--checked': isBoxChecked }"
+                v-tooltip:right="'En sélectionner 10'"
+                @click="selectTenBoxes"
+                ><IconComponent
+                  :icon="`check`"
+                  color="#fffdfa"
+                  v-if="isBoxChecked"
+              /></span>
+            </th>
+            <th class="table__header">
+              <IconComponent icon="clock" color="#232323" /> Date de décès
+            </th>
+            <th class="table__header">
+              <IconComponent icon="map-pin" /> Ville
+            </th>
+            <th class="table__header">
+              <IconComponent icon="user" color="#232323" /> Prénom
+            </th>
+            <th class="table__header">
+              <IconComponent icon="user" color="#232323" /> Nom
+            </th>
+          </tr>
+        </thead>
+        <tbody class="table__body">
+          <ProfileCard
+            v-for="(sortedRecord, i) in sortedRecords"
+            :key="i"
+            :id="sortedRecord.id"
+            v-model:box="boxArray[i]"
+            @update-box="updateBox(i, $event)"
+            :sex="sortedRecord.sex"
+            :name="{
+              first: sortedRecord.firstnames,
+              last: sortedRecord.lastname,
+            }"
+            :death="{
+              age: sortedRecord.age,
+              date: sortedRecord.death_date,
+              city: sortedRecord.current_death_com_name,
+              departmentCode: sortedRecord.current_death_dep_code,
+              departmentName: sortedRecord.current_death_dep_name,
+              regionName: sortedRecord.current_death_reg_name,
+            }"
+            :uuid="sortedRecord.id"
+            :index="i"
+            :box-array="boxArray"
+          />
+        </tbody>
+      </table>
+    </Container>
     <Container>
       <PaginationComponent
         :totalDeadPeople="deathStore.totalDeadPeople"
@@ -185,13 +276,6 @@ const [showMenu, toggleMenu] = useToggle();
 </template>
 
 <style scoped lang="scss">
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(343px, 1fr));
-  width: 100%;
-  gap: 1rem;
-}
-
 .sorting-and-filtering {
   z-index: 1;
   display: flex;

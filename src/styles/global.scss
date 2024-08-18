@@ -147,13 +147,14 @@ input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  border: none !important;
+  // border: none !important;
+  border: $secondary-color-faded 1px solid;
   width: 1.5rem;
   min-width: 1.5rem;
   height: 1.5rem;
   cursor: pointer;
   background-color: $primary-color;
-  box-shadow: $shadow-black;
+  box-shadow: $shadow-secondary;
   transition: background-color 0.2s;
   position: relative;
   display: flex;
@@ -181,6 +182,21 @@ input[type="checkbox"] {
     inset: 0;
     pointer-events: none;
     text-align: center;
+  }
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: $radius;
+  border: 1px solid $secondary-color-faded;
+  cursor: pointer;
+
+  &--checked {
+    background-color: $secondary-color;
   }
 }
 
@@ -240,6 +256,59 @@ input[type="checkbox"] {
     text-decoration: underline;
     white-space: nowrap;
   }
+}
+
+.table {
+  width: 100%;
+  // border-collapse: collapse;
+  border-spacing: 0;
+
+  &__header {
+    background-color: $primary-color;
+    font-weight: $skinny-thick;
+    text-align: left;
+
+    &:nth-of-type(1) {
+      border-radius: $radius 0 0 $radius;
+      padding: 0.5rem;
+    }
+
+    &:nth-last-of-type(1) {
+      border-radius: 0 $radius $radius 0;
+    }
+  }
+  &__body {
+    &__row {
+      transition: background-color 0.3s;
+      &:hover,
+      &--selected {
+        background-color: $primary-color-faded;
+        cursor: pointer;
+      }
+
+      &__td {
+        padding: 1rem;
+
+        &__location {
+          font-weight: $skinny-thick;
+        }
+
+        &__date {
+          font-weight: $skinny-thick;
+        }
+      }
+    }
+  }
+}
+@keyframes spin {
+  from {
+  }
+  to {
+    transform: rotate(180deg);
+  }
+}
+.spin {
+  animation: 2s spin infinite linear;
 }
 
 .scale-on-hover {

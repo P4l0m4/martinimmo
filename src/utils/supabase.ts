@@ -1,5 +1,10 @@
-import type { Member } from "~/components/FamilyMember.vue";
 import { useAccountStore } from "@/stores/accountStore";
+import type {
+  FamilyMember,
+  DeadPersonWihFamily,
+  DeadPerson,
+  Member,
+} from "@/components/FamilyMember.vue";
 let accountStore: any;
 export default {
   asyncData({ $pinia }) {
@@ -14,7 +19,10 @@ export function initSupabase(s: any) {
 }
 
 export async function fetchAllDeadPeople() {
-  const { data, error } = await supabase.from("dead_people_list").select("*");
+  const { data, error } = await supabase
+    .from("dead_people_list")
+    .select("*")
+    .not("unlocked", "eq", true);
 
   if (error) {
     console.error("Error fetching data:", error);
@@ -28,7 +36,8 @@ export async function fetchDeadPeopleByRegion(region: string) {
   const { data, error } = await supabase
     .from("dead_people_list")
     .select("*")
-    .eq("current_death_reg_name", region);
+    .eq("current_death_reg_name", region)
+    .not("unlocked", "eq", true);
   if (error) {
     console.error("Error fetching data:", error);
     return [];
@@ -50,32 +59,6 @@ export async function fetchDeadPersonById(id: string) {
     return data;
   }
 }
-
-// export async function fetchDeadPeopleByRangeAndRegion(
-//   slice: number[],
-//   region?: string
-// ) {
-//   let query = supabase
-//     .from("dead_people_list")
-//     .select("*")
-//     .range(slice[0], slice[1]);
-
-//   if (region && region.length > 0) {
-//     query = query.eq("current_death_reg_name", region);
-//     console.log("Region:", region);
-//   }
-
-//   const { data, error } = await query;
-
-//   console.log("Data:", query);
-
-//   if (error) {
-//     console.error("Error fetching data:", error);
-//     return [];
-//   } else {
-//     return data;
-//   }
-// }
 
 export async function addPerson(
   firstname: string,
@@ -292,39 +275,59 @@ export async function removeOneCredit(user_id: string) {
   }
 }
 
-export async function addFamillyMemberInfoToDB(
+// export async function addFamillyMemberInfoToDB(
+//   user_id: string,
+//   member: Member,
+//   savedMembers: Member[]
+// ) {
+//   try {
+//     //check if member already exists
+//     const memberExists = savedMembers.some(
+//       (m: Member) => m.email === member.email
+//     );
+//     if (memberExists) {
+//       return false;
+//     }
+
+//     const membersToAddToDB = [...new Set(savedMembers), member];
+
+//     const { data, error } = await supabase
+//       .from("users")
+//       .update({ saved_contacts: membersToAddToDB })
+//       .eq("user_id", user_id)
+//       .select();
+
+//     if (error) {
+//       console.error("Error inserting saved_contacts data:", error);
+//       return [];
+//     }
+//     return data[0]?.saved_contacts || [];
+//   } catch (error) {
+//     console.error("Error fetching or updating family member info:", error);
+//   }
+// }
+
+export async function addDeadPersonInfoToDB(
   user_id: string,
-  member: Member,
-  savedMembers: Member[]
+  selectedPersons: DeadPerson[]
 ) {
-  try {
-    //check if member already exists
-    const memberExists = savedMembers.some(
-      (m: Member) => m.email === member.email
-    );
-    if (memberExists) {
-      return false;
-    }
+  const savedPeople = await fetchDeadPersonInfoFromDB(user_id);
 
-    const membersToAddToDB = [...new Set(savedMembers), member];
+  const membersToAddToDB = [...new Set([...savedPeople, ...selectedPersons])];
 
-    const { data, error } = await supabase
-      .from("users")
-      .update({ saved_contacts: membersToAddToDB })
-      .eq("user_id", user_id)
-      .select();
+  const { data, error } = await supabase
+    .from("users")
+    .update({ saved_contacts: membersToAddToDB })
+    .eq("user_id", user_id)
+    .select();
 
-    if (error) {
-      console.error("Error inserting saved_contacts data:", error);
-      return [];
-    }
-    return data[0]?.saved_contacts || [];
-  } catch (error) {
-    console.error("Error fetching or updating family member info:", error);
+  if (error) {
+    console.error("Error inserting saved_contacts data:", error);
+    return [];
   }
 }
 
-export async function fetchFamillyMemberInfoFromDB(user_id: string) {
+export async function fetchDeadPersonInfoFromDB(user_id: string) {
   const { data, error } = await supabase
     .from("users")
     .select("saved_contacts")
@@ -375,6 +378,86 @@ export async function deleteAllSavedContacts(user_id: string) {
     console.error("Error deleting data:", error);
   } else {
     location.reload();
+  }
+}
+
+export async function getAllFamilyFromDB(
+  user_id: string
+): Promise<FamilyMember[]> {
+  let idsArray: string[];
+  const deadPersonsFromDB = await fetchDeadPersonInfoFromDB(user_id);
+
+  idsArray = deadPersonsFromDB.map((person: any) => person.id);
+
+  let familyFromDB: FamilyMember[] = [];
+
+  const familyPromises = idsArray.map(async (id: string) => {
+    const { data, error } = await supabase
+      .from("family_from_unlocked_persons")
+      .select("*")
+      .eq("id_from_deceased", id);
+
+    if (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+    return data || [];
+  });
+
+  const familyDataArrays = await Promise.all(familyPromises);
+
+  familyFromDB = familyDataArrays.flat();
+
+  return familyFromDB;
+}
+
+export async function addFamillyToDB(familyMember: FamilyMember) {
+  await supabase.from("family_from_unlocked_persons").insert([
+    {
+      firstnames: familyMember.first_name,
+      lastname: familyMember.last_name,
+      email: familyMember.email,
+      id_from_deceased: familyMember.id_from_deceased,
+    },
+  ]);
+}
+
+export async function getFamillyByDeceasedId(deceasedId: string) {
+  const { data, error } = await supabase
+    .from("family_from_unlocked_persons")
+    .select("*")
+    .eq("id_from_deceased", deceasedId);
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
+export async function updateUnlockedStatusOfDeceasedPerson(deceasedId: string) {
+  const { data, error } = await supabase
+    .from("dead_people_list")
+    .update({ unlocked: true })
+    .eq("id", deceasedId);
+
+  if (error) {
+    console.error("Error updating data:", error);
+  }
+}
+
+export async function updateRelativesCountOfDeceasedPerson(
+  deceasedId: string,
+  relativesCount: number
+) {
+  const { data, error } = await supabase
+    .from("dead_people_list")
+    .update({ relatives_count: relativesCount })
+    .eq("id", deceasedId);
+
+  if (error) {
+    console.error("Error updating data:", error);
   }
 }
 
