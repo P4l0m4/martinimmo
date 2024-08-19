@@ -1,4 +1,3 @@
-<script setup lang="ts"></script>
 <template>
   <buttton class="menu-button">
     <IconComponent icon="sliders" color="#fffdfa" size="2rem" />
@@ -23,5 +22,9 @@
   @media (min-width: $big-tablet-screen) {
     display: none;
   }
+}
+
+.rotated {
+  transform: rotate(45deg);
 }
 </style>

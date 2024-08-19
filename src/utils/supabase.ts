@@ -46,6 +46,47 @@ export async function fetchDeadPeopleByRegion(region: string) {
   }
 }
 
+export async function fetchDeadPeopleByDepartment(department: string) {
+  const { data, error } = await supabase
+    .from("dead_people_list")
+    .select("*")
+    .eq("current_death_dep_name", department)
+    .not("unlocked", "eq", true);
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
+export async function fetchDeadPeopleByCity(city: string) {
+  const { data, error } = await supabase
+    .from("dead_people_list")
+    .select("*")
+    .eq("current_death_com_name", city)
+    .not("unlocked", "eq", true);
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
+export async function fetchCitiesList(department: string) {
+  const { data, error } = await supabase
+    .from("departments_and_cities")
+    .select("*")
+    .eq("department_name", department);
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
 export async function fetchDeadPersonById(id: string) {
   const { data, error } = await supabase
     .from("dead_people_list")

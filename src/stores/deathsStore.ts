@@ -48,6 +48,7 @@ export const useDeathStore = defineStore({
     records: [],
     region: "",
     department: "",
+    city: "",
     regions: regions.regions,
     slice: [0, 200],
     totalDeadPeople: 0,
@@ -56,19 +57,18 @@ export const useDeathStore = defineStore({
   actions: {
     async fetchData() {
       try {
-        const data = await fetchDeadPeopleByRegion(this.region);
-        if (this.department.length > 0) {
-          this.records = data
-            .filter(
-              (record: any) => record.current_death_dep_name === this.department
-            )
-            .slice(this.slice[0], this.slice[1]);
-          this.totalDeadPeople = data.filter(
-            (record: any) => record.current_death_dep_name === this.department
-          ).length;
+        if (this.city.length > 0) {
+          const data = await fetchDeadPeopleByCity(this.city);
+          this.records = data;
+          return;
+        } else if (this.department.length > 0) {
+          const data = await fetchDeadPeopleByDepartment(this.department);
+          this.records = data.slice(this.slice[0], this.slice[1]);
+          return;
         } else if (this.region.length < 1) {
           this.getAllDeadPeople();
         } else {
+          const data = await fetchDeadPeopleByRegion(this.region);
           this.records = data.slice(this.slice[0], this.slice[1]);
           this.totalDeadPeople = data.length;
         }
@@ -91,6 +91,10 @@ export const useDeathStore = defineStore({
     },
     setDepartment(department: string) {
       this.department = department;
+      this.fetchData();
+    },
+    setCity(city: string) {
+      this.city = city;
       this.fetchData();
     },
     setSelectedRecords(records: any) {

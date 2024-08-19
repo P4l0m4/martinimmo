@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
+import { fetchCitiesList } from "@/utils/supabase";
 
 interface Props {
   regions: any;
@@ -20,22 +21,28 @@ const emit = defineEmits<{
       url_part: string;
     }
   ): void;
+  (e: "setCity", payload: { city: string }): void;
 }>();
 
 const target = ref(null);
 
 const regionsList = ref(props.regions);
 const selectedRegion = ref();
+const selectedDepartment = ref();
+const selectedCity = ref();
 
 const departmentsList = ref();
+const citiesList = ref([]);
 
 const displayRegion = ref(false);
 const displayDepartment = ref(false);
+const displayCity = ref(false);
 
 const filterBy = ref("default");
 
 const regionLabel = ref("Filtrer par région");
 const departmentLabel = ref("Filtrer par département");
+const cityLabel = ref("Filtrer par ville");
 
 const handleRegion = (region: any) => {
   displayRegion.value = false;
@@ -56,8 +63,9 @@ const handleRegion = (region: any) => {
   }
 };
 
-const handleDepartment = (department: any) => {
+const handleDepartment = async (department: any) => {
   displayDepartment.value = false;
+  selectedDepartment.value = department.department_name;
   if (
     filterBy.value === "default" ||
     filterBy.value !== department.department_name
@@ -73,10 +81,25 @@ const handleDepartment = (department: any) => {
   } else {
     departmentLabel.value = "Filtrer par département";
   }
+  citiesList.value = await fetchCitiesList(department.department_name);
+};
+
+const handleCity = (city: string) => {
+  displayCity.value = false;
+  if (filterBy.value === "default" || filterBy.value !== city) {
+    filterBy.value = city;
+    cityLabel.value = city;
+
+    const cityData = city;
+    emit("setCity", cityData);
+  } else {
+    cityLabel.value = "Filtrer par ville";
+  }
 };
 
 onClickOutside(target, (event) => (displayRegion.value = false));
 onClickOutside(target, (event) => (displayDepartment.value = false));
+onClickOutside(target, (event) => (displayCity.value = false));
 </script>
 <template>
   <div class="filtering">
@@ -129,6 +152,35 @@ onClickOutside(target, (event) => (displayDepartment.value = false));
             }"
             @click="handleDepartment(department)"
             >{{ department.department_name }}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="selectedDepartment" class="filtering">
+    <div class="filtering__dropdown">
+      <span
+        class="filtering__dropdown__label"
+        :class="{
+          'filtering__dropdown__label--active':
+            cityLabel !== 'Filtrer par ville',
+        }"
+        @click="displayCity = !displayCity"
+        >{{ cityLabel }}</span
+      >
+
+      <div class="wrapper" v-if="displayCity">
+        <div class="list" ref="target">
+          <span
+            class="list__element"
+            v-for="(city, i) in citiesList[0].cities"
+            :key="i"
+            :class="{
+              disabled: filterBy === city,
+            }"
+            @click="handleCity(city)"
+            >{{ city }}</span
           >
         </div>
       </div>

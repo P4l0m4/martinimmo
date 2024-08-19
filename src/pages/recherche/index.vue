@@ -79,6 +79,12 @@ async function handleRegionFilter(filter: {
   sortedRecords.value = deathStore.records;
 }
 
+async function handleCityFilter(filter: string) {
+  await deathStore.setCity(filter);
+  records.value = deathStore.records;
+  sortedRecords.value = deathStore.records;
+}
+
 function setSliceInStore(slice: [number, number]) {
   deathStore.setSlice(slice);
   records.value = deathStore.records;
@@ -185,9 +191,8 @@ async function savePersons() {
 <template>
   <template v-if="isUserLoggedIn?.user.aud">
     <Container>
-      <Transition>
-        <MenuButton v-if="!showMenu" @click="toggleMenu()" />
-      </Transition>
+      <MenuButton @click="toggleMenu()" v-if="!showMenu" />
+
       <Transition name="expand">
         <div
           class="sorting-and-filtering"
@@ -198,6 +203,7 @@ async function savePersons() {
             :regions="deathStore.regions"
             @set-department="handleDepartmentFilter"
             @set-region="handleRegionFilter"
+            @set-city="handleCityFilter"
           />
           <Sorting :order="sortOrder" @sort-by="handleSort" />
           <PrimaryButton @click="savePersons"

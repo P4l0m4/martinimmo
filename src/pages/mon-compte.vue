@@ -233,7 +233,7 @@ onMounted(async () => {
               >
             </ConfirmationPopUp>
           </div>
-          <pre>{{ persons }}</pre>
+
           <table class="table">
             <tbody class="table__body">
               <tr
@@ -280,7 +280,7 @@ onMounted(async () => {
                       'Plus d\'infos sur cette personne et les membres de sa famille'
                     "
                     >Voir plus</NuxtLink
-                  >{{ person.relatives_count }}
+                  >
                 </td>
               </tr>
             </tbody>
