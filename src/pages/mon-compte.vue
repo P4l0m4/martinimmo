@@ -233,10 +233,8 @@ onMounted(async () => {
             style="justify-content: space-between"
           >
             <span class="header__text">
-              <span style="opacity: 0.6"
-                ><IconComponent icon="bookmark"
-              /></span>
-              Vos contacts sauvegardés
+              <span style="opacity: 0.6"><IconComponent icon="unlock" /></span>
+              Vos contacts débloqués
             </span>
             <SecondaryButton
               button-type="dark"
@@ -291,7 +289,7 @@ onMounted(async () => {
                   <IconComponent icon="user" color="#232323" />
                   {{ person.lastname }}
                 </div>
-                <div class="table__body__row__cell">
+                <div class="table__body__row__cell" style="margin-left: auto">
                   <IconComponent icon="map-pin" />
                   {{ person.current_death_com_name }} ({{
                     person.current_death_dep_code

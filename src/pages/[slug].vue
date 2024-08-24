@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { stringToSlug } from "@/utils/slugify";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
