@@ -43,57 +43,28 @@ const isBoxChecked = computed({
 </script>
 <template>
   <Transition>
-    <tr
+    <div
       class="table__body__row"
       :class="{ 'table__body__row--selected': isBoxChecked }"
       @click="emit('update-box', isBoxChecked)"
     >
-      <!-- <NuxtLink
-        class="table__body scale-on-hover shadow-on-hover"
-        :to="{
-          name: 'recherche-slug',
-          params: {
-            slug: props.uuid,
-          },
-        }"
-      > -->
-
-      <td style="padding-left: 0.5rem">
+      <div>
         <span class="checkbox" :class="{ 'checkbox--checked': isBoxChecked }"
           ><IconComponent :icon="`check`" color="#fffdfa" v-if="isBoxChecked"
         /></span>
-      </td>
-      <td class="table__body__row__td">
-        <span class="table__body__row__td__date"
-          >{{ formattedDeathDate }}
-        </span>
-      </td>
-      <td class="table__body__row__td__location">
+      </div>
+
+      <span class="table__body__row__cell">{{ formattedDeathDate }}</span>
+      <span class="table__body__row__cell">
         {{ death.city }}
         <!-- <span>{{ death.departmentName }} ({{ death.departmentCode }})</span> -->
-      </td>
-      <td class="table__body__name">
+      </span>
+      <span class="table__body__row__cell">
         {{ name.first }}
-
-        <!-- <span class="sex-circle" :class="{ 'sex-circle--m': sex === 'M' }">{{
-          sex === "F" ? "F" : "H"
-        }}</span> -->
-      </td>
-      <td class="table__body__name">
+      </span>
+      <span class="table__body__row__cell">
         {{ name.last }}
-      </td>
-
-      <!-- </NuxtLink> -->
-    </tr>
+      </span>
+    </div>
   </Transition>
 </template>
-<style lang="scss" scoped>
-.table__body__name {
-  text-wrap: balance;
-  font-size: $small-text;
-
-  & .icon {
-    margin-left: auto;
-  }
-}
-</style>

@@ -18,6 +18,8 @@ const sortOrder = ref("default");
 const reset = ref(false);
 const isDesktop = computed(() => window.innerWidth > 1024);
 
+const buttonState = ref("");
+
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
   if (isUserLoggedIn.value === null) {
@@ -133,11 +135,11 @@ watch(
     }, 100);
   }
 );
-import { useToggle, onClickOutside } from "@vueuse/core";
-const target = ref<HTMLElement | null>(null);
-onClickOutside(target, () => toggleMenu());
+// import { useToggle, onClickOutside } from "@vueuse/core";
+// const target = ref<HTMLElement | null>(null);
+// onClickOutside(target, () => toggleMenu());
 
-const [showMenu, toggleMenu] = useToggle();
+// const [showMenu, toggleMenu] = useToggle();
 
 const boxArray = ref<boolean[]>([]);
 
@@ -181,24 +183,25 @@ async function savePersons() {
   } catch (error) {
     console.error("Failed to add family member info:", error);
   }
+
   for (let i = 0; i < selectedRecords.value.length; i++) {
     await updateUnlockedStatusOfDeceasedPerson(selectedRecords.value[i].id);
-    console.log(selectedRecords.value[i].id);
+    // console.log(selectedRecords.value[i].id);
   }
+  buttonState.value = "success";
+  setTimeout(() => {
+    location.reload();
+  }, 1000);
 }
 </script>
 
 <template>
   <template v-if="isUserLoggedIn?.user.aud">
     <Container>
-      <MenuButton @click="toggleMenu()" v-if="!showMenu" />
+      <!-- <MenuButton @click="toggleMenu()" v-if="!showMenu" /> -->
 
       <Transition name="expand">
-        <div
-          class="sorting-and-filtering"
-          v-if="showMenu || isDesktop"
-          ref="target"
-        >
+        <div class="sorting-and-filtering" ref="target">
           <Filtering
             :regions="deathStore.regions"
             @set-department="handleDepartmentFilter"
@@ -206,44 +209,42 @@ async function savePersons() {
             @set-city="handleCityFilter"
           />
           <Sorting :order="sortOrder" @sort-by="handleSort" />
-          <PrimaryButton @click="savePersons"
+          <PrimaryButton @click="savePersons" :buttonState
             >Débloquer {{ selectedRecords.length }} contact(s)</PrimaryButton
           >
         </div></Transition
       >
     </Container>
     <Container>
-      <table class="table">
-        <thead>
-          <tr>
-            <th class="table__header">
-              <span
-                class="checkbox"
-                :class="{ 'checkbox--checked': isBoxChecked }"
-                v-tooltip:right="'En sélectionner 10'"
-                @click="selectTenBoxes"
-                ><IconComponent
-                  :icon="`check`"
-                  color="#fffdfa"
-                  v-if="isBoxChecked"
-              /></span>
-            </th>
-            <th class="table__header">
-              <IconComponent icon="clock" color="#232323" /> Date de décès
-            </th>
-            <th class="table__header">
-              <IconComponent icon="map-pin" /> Ville
-            </th>
-            <th class="table__header">
-              <IconComponent icon="user" color="#232323" /> Prénom
-            </th>
-            <th class="table__header">
-              <IconComponent icon="user" color="#232323" /> Nom
-            </th>
-          </tr>
-        </thead>
-        <tbody class="table__body">
-          <ProfileCard
+      <div class="table">
+        <div class="table__header">
+          <div class="table__header__cell">
+            <span
+              class="checkbox"
+              :class="{ 'checkbox--checked': isBoxChecked }"
+              v-tooltip:right="'En sélectionner 10'"
+              @click="selectTenBoxes"
+              ><IconComponent
+                :icon="`check`"
+                color="#fffdfa"
+                v-if="isBoxChecked"
+            /></span>
+          </div>
+          <div class="table__header__cell">
+            <IconComponent icon="clock" color="#232323" /> Date de décès
+          </div>
+          <div class="table__header__cell">
+            <IconComponent icon="map-pin" /> Ville
+          </div>
+          <div class="table__header__cell">
+            <IconComponent icon="user" color="#232323" /> Prénom
+          </div>
+          <div class="table__header__cell">
+            <IconComponent icon="user" color="#232323" /> Nom
+          </div>
+        </div>
+        <div class="table__body">
+          <ProfileTableRow
             v-for="(sortedRecord, i) in sortedRecords"
             :key="i"
             :id="sortedRecord.id"
@@ -266,8 +267,8 @@ async function savePersons() {
             :index="i"
             :box-array="boxArray"
           />
-        </tbody>
-      </table>
+        </div>
+      </div>
     </Container>
     <Container>
       <PaginationComponent
@@ -283,7 +284,6 @@ async function savePersons() {
 
 <style scoped lang="scss">
 .sorting-and-filtering {
-  z-index: 1;
   display: flex;
   gap: 1rem;
   white-space: nowrap;
@@ -291,9 +291,6 @@ async function savePersons() {
   padding: 1rem;
   border-radius: $radius;
   flex-direction: column;
-  width: calc(100% - 2rem);
-  position: fixed;
-  top: 6rem;
 
   @media (min-width: $big-tablet-screen) {
     flex-direction: row;

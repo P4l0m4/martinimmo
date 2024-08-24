@@ -5,6 +5,8 @@ import {
   signOut,
   deleteAllSavedContacts,
   fetchDeadPersonInfoFromDB,
+  addFamillyToDB,
+  getFamillyByDeceasedId,
 } from "@/utils/supabase";
 import { fetchPerplexityData, validateEmail } from "@/utils/APIData";
 import { useAccountStore } from "@/stores/accountStore";
@@ -13,26 +15,34 @@ import { generateEmailAddresses } from "@/utils/emailPatterns";
 import { normalizeString } from "@/utils/normalize";
 import { removeMatchingNames } from "@/utils/dataSanitization";
 import { sleep } from "@/utils/sleep";
-import type { DeadPerson, FamilyMember } from "@/components/FamilyMember.vue";
+import type { FamilyMember } from "@/components/FamilyMember.vue";
+
+interface DeadPerson {
+  id: string;
+  firstnames: string;
+  lastname: string;
+  current_death_com_name: string;
+  current_death_dep_code: string;
+  hasFamilyInDB: boolean;
+  status: "idle" | "loading" | "success" | "error";
+}
 
 const [showConfirmation, toggleConfirmation] = useToggle();
-
 const accountStore = useAccountStore();
 
 const isUserLoggedIn = ref();
-const emailsInDB = ref([]);
-const familyMembersWithEmails = ref<FamilyMember[]>([]);
+interface Count {
+  id: string;
+  count: number;
+}
 const persons = ref<DeadPerson[]>([]);
+const relativesCountByPerson = ref<Count[]>([]);
 
 const loading = ref(false);
-const perplexityFetchingStatus = ref("");
-const emailsFetchingStatus = ref("");
-const emailsTestingStatus = ref("");
 const APIData = ref([]);
 
 async function getDataFromPerplexity(profile: DeadPerson) {
-  console.log("Fetching data from Perplexity for person:", profile);
-  perplexityFetchingStatus.value = "loading";
+  console.log("Fetching data for person:", profile.firstnames);
   try {
     const data = await fetchPerplexityData(
       `first name is ${profile.firstnames}, last name is ${profile.lastname}, death date is ${profile.death_date}, death departement/location is ${profile.current_death_dep_name}, death city is ${profile.current_death_com_name}, birth date is ${profile.birth_date}, birth departement/location is ${profile.current_birth_dep_name}, this person died at the age of ${profile.age} years old and was a french citizen.`
@@ -49,17 +59,13 @@ async function getDataFromPerplexity(profile: DeadPerson) {
     const jsonString = match[1].trim();
     const correctedJsonString = `[${jsonString}]`;
 
-    perplexityFetchingStatus.value = "success";
     APIData.value = JSON.parse(correctedJsonString);
   } catch (error) {
     console.error("Error fetching data:", error);
-    perplexityFetchingStatus.value = "error";
-    return;
   }
 }
 
 function sanitizeDataForPerson(person: DeadPerson) {
-  console.log("Sanitizing data for person:", person);
   if (!APIData.value || APIData.value.length === 0) return [];
 
   const sanitized = removeMatchingNames(
@@ -68,18 +74,18 @@ function sanitizeDataForPerson(person: DeadPerson) {
     person.lastname
   );
 
-  // Add id to each family member
   sanitized.forEach((member) => {
     member.id_from_deceased = person.id;
   });
 
-  return sanitized.length > 0 ? sanitized : [];
+  return sanitized;
 }
 
-async function generateEmailAddressesForFamilyMembers(
-  sanitizedFamilyMembers: any[]
+async function validateEmailsAndAddToDB(
+  sanitizedFamilyMembers: FamilyMember[],
+  deceasedId: string
 ) {
-  emailsFetchingStatus.value = "loading";
+  let validFamilyMembers: FamilyMember[] = [];
 
   for (const member of sanitizedFamilyMembers) {
     const emails = generateEmailAddresses(
@@ -87,56 +93,67 @@ async function generateEmailAddressesForFamilyMembers(
       normalizeString(member.last_name)
     );
 
+    if (!emails || emails.length === 0) {
+      continue;
+    }
+
     for (const email of emails) {
+      if (!email) {
+        continue;
+      }
+
       try {
         const response = await validateEmail(email);
         if (response.deliverability === "DELIVERABLE") {
-          familyMembersWithEmails.value.push({
-            ...member,
-            email,
-          });
+          const doesEmailExistInDB = await checkIfFamilyMemberExists(email);
+
+          if (doesEmailExistInDB.length > 0) {
+            continue;
+          }
+
+          validFamilyMembers.push({ ...member, email: email });
+          await addFamillyToDB({ ...member, email: email });
           break;
         }
         await sleep(1100);
       } catch (error) {
         console.error("Error validating email:", error);
-        emailsFetchingStatus.value = "error";
       }
     }
   }
-  await updateRelativesCountOfDeceasedPerson(
-    person.id,
-    familyMembersWithEmails.value.length
-  );
-  for (const member of familyMembersWithEmails.value) {
-    try {
-      await addFamillyToDB(member);
-    } catch (error) {
-      console.error("Failed to add family member info:", error);
-    }
-  }
 
-  emailsFetchingStatus.value = "success";
+  return validFamilyMembers.length;
+}
+
+async function processPerson(deadPerson: DeadPerson) {
+  deadPerson.status = "loading";
+
+  try {
+    await getDataFromPerplexity(deadPerson);
+
+    const sanitizedFamilyMembers = sanitizeDataForPerson(deadPerson);
+
+    if (sanitizedFamilyMembers.length === 0) {
+      deadPerson.status = "error";
+      return;
+    }
+
+    const validFamilyMembersCount = await validateEmailsAndAddToDB(
+      sanitizedFamilyMembers,
+      deadPerson.id
+    );
+
+    deadPerson.status = validFamilyMembersCount > 0 ? "success" : "error";
+  } catch (error) {
+    console.error("Error processing person:", error);
+    deadPerson.status = "error";
+  }
 }
 
 async function findFamily() {
   for (const deadPerson of persons.value) {
-    if (deadPerson.relatives_count === 0) {
-      // Fetch data for the current person
-      await getDataFromPerplexity(deadPerson);
-
-      // Sanitize the data for the current person
-      const sanitizedFamilyMembers = sanitizeDataForPerson(deadPerson);
-
-      if (sanitizedFamilyMembers.length === 0) {
-        console.log(
-          `No family members found for person with ID: ${deadPerson.id}`
-        );
-        continue; // Move on to the next person if no family members are found
-      }
-
-      // Generate email addresses for the family members of the current person
-      await generateEmailAddressesForFamilyMembers(sanitizedFamilyMembers);
+    if (!deadPerson.hasFamilyInDB) {
+      await processPerson(deadPerson);
     }
   }
 }
@@ -144,12 +161,52 @@ async function findFamily() {
 async function getPersonsFromDB() {
   if (!isUserLoggedIn.value) return;
   const data = await fetchDeadPersonInfoFromDB(isUserLoggedIn.value.user.id);
-  if (data.length === 0) return;
-  console.log("Data:", data);
-
-  for (const person of data) {
-    persons.value.push(person);
+  if (data.length === 0) {
+    return;
   }
+
+  const allPersons = [];
+  for (const person of data) {
+    const existingFamilyMembers = await getFamillyByDeceasedId(person.id);
+    const hasFamilyInDB = existingFamilyMembers.length > 0;
+
+    if (hasFamilyInDB) {
+      relativesCountByPerson.value.push({
+        id: person.id,
+        count: existingFamilyMembers.length,
+      });
+    }
+
+    allPersons.push({
+      ...person,
+      hasFamilyInDB,
+      status: "idle",
+    });
+  }
+
+  persons.value = allPersons;
+}
+
+function getRelativesCount(deceasedId: string): number {
+  const personCount = relativesCountByPerson.value.find(
+    (entry) => entry.id === deceasedId
+  );
+  return personCount ? personCount.count : 0;
+}
+
+function generateCSV() {
+  const csv = persons.value
+    .map((person) => {
+      return `${person.firstnames},${person.lastname},${person.current_death_com_name},${person.current_death_dep_code}`;
+    })
+    .join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "contacts.csv";
+  a.click();
 }
 
 onMounted(async () => {
@@ -163,175 +220,185 @@ onMounted(async () => {
   await findFamily();
 });
 </script>
+
 <template>
   <SkeletonsMyAccountSkeleton v-if="loading" />
   <template v-if="isUserLoggedIn?.user.aud">
     <Container>
-      <h1 class="subtitles">Mon compte</h1>
       <div class="lists">
-        <ul class="account-info">
-          <div class="header">
-            <span class="header__text"
-              ><span style="opacity: 0.6"><IconComponent icon="info" /></span
-              >Vos informations</span
-            >
-          </div>
-          <li class="account-info__element">
-            <span class="account-info__element__icon"
-              ><IconComponent icon="credit-card" /></span
-            >{{ accountStore.$state.credits }}
-            Crédits disponibles
-          </li>
-
-          <li class="account-info__element">
-            <span class="account-info__element__icon"
-              ><IconComponent icon="star"
-            /></span>
-            Compte
-            {{ isUserLoggedIn?.user.user_metadata.accountType }}
-          </li>
-          <li class="account-info__element">
-            <span class="account-info__element__icon"
-              ><IconComponent icon="mail"
-            /></span>
-            {{ isUserLoggedIn?.user.email }}
-          </li>
-          <PrimaryButton
-            button-type="dark"
-            @click="signOut"
-            class="logout-button"
-            >Déconnexion</PrimaryButton
-          >
-        </ul>
-        <ul class="unlocked-persons">
+        <div class="unlocked-persons">
           <div
             v-if="persons.length"
             class="header"
             style="justify-content: space-between"
           >
-            <span class="header__text"
-              ><span style="opacity: 0.6"
-                ><IconComponent icon="bookmark" /></span
-              >Vos contacts sauvegardés</span
-            ><SecondaryButton
+            <span class="header__text">
+              <span style="opacity: 0.6"
+                ><IconComponent icon="bookmark"
+              /></span>
+              Vos contacts sauvegardés
+            </span>
+            <SecondaryButton
               button-type="dark"
               @click="generateCSV()"
               :button-state="loading"
-              ><IconComponent icon="download" /> Exporter</SecondaryButton
             >
+              <IconComponent icon="download" /> Exporter
+            </SecondaryButton>
 
             <ConfirmationPopUp
               v-if="showConfirmation"
               @close-confirmation="toggleConfirmation"
-              >Êtes-vous sûr(e) de vouloir supprimer touts les contacts
-              sauvegardés ?<template #button
-                ><PrimaryButton
+            >
+              Êtes-vous sûr(e) de vouloir supprimer touts les contacts
+              sauvegardés ?
+              <template #button>
+                <PrimaryButton
                   button-type="dark"
                   @click="deleteAllSavedContacts(isUserLoggedIn?.user.id)"
-                  >Oui, supprimer</PrimaryButton
-                ></template
-              >
+                >
+                  Oui, supprimer
+                </PrimaryButton>
+              </template>
             </ConfirmationPopUp>
           </div>
 
-          <table class="table">
-            <tbody class="table__body">
-              <tr
+          <div v-else class="empty">
+            <span
+              >Quand vous débloquerez des contacts, ils apparaîtront ici.</span
+            >
+            <PrimaryButton button-type="dark" @click="navigateTo('/recherche')">
+              Débloquer des contacts
+            </PrimaryButton>
+          </div>
+
+          <div class="table">
+            <div class="table__body">
+              <div
                 class="table__body__row"
                 v-for="person in persons"
                 :key="person.id"
                 @click="navigateTo(person.id)"
               >
-                <td class="table__body__row__td">
+                <div
+                  class="table__body__row__cell"
+                  v-tooltip:right="person.firstnames"
+                >
                   <IconComponent icon="user" color="#232323" />
                   {{ person.firstnames }}
-                </td>
-                <td class="table__body__row__td">
+                </div>
+                <div class="table__body__row__cell">
                   <IconComponent icon="user" color="#232323" />
                   {{ person.lastname }}
-                </td>
-                <td class="table__body__row__td">
+                </div>
+                <div class="table__body__row__cell">
                   <IconComponent icon="map-pin" />
                   {{ person.current_death_com_name }} ({{
                     person.current_death_dep_code
                   }})
-                </td>
+                </div>
 
-                <td class="table__body__row__td">
-                  <span
-                    v-if="!person.relatives_count"
-                    v-tooltip:left="
-                      `Chargement des ${
-                        emailsFetchingStatus === 'loading'
-                          ? 'membres de la famille'
-                          : 'membres de la famille'
-                      }`
-                    "
-                    ><IconComponent icon="loader" color="#9600de" />{{
-                      person.relatives_count
-                    }}</span
+                <div class="table__body__row__cell" style="margin-left: auto">
+                  <div
+                    v-if="getRelativesCount(person.id) > 0"
+                    style="font-size: 1rem"
                   >
-
-                  <NuxtLink
-                    v-else
-                    :to="`/${person.id}`"
-                    class="button--tertiary-dark"
-                    v-tooltip:left="
-                      'Plus d\'infos sur cette personne et les membres de sa famille'
-                    "
-                    >Voir plus</NuxtLink
-                  >
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- <div class="table-row-container">
-            
-           <TableRow
-              v-for="email in emailsInDB"
-              :key="email.email"
-              :first-name="email.first_name"
-              :last-name="email.last_name"
-              :email="email.email"
-              :userId="isUserLoggedIn?.user.id"
-            /> 
-
-            <li v-if="!emailsInDB.length" class="empty">
-              Lorsque vous débloquerez des contacts, ils apparaîtront ici
+                    <IconComponent icon="user" />{{
+                      getRelativesCount(person.id)
+                    }}
+                  </div>
+                  <IconComponent
+                    icon="check-circle"
+                    v-if="person.status === 'success'"
+                    color="green"
+                  />
+                  <IconComponent
+                    icon="rotate-cw"
+                    v-if="person.status === 'error'"
+                    color="red"
+                    v-tooltip:left="'Erreur, cliquez pour réessayer'"
+                    @click.stop="processPerson(person)"
+                  />
+                  <IconComponent
+                    icon="loader"
+                    v-if="person.status === 'loading'"
+                    color="purple"
+                    v-tooltip:left="'Chargement, ne pas fermer cette page'"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <button
+            class="button--tertiary-dark"
+            @click="toggleConfirmation"
+            v-if="persons.length > 0"
+          >
+            <IconComponent icon="trash" /> Tout supprimer
+          </button>
+        </div>
+        <ul class="account-info">
+          <div class="header">
+            <span class="header__text">
+              <IconComponent icon="info" />
+              Vos informations
+            </span>
+          </div>
+          <ul class="account-info__list">
+            <li class="account-info__element">
+              <IconComponent icon="credit-card" />
+              {{ accountStore.$state.credits }} Crédits disponibles
             </li>
-          </div> -->
+            <li class="account-info__element">
+              <IconComponent icon="star" />
+              Compte {{ isUserLoggedIn?.user.user_metadata.accountType }}
+            </li>
+            <li class="account-info__element">
+              <IconComponent icon="mail" />
+              {{ isUserLoggedIn?.user.email }}
+            </li>
+            <li class="account-info__element">
+              <PrimaryButton
+                button-type="dark"
+                @click="signOut"
+                class="logout-button"
+              >
+                Déconnexion
+              </PrimaryButton>
+            </li>
+          </ul>
         </ul>
       </div>
-      <button class="button--tertiary-dark" @click="toggleConfirmation">
-        <IconComponent icon="trash" /> Tout supprimer
-      </button>
     </Container>
   </template>
   <template v-if="!isUserLoggedIn?.user.aud">
     <MustBeAuthenticated />
   </template>
 </template>
+
 <style lang="scss" scoped>
+.table__body {
+  overflow-x: scroll;
+}
 .lists {
   display: flex;
   gap: 4rem;
   flex-direction: column;
 
   @media (min-width: $laptop-screen) {
-    flex-direction: row;
     justify-content: space-between;
   }
 
   .account-info {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
 
     &__element {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0 1rem;
+      padding: 0.5rem 1rem;
 
       &__icon {
         opacity: 0.6;
@@ -344,26 +411,29 @@ onMounted(async () => {
   }
 
   .unlocked-persons {
+    white-space: nowrap;
     display: flex;
     flex-direction: column;
     gap: 2rem;
     width: 100%;
     list-style: none;
 
-    .fetching-status-indicator {
-      display: flex;
-      width: 1.5rem;
-      height: 1.5rem;
-      justify-content: center;
-      align-items: center;
-    }
+    // .fetching-status-indicator {
+    //   display: flex;
+    //   width: 1.5rem;
+    //   height: 1.5rem;
+    //   justify-content: center;
+    //   align-items: center;
+    // }
 
     .empty {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100%;
       text-align: center;
+      gap: 2rem;
     }
   }
 

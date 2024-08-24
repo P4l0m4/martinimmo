@@ -453,14 +453,26 @@ export async function getAllFamilyFromDB(
 }
 
 export async function addFamillyToDB(familyMember: FamilyMember) {
-  await supabase.from("family_from_unlocked_persons").insert([
-    {
-      firstnames: familyMember.first_name,
-      lastname: familyMember.last_name,
-      email: familyMember.email,
-      id_from_deceased: familyMember.id_from_deceased,
-    },
-  ]);
+  try {
+    const { data, error } = await supabase
+      .from("family_from_unlocked_persons")
+      .insert([
+        {
+          firstnames: familyMember.first_name,
+          lastname: familyMember.last_name,
+          email: familyMember.email,
+          id_from_deceased: familyMember.id_from_deceased,
+        },
+      ]);
+
+    if (error) {
+      throw error; // This will be caught by the catch block
+    }
+
+    console.log("Family member added successfully to DB!", data);
+  } catch (error) {
+    console.error("Error adding family member to DB:", error);
+  }
 }
 
 export async function getFamillyByDeceasedId(deceasedId: string) {
@@ -468,6 +480,20 @@ export async function getFamillyByDeceasedId(deceasedId: string) {
     .from("family_from_unlocked_persons")
     .select("*")
     .eq("id_from_deceased", deceasedId);
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  } else {
+    return data;
+  }
+}
+
+export async function checkIfFamilyMemberExists(email: string) {
+  const { data, error } = await supabase
+    .from("family_from_unlocked_persons")
+    .select("*")
+    .eq("email", email);
 
   if (error) {
     console.error("Error fetching data:", error);
@@ -485,20 +511,8 @@ export async function updateUnlockedStatusOfDeceasedPerson(deceasedId: string) {
 
   if (error) {
     console.error("Error updating data:", error);
-  }
-}
-
-export async function updateRelativesCountOfDeceasedPerson(
-  deceasedId: string,
-  relativesCount: number
-) {
-  const { data, error } = await supabase
-    .from("dead_people_list")
-    .update({ relatives_count: relativesCount })
-    .eq("id", deceasedId);
-
-  if (error) {
-    console.error("Error updating data:", error);
+  } else {
+    console.log("Deceased person unlocked successfully!");
   }
 }
 

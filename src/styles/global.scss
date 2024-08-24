@@ -36,6 +36,7 @@ html {
   scroll-behavior: smooth;
   line-height: $line-height;
   overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -259,47 +260,124 @@ input[type="checkbox"] {
 }
 
 .table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   width: 100%;
-  // border-collapse: collapse;
-  border-spacing: 0;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   &__header {
     background-color: $primary-color;
     font-weight: $skinny-thick;
     text-align: left;
+    display: flex;
+    white-space: nowrap;
+    height: fit-content;
+    align-items: center;
+    padding: 0.5rem;
+    gap: 1rem;
+    width: 100%;
 
-    &:nth-of-type(1) {
-      border-radius: $radius 0 0 $radius;
-      padding: 0.5rem;
-    }
+    &__cell {
+      background-color: $primary-color;
+      font-weight: bold;
+      height: fit-content;
 
-    &:nth-last-of-type(1) {
-      border-radius: 0 $radius $radius 0;
+      &:nth-of-type(1) {
+        width: 40px;
+      }
+      &:nth-of-type(2) {
+        min-width: 136px;
+        width: 136px;
+        max-width: 136px;
+
+        @media (min-width: $big-tablet-screen) {
+          margin-left: -1rem;
+        }
+      }
+      &:nth-of-type(3) {
+        min-width: 200px;
+        width: 200px;
+        max-width: 200px;
+      }
+      &:nth-of-type(4) {
+        min-width: 240px;
+        width: 240px;
+        max-width: 240px;
+      }
     }
   }
+
   &__body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    max-height: 60dvh;
+    overflow-y: scroll;
+    gap: 0.5rem;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    @media (min-width: $big-tablet-screen) {
+      &::-webkit-scrollbar {
+        display: initial;
+      }
+    }
+
     &__row {
+      padding: 0.5rem;
+      display: flex;
+      gap: 1rem;
       transition: background-color 0.3s;
+      align-items: center;
       &:hover,
       &--selected {
         background-color: $primary-color-faded;
         cursor: pointer;
       }
 
-      &__td {
-        padding: 1rem;
+      &__cell {
+        white-space: nowrap;
+        display: flex;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: fit-content;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
 
-        &__location {
-          font-weight: $skinny-thick;
+        &:nth-of-type(1) {
+          min-width: 136px;
+          width: 136px;
+          max-width: 136px;
         }
-
-        &__date {
-          font-weight: $skinny-thick;
+        &:nth-of-type(2) {
+          min-width: 200px;
+          width: 200px;
+          max-width: 200px;
+        }
+        &:nth-of-type(3) {
+          min-width: 240px;
+          width: 240px;
+          max-width: 240px;
+          font-size: $small-text;
+        }
+        &:nth-of-type(4) {
+          min-width: 140px;
+          width: 140px;
+          max-width: 140px;
+          font-size: $small-text;
         }
       }
     }
   }
 }
+
 @keyframes spin {
   from {
   }

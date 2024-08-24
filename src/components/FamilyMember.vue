@@ -33,7 +33,6 @@ export type DeadPerson = {
   age: string;
   id: string;
   unlocked: boolean;
-  relatives_count: number;
 };
 
 export type DeadPersonWihFamily = {
