@@ -18,7 +18,8 @@ export function fetchPerplexityData(profile: any): Promise<any> {
           role: "user",
           content: `Write me a list of five possible family members of this person: ${profile}, I want this list in a JSON format as the following example: {
             "first_name": "John",
-            "last_name": "Doe"
+            "last_name": "Doe",
+            "sex": "M",
           }. To guide your search, you can look at the obytuary of this person if it exist. If it does exist, you will consider the familly members on this document as the primary and most reliable ones. Don't add any ancestor to the list (grandparents for example) and don't add anyone who is dead either. Don't add the person itself to the list, this is important.
 `,
         },

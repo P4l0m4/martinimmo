@@ -43,6 +43,149 @@ async function initProfileData() {
 }
 </script>
 <template>
-  <pre v-if="profile">{{ profile[0] }}</pre>
-  <pre v-if="family">{{ family }}</pre>
+  <Container v-if="profile">
+    <div class="profile">
+      <img
+        class="face"
+        src="@/assets/images/man.svg"
+        alt="man profile"
+        v-if="profile[0].sex === 'M'"
+      />
+      <img
+        class="face"
+        src="@/assets/images/woman.svg"
+        alt="woman profile"
+        v-else
+      />
+      <div class="profile__text">
+        <h1 class="subtitles">
+          {{ profile[0].firstnames }} {{ profile[0].lastname }}
+        </h1>
+        <h2 class="paragraphs dates">
+          {{ formattedBirthDate }} | {{ formattedDeathDate }}
+        </h2>
+        <ul class="list">
+          <li class="paragraphs">
+            Né(e) à {{ profile[0].source_birth_com_name }}, en
+            {{ profile[0].current_birth_dep_name }} ({{
+              profile[0].current_birth_dep_code
+            }}).
+          </li>
+          <li class="paragraphs">
+            Décédé(e) à {{ profile[0].current_death_com_name }}, en
+            {{ profile[0].current_death_dep_name }} ({{
+              profile[0].current_death_dep_code
+            }}) à l'âge de {{ profile[0].age }} ans.
+          </li>
+        </ul>
+      </div>
+
+      <div class="family">
+        <div v-for="member in family" :key="member.id" class="family__member">
+          <img
+            class="family__member__face"
+            src="@/assets/images/man.svg"
+            alt="man profile"
+            v-if="member.sex === 'M'"
+          />
+          <img
+            class="family__member__face"
+            src="@/assets/images/woman.svg"
+            alt="woman profile"
+            v-else
+          />
+          <div class="family__member__info">
+            <span>{{ member.firstnames }} {{ member.lastname }}</span>
+            <span>{{ member.email }}</span>
+          </div>
+        </div>
+      </div>
+    </div></Container
+  >
 </template>
+<style scoped lang="scss">
+.profile {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+
+    @media (min-width: $big-tablet-screen) {
+      max-width: 260px;
+    }
+  }
+
+  @media (min-width: $laptop-screen) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.face {
+  width: 100px;
+  -moz-transform: scale(-1, 1);
+  -webkit-transform: scale(-1, 1);
+  -o-transform: scale(-1, 1);
+  -ms-transform: scale(-1, 1);
+  transform: scale(-1, 1);
+
+  @media (min-width: $big-tablet-screen) {
+    width: 60%;
+    max-width: 400px;
+  }
+}
+
+.dates {
+  white-space: nowrap;
+}
+
+.list {
+  list-style: upper-roman;
+  list-style-position: inside;
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.family {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+
+  @media (min-width: $laptop-screen) {
+    padding-left: 10%;
+  }
+
+  &__member {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    &__face {
+      background-color: $primary-color;
+      padding: 0.5rem;
+      border-radius: 50%;
+      width: 40px;
+      -moz-transform: scale(-1, 1);
+      -webkit-transform: scale(-1, 1);
+      -o-transform: scale(-1, 1);
+      -ms-transform: scale(-1, 1);
+      transform: scale(-1, 1);
+    }
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+  }
+}
+</style>
