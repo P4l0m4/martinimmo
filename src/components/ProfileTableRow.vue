@@ -53,7 +53,6 @@ const isBoxChecked = computed({
           ><IconComponent :icon="`check`" color="#fffdfa" v-if="isBoxChecked"
         /></span>
       </div>
-
       <span class="table__body__row__cell">{{ formattedDeathDate }}</span>
       <span class="table__body__row__cell">
         {{ death.city }}

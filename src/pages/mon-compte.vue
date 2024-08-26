@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import {
   checkExistingToken,
   signOut,
-  deleteAllSavedContacts,
+  deleteSavedContactByID,
   fetchDeadPersonInfoFromDB,
   addFamillyToDB,
   getFamillyByDeceasedId,
 } from "@/utils/supabase";
+import { copyToClipboard } from "@/utils/copyToClipboard";
 import { fetchPerplexityData, validateEmail } from "@/utils/APIData";
 import { useAccountStore } from "@/stores/accountStore";
 import { useToggle } from "@vueuse/core";
@@ -16,6 +17,7 @@ import { normalizeString } from "@/utils/normalize";
 import { removeMatchingNames } from "@/utils/dataSanitization";
 import { sleep } from "@/utils/sleep";
 import type { FamilyMember } from "@/components/FamilyMember.vue";
+import SecondaryButton from "~/components/SecondaryButton.vue";
 
 interface DeadPerson {
   id: string;
@@ -40,6 +42,11 @@ const relativesCountByPerson = ref<Count[]>([]);
 
 const loading = ref(false);
 const APIData = ref([]);
+
+const allFamilyMembers = ref<FamilyMember[]>([]);
+
+const isBoxChecked = ref(false);
+const boxArray = ref<boolean[]>([]);
 
 async function getDataFromPerplexity(profile: DeadPerson) {
   console.log("Fetching data for person:", profile.firstnames);
@@ -209,15 +216,51 @@ function generateCSV() {
   a.click();
 }
 
+async function getAllFamilyMembers() {
+  for (const person of persons.value) {
+    const familyMembers = await getFamillyByDeceasedId(person.id);
+    allFamilyMembers.value.push(...familyMembers);
+  }
+  console.log("All family members:", allFamilyMembers.value);
+}
+
+function selectTenBoxes() {
+  isBoxChecked.value = !isBoxChecked.value;
+  boxArray.value = persons.value.map(() => isBoxChecked.value);
+}
+
+function updateBox(index: number, newValue: boolean) {
+  boxArray.value.splice(index, 1, newValue);
+
+  isBoxChecked.value = boxArray.value.every((box) => box);
+}
+const deceasedIDOfPersonsToBeDeleted = computed(() => {
+  return boxArray.value
+    .map((box, index) => (box ? persons.value[index].id : null))
+    .filter((id) => id);
+});
+
+function deleteSelectedContactsWithFamilyMembers() {
+  const userId = isUserLoggedIn.value.user.id;
+
+  deceasedIDOfPersonsToBeDeleted.value.forEach(async (deceasedID: any) => {
+    await deleteSavedContactByID(userId, deceasedID);
+  });
+}
+
 onMounted(async () => {
   loading.value = true;
   isUserLoggedIn.value = await checkExistingToken();
-  loading.value = false;
+
   if (isUserLoggedIn.value) {
     accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
   }
   await getPersonsFromDB();
+  loading.value = false;
   await findFamily();
+  await getAllFamilyMembers();
+
+  boxArray.value = persons.value.map(() => false);
 });
 </script>
 
@@ -228,7 +271,7 @@ onMounted(async () => {
       <div class="lists">
         <div class="unlocked-persons">
           <div
-            v-if="persons.length"
+            v-if="persons.length > 0"
             class="header"
             style="justify-content: space-between"
           >
@@ -248,12 +291,13 @@ onMounted(async () => {
               v-if="showConfirmation"
               @close-confirmation="toggleConfirmation"
             >
-              Êtes-vous sûr(e) de vouloir supprimer touts les contacts
-              sauvegardés ?
+              Êtes-vous sûr(e) de vouloir supprimer
+              {{ boxArray.filter((box) => box).length }} contact(s)
+              sauvegardé(s) et les proches associés ?
               <template #button>
                 <PrimaryButton
                   button-type="dark"
-                  @click="deleteAllSavedContacts(isUserLoggedIn?.user.id)"
+                  @click="deleteSelectedContactsWithFamilyMembers"
                 >
                   Oui, supprimer
                 </PrimaryButton>
@@ -270,41 +314,63 @@ onMounted(async () => {
             </PrimaryButton>
           </div>
 
-          <div class="table">
+          <div class="table" v-if="persons.length > 0">
+            <div class="table__header">
+              <span
+                class="checkbox"
+                :class="{ 'checkbox--checked': isBoxChecked }"
+                @click="selectTenBoxes"
+              >
+                <IconComponent
+                  :icon="`check`"
+                  color="#fffdfa"
+                  v-if="isBoxChecked"
+                />
+              </span>
+
+              <span class="table__header__cell">Prénom</span>
+              <span class="table__header__cell">Nom</span>
+              <span class="table__header__cell">Lieu de décès</span>
+              <span class="table__header__cell">Proches trouvés</span>
+              <button class="button--tertiary-dark" @click="toggleConfirmation">
+                <IconComponent icon="trash" />
+              </button>
+            </div>
             <div class="table__body">
               <div
                 class="table__body__row"
-                v-for="person in persons"
+                v-for="(person, index) in persons"
                 :key="person.id"
+                :class="{ 'table__body__row--selected': boxArray[index] }"
                 @click="navigateTo(person.id)"
               >
-                <div
-                  class="table__body__row__cell"
-                  v-tooltip:right="person.firstnames"
+                <span
+                  class="checkbox"
+                  :class="{ 'checkbox--checked': boxArray[index] }"
+                  @click.stop="updateBox(index, !boxArray[index])"
                 >
-                  <IconComponent icon="user" color="#232323" />
+                  <IconComponent
+                    :icon="`check`"
+                    color="#fffdfa"
+                    v-if="boxArray[index]"
+                  />
+                </span>
+
+                <div class="table__body__row__cell">
                   {{ person.firstnames }}
                 </div>
+                <div class="table__body__row__cell">{{ person.lastname }}</div>
                 <div class="table__body__row__cell">
-                  <IconComponent icon="user" color="#232323" />
-                  {{ person.lastname }}
-                </div>
-                <div class="table__body__row__cell" style="margin-left: auto">
-                  <IconComponent icon="map-pin" />
                   {{ person.current_death_com_name }} ({{
                     person.current_death_dep_code
                   }})
                 </div>
-
-                <div class="table__body__row__cell" style="margin-left: auto">
-                  <div
-                    v-if="getRelativesCount(person.id) > 0"
-                    style="font-size: 1rem"
-                  >
-                    <IconComponent icon="user" />{{
-                      getRelativesCount(person.id)
-                    }}
+                <div class="table__body__row__cell">
+                  <div v-if="getRelativesCount(person.id) > 0">
+                    <IconComponent icon="user" />
+                    {{ getRelativesCount(person.id) }}
                   </div>
+
                   <IconComponent
                     icon="check-circle"
                     v-if="person.status === 'success'"
@@ -324,16 +390,41 @@ onMounted(async () => {
                     v-tooltip:left="'Chargement, ne pas fermer cette page'"
                   />
                 </div>
+                <span width="60px"></span>
               </div>
             </div>
           </div>
-          <button
-            class="button--tertiary-dark"
-            @click="toggleConfirmation"
-            v-if="persons.length > 0"
-          >
-            <IconComponent icon="trash" /> Tout supprimer
-          </button>
+        </div>
+        <div class="table" v-if="allFamilyMembers.length > 0">
+          <div class="table__body">
+            <div
+              v-for="member in allFamilyMembers"
+              :key="member.id"
+              class="table__body__row"
+            >
+              <span
+                class="table__body__row__cell"
+                v-tooltip:top="'Cliquez pour copier le prénom'"
+                @click="copyToClipboard(member.firstnames)"
+              >
+                {{ member.firstnames }}
+              </span>
+              <span
+                class="table__body__row__cell"
+                v-tooltip:top="'Cliquez pour copier le nom'"
+                @click="copyToClipboard(member.lastname)"
+              >
+                {{ member.lastname }}
+              </span>
+              <span
+                class="table__body__row__cell"
+                v-tooltip:top="'Cliquez pour copier l\'email'"
+                @click="copyToClipboard(member.email)"
+              >
+                {{ member.email }}
+              </span>
+            </div>
+          </div>
         </div>
         <ul class="account-info">
           <div class="header">
@@ -466,7 +557,7 @@ onMounted(async () => {
   width: 100%;
   flex-direction: column;
   gap: 1rem;
-  padding-right: 1rem;
+  padding-top: 1rem;
   max-height: 40dvh;
   overflow-y: scroll;
 }

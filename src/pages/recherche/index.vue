@@ -41,10 +41,6 @@ onMounted(async () => {
     deathStore.setDepartment(route.query.department as string);
   }
 
-  if (window.innerWidth > 1024) {
-    showMenu.value = true;
-  }
-
   boxArray.value = Array(sortedRecords.value.length).fill(false);
 });
 
@@ -198,8 +194,6 @@ async function savePersons() {
 <template>
   <template v-if="isUserLoggedIn?.user.aud">
     <Container>
-      <!-- <MenuButton @click="toggleMenu()" v-if="!showMenu" /> -->
-
       <Transition name="expand">
         <div class="sorting-and-filtering" ref="target">
           <Filtering
@@ -218,11 +212,10 @@ async function savePersons() {
     <Container>
       <div class="table">
         <div class="table__header">
-          <div class="table__header__cell">
+          <div>
             <span
               class="checkbox"
               :class="{ 'checkbox--checked': isBoxChecked }"
-              v-tooltip:right="'En sélectionner 10'"
               @click="selectTenBoxes"
               ><IconComponent
                 :icon="`check`"
@@ -231,16 +224,16 @@ async function savePersons() {
             /></span>
           </div>
           <div class="table__header__cell">
-            <IconComponent icon="clock" color="#232323" /> Date de décès
+            <IconComponent icon="clock" color="#232323" />Date de décès
           </div>
           <div class="table__header__cell">
-            <IconComponent icon="map-pin" /> Ville
+            <IconComponent icon="map-pin" />Commune
           </div>
           <div class="table__header__cell">
-            <IconComponent icon="user" color="#232323" /> Prénom
+            <IconComponent icon="user" color="#232323" />Prénom
           </div>
           <div class="table__header__cell">
-            <IconComponent icon="user" color="#232323" /> Nom
+            <IconComponent icon="user" color="#232323" />Nom
           </div>
         </div>
         <div class="table__body">

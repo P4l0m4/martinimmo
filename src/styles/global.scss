@@ -190,6 +190,7 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 1.5rem;
   width: 1.5rem;
   height: 1.5rem;
   border-radius: $radius;
@@ -285,29 +286,11 @@ input[type="checkbox"] {
       background-color: $primary-color;
       font-weight: bold;
       height: fit-content;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
 
-      &:nth-of-type(1) {
-        width: 40px;
-      }
-      &:nth-of-type(2) {
-        min-width: 136px;
-        width: 136px;
-        max-width: 136px;
-
-        @media (min-width: $big-tablet-screen) {
-          margin-left: -1rem;
-        }
-      }
-      &:nth-of-type(3) {
-        min-width: 200px;
-        width: 200px;
-        max-width: 200px;
-      }
-      &:nth-of-type(4) {
-        min-width: 240px;
-        width: 240px;
-        max-width: 240px;
-      }
+      width: 240px;
     }
   }
 
@@ -351,26 +334,12 @@ input[type="checkbox"] {
         align-items: center;
         gap: 0.5rem;
 
-        &:nth-of-type(1) {
-          min-width: 136px;
-          width: 136px;
-          max-width: 136px;
-        }
-        &:nth-of-type(2) {
-          min-width: 200px;
-          width: 200px;
-          max-width: 200px;
-        }
+        width: 240px;
+
         &:nth-of-type(3) {
-          min-width: 240px;
-          width: 240px;
-          max-width: 240px;
           font-size: $small-text;
         }
         &:nth-of-type(4) {
-          min-width: 140px;
-          width: 140px;
-          max-width: 140px;
           font-size: $small-text;
         }
       }

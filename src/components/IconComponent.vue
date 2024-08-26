@@ -13,7 +13,7 @@ withDefaults(defineProps<Props>(), {
 <template>
   <span
     class="icon"
-    :class="{ spin: icon === 'loader' }"
+    :class="{ spin: icon === 'loader', info: icon === 'info' }"
     :style="{ color, fontSize: size }"
     >{{ icon }}</span
   >
@@ -50,5 +50,9 @@ withDefaults(defineProps<Props>(), {
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.info {
+  cursor: help;
 }
 </style>

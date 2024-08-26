@@ -1,10 +1,5 @@
 import { useAccountStore } from "@/stores/accountStore";
-import type {
-  FamilyMember,
-  DeadPersonWihFamily,
-  DeadPerson,
-  Member,
-} from "@/components/FamilyMember.vue";
+import type { FamilyMember, DeadPerson } from "@/components/FamilyMember.vue";
 let accountStore: any;
 export default {
   asyncData({ $pinia }) {
@@ -316,38 +311,6 @@ export async function removeOneCredit(user_id: string) {
   }
 }
 
-// export async function addFamillyMemberInfoToDB(
-//   user_id: string,
-//   member: Member,
-//   savedMembers: Member[]
-// ) {
-//   try {
-//     //check if member already exists
-//     const memberExists = savedMembers.some(
-//       (m: Member) => m.email === member.email
-//     );
-//     if (memberExists) {
-//       return false;
-//     }
-
-//     const membersToAddToDB = [...new Set(savedMembers), member];
-
-//     const { data, error } = await supabase
-//       .from("users")
-//       .update({ saved_contacts: membersToAddToDB })
-//       .eq("user_id", user_id)
-//       .select();
-
-//     if (error) {
-//       console.error("Error inserting saved_contacts data:", error);
-//       return [];
-//     }
-//     return data[0]?.saved_contacts || [];
-//   } catch (error) {
-//     console.error("Error fetching or updating family member info:", error);
-//   }
-// }
-
 export async function addDeadPersonInfoToDB(
   user_id: string,
   selectedPersons: DeadPerson[]
@@ -381,34 +344,7 @@ export async function fetchDeadPersonInfoFromDB(user_id: string) {
   return data[0]?.saved_contacts || [];
 }
 
-export async function removeFamillyMemberInfoFromDB(
-  user_id: string,
-  member: Member,
-  savedMembers: Member[]
-) {
-  try {
-    // Remove the member with the given email
-    const updatedMembers = savedMembers.filter(
-      (m: Member) => m.email !== member.email
-    );
-
-    const { data, error } = await supabase
-      .from("users")
-      .update({ saved_contacts: updatedMembers })
-      .eq("user_id", user_id)
-      .select();
-
-    if (error) {
-      console.error("Error removing member from saved_contacts data:", error);
-      return [];
-    }
-    return data[0]?.saved_contacts || [];
-  } catch (error) {
-    console.error("Error fetching or updating family member info:", error);
-  }
-}
-
-export async function deleteAllSavedContacts(user_id: string) {
+export async function deleteAllSavedContactsAndFamilyMembers(user_id: string) {
   const { data, error } = await supabase
     .from("users")
     .update({ saved_contacts: [] })
@@ -418,7 +354,45 @@ export async function deleteAllSavedContacts(user_id: string) {
   if (error) {
     console.error("Error deleting data:", error);
   } else {
-    location.reload();
+    const { data, error } = await supabase
+      .from("family_from_unlocked_persons")
+      .select("*")
+      .eq("user_id", user_id)
+      .delete();
+
+    if (error) {
+      console.error("Error deleting family members:", error);
+    } else {
+      location.reload();
+    }
+  }
+}
+
+export async function deleteSavedContactByID(user_id: string, id: string) {
+  const savedPeople = await fetchDeadPersonInfoFromDB(user_id);
+  const updatedSavedPeople = savedPeople.filter(
+    (person: any) => person.id !== id
+  );
+  const { data, error } = await supabase
+    .from("users")
+    .update({ saved_contacts: updatedSavedPeople })
+    .eq("user_id", user_id);
+
+  if (error) {
+    console.error("Error deleting data:", error);
+  } else {
+    console.log("Contact deleted successfully, now deleting family members...");
+    const { data2, error2 } = await supabase
+      .from("family_from_unlocked_persons")
+      .delete()
+      .eq("id_from_deceased", id);
+
+    if (error2) {
+      console.error("Error deleting family members:", error);
+    } else {
+      alert(`Success: ${id}`);
+      location.reload();
+    }
   }
 }
 
@@ -485,6 +459,7 @@ export async function getFamillyByDeceasedId(deceasedId: string) {
     console.error("Error fetching data:", error);
     return [];
   } else {
+    console.log("Family members fetched successfully!", data);
     return data;
   }
 }

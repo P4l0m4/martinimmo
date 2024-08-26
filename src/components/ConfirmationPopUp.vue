@@ -36,12 +36,14 @@ onClickOutside(target, () => emit("closeConfirmation"));
     padding: 1rem;
     width: 100%;
     max-width: 400px;
+    height: fit-content;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     justify-content: center;
     align-items: center;
     text-align: center;
+    white-space: pre-wrap;
   }
 }
 </style>
