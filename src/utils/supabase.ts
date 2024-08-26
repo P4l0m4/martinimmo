@@ -381,7 +381,6 @@ export async function deleteSavedContactByID(user_id: string, id: string) {
   if (error) {
     console.error("Error deleting data:", error);
   } else {
-    console.log("Contact deleted successfully, now deleting family members...");
     const { data2, error2 } = await supabase
       .from("family_from_unlocked_persons")
       .delete()
@@ -390,7 +389,6 @@ export async function deleteSavedContactByID(user_id: string, id: string) {
     if (error2) {
       console.error("Error deleting family members:", error);
     } else {
-      alert(`Success: ${id}`);
       location.reload();
     }
   }

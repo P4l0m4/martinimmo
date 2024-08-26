@@ -221,7 +221,6 @@ async function getAllFamilyMembers() {
     const familyMembers = await getFamillyByDeceasedId(person.id);
     allFamilyMembers.value.push(...familyMembers);
   }
-  console.log("All family members:", allFamilyMembers.value);
 }
 
 function selectTenBoxes() {
