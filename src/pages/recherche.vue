@@ -3,12 +3,11 @@ import { ref, onMounted, watch } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
 import {
   checkExistingToken,
-  removeOneCredit,
+  removeCredits,
   getCredits,
 } from "@/utils/supabase";
 import { useRoute, useRouter } from "vue-router";
 import { computedAsync } from "@vueuse/core";
-import type { DeadPerson } from "@/components/FamilyMember.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -86,7 +85,6 @@ function handleCityFilter(filter: string) {
   updateUrl();
 }
 
-// Consolidated function to update the URL with region, department, and city
 function updateUrl() {
   const queryParams = {
     region: deathStore.region || "",
@@ -109,7 +107,6 @@ function setSliceInStore(slice: [number, number]) {
   fetchAndUpdateRecords();
 }
 
-// Watch for store updates to update local records
 watch(
   () => deathStore.records,
   (newRecords) => {
@@ -148,27 +145,33 @@ const selectedRecords = computed(() =>
     .map((value, index) => (value ? sortedRecords.value[index] : null))
     .filter((record) => record)
 );
-
 async function savePersons() {
   if (!isUserLoggedIn?.value || selectedRecords.value.length === 0) return;
 
   try {
+    // Save the selected records to the database
     await addDeadPersonInfoToDB(
       isUserLoggedIn?.value.user.id,
-      selectedRecords.value as DeadPerson[]
+      selectedRecords.value
     );
+
+    // Update the unlocked status for each selected record
+    for (let record of selectedRecords.value) {
+      await updateUnlockedStatusOfDeceasedPerson(record.id);
+    }
+
+    // Remove credits only once based on the total number of selected records
+    await removeCredits(
+      isUserLoggedIn?.value.user.id,
+      selectedRecords.value.length
+    );
+
+    // Indicate success
+    buttonState.value = "success";
+    setTimeout(() => location.reload(), 1000);
   } catch (error) {
-    console.error("Failed to add family member info:", error);
-    return;
+    console.error("Failed to unlock profiles and deduct credits:", error);
   }
-
-  for (let record of selectedRecords.value) {
-    await updateUnlockedStatusOfDeceasedPerson(record.id);
-    await removeOneCredit(isUserLoggedIn?.value.user.id, 1);
-  }
-
-  buttonState.value = "success";
-  setTimeout(() => location.reload(), 1000);
 }
 </script>
 

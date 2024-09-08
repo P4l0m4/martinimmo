@@ -311,6 +311,29 @@ export async function removeOneCredit(user_id: string) {
   }
 }
 
+export async function removeCredits(user_id: string, creditsToRemove: number) {
+  let credits = await getCredits(user_id);
+
+  const newCredits = credits.credits - creditsToRemove;
+
+  if (newCredits <= 0) {
+    console.error("Not enough credits to remove one.");
+    return;
+  } else {
+    for (let i = 0; i < creditsToRemove; i++) {
+      const { data, error: updateError } = await supabase
+        .from("users")
+        .update({ credits: newCredits })
+        .eq("user_id", user_id)
+        .single();
+
+      if (updateError) {
+        console.error("Error updating data:", updateError.message);
+      }
+    }
+  }
+}
+
 export async function addCredits(user_id: string, creditsToAdd: number) {
   let user = await fetchUserById(user_id);
 
