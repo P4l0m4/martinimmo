@@ -20,7 +20,7 @@ const errors = ref<string[]>([]);
 async function createPaymentIntent() {
   try {
     const response = await fetch(
-      "http://localhost:3001/create-payment-intent",
+      "https://martinimmo-backend.vercel.app/create-payment-intent",
       {
         method: "POST",
         headers: {
