@@ -7,7 +7,9 @@ import {
   getCredits,
 } from "@/utils/supabase";
 import { useRoute, useRouter } from "vue-router";
-import { computedAsync } from "@vueuse/core";
+import { computedAsync, useToggle } from "@vueuse/core";
+
+const [showCreditsPopUp, toggleCreditsPopUp] = useToggle();
 
 const route = useRoute();
 const router = useRouter();
@@ -147,7 +149,10 @@ const selectedRecords = computed(() =>
 );
 async function savePersons() {
   if (!isUserLoggedIn?.value || selectedRecords.value.length === 0) return;
-
+  if (userCredits.value < selectedRecords.value.length) {
+    toggleCreditsPopUp();
+    return;
+  }
   try {
     // Save the selected records to the database
     await addDeadPersonInfoToDB(
@@ -187,12 +192,35 @@ async function savePersons() {
             @set-city="handleCityFilter"
           />
           <Sorting :order="sortOrder" @sort-by="handleSort" />
+
           <PrimaryButton
-            v-if="userCredits > 0"
+            v-if="
+              selectedRecords.length > 0 &&
+              selectedRecords.length <= userCredits
+            "
             @click="savePersons"
             :buttonState
             >Débloquer {{ selectedRecords.length }} contact(s)</PrimaryButton
           >
+          <PrimaryButton
+            v-else-if="
+              selectedRecords.length > 0 && selectedRecords.length > userCredits
+            "
+            @click="toggleCreditsPopUp"
+            :buttonState
+            >Débloquer {{ selectedRecords.length }} contact(s)</PrimaryButton
+          >
+          <ConfirmationPopUp
+            v-if="showCreditsPopUp"
+            @closeConfirmation="toggleCreditsPopUp"
+          >
+            Vous n'avez pas assez de crédits
+            <template #button>
+              <NuxtLink to="/credits" class="button primary--dark">
+                Acheter des crédits
+              </NuxtLink>
+            </template>
+          </ConfirmationPopUp>
         </div></Transition
       >
     </Container>
