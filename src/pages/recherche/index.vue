@@ -1,159 +1,141 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
-import { checkExistingToken } from "@/utils/supabase";
-import { useRoute } from "vue-router";
+import {
+  checkExistingToken,
+  removeOneCredit,
+  getCredits,
+} from "@/utils/supabase";
+import { useRoute, useRouter } from "vue-router";
+import { computedAsync } from "@vueuse/core";
+import type { DeadPerson } from "@/components/FamilyMember.vue";
 
 const route = useRoute();
-
+const router = useRouter();
 const deathStore = useDeathStore();
 
 const isUserLoggedIn = ref();
-
 const records = ref([]);
 const sortedRecords = ref([]);
-
 const sortOrder = ref("default");
-
 const reset = ref(false);
-const isDesktop = computed(() => window.innerWidth > 1024);
-
 const buttonState = ref("");
+const boxArray = ref<boolean[]>([]);
+const isBoxChecked = ref(false);
+
+const userCredits = computedAsync(async () => {
+  if (isUserLoggedIn.value) {
+    const credits = await getCredits(isUserLoggedIn.value.user.id);
+    return credits.credits;
+  }
+  return 0;
+}, 0);
+
+async function fetchAndUpdateRecords() {
+  records.value = Array.from(deathStore.records);
+  sortedRecords.value = Array.from(deathStore.records);
+  boxArray.value = Array(sortedRecords.value.length).fill(false);
+}
 
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
-  if (isUserLoggedIn.value === null) {
-    await navigateTo({ path: "/" });
+  if (!isUserLoggedIn.value) {
+    await router.push({ path: "/" });
+    return;
   }
-  // await deathStore.fetchData();
   await deathStore.getAllDeadPeople();
-  records.value = deathStore.records;
-  sortedRecords.value = deathStore.records;
+  const { region, department, city } = route.query;
 
-  if (route.query.region) {
-    navigateTo(`${route.path}?region=${deathStore.region}`);
-    deathStore.setRegion(route.query.region as string);
-  }
-  if (route.query.department) {
-    navigateTo(
-      `${route.path}?region=${deathStore.region}&department=${deathStore.department}`
-    );
-    deathStore.setDepartment(route.query.department as string);
-  }
+  if (region) deathStore.setRegion(region as string);
+  if (department) deathStore.setDepartment(department as string);
+  if (city) deathStore.setCity(city as string);
 
-  boxArray.value = Array(sortedRecords.value.length).fill(false);
+  await fetchAndUpdateRecords();
 });
 
 function handleSort(order: string) {
   sortOrder.value = order;
   if (order === "default") {
-    sortedRecords.value = [...records.value];
+    sortedRecords.value = Array.from(records.value);
   } else if (order === "date-latest") {
-    sortedRecords.value = [...records.value].sort((a, b) =>
+    sortedRecords.value = Array.from(records.value).sort((a, b) =>
       a.death_date > b.death_date ? -1 : 1
     );
   } else if (order === "date-oldest") {
-    sortedRecords.value = [...records.value].sort((a, b) =>
+    sortedRecords.value = Array.from(records.value).sort((a, b) =>
       a.death_date < b.death_date ? -1 : 1
     );
   }
 }
 
-async function handleDepartmentFilter(filter: {
+function handleDepartmentFilter(filter: {
   department_name: string;
   url_part: string;
 }) {
-  await deathStore.setDepartment(filter.department_name);
-  records.value = deathStore.records;
-  sortedRecords.value = deathStore.records;
+  deathStore.setDepartment(filter.department_name);
+  updateUrl();
 }
 
-async function handleRegionFilter(filter: {
-  region_name: string;
-  url_part: string;
-}) {
-  await deathStore.setRegion(filter.region_name);
-  records.value = deathStore.records;
-  sortedRecords.value = deathStore.records;
+function handleRegionFilter(filter: { region_name: string; url_part: string }) {
+  deathStore.setRegion(filter.region_name);
+  updateUrl();
 }
 
-async function handleCityFilter(filter: string) {
-  await deathStore.setCity(filter);
-  records.value = deathStore.records;
-  sortedRecords.value = deathStore.records;
+function handleCityFilter(filter: string) {
+  deathStore.setCity(filter);
+  updateUrl();
+}
+
+// Consolidated function to update the URL with region, department, and city
+function updateUrl() {
+  const queryParams = {
+    region: deathStore.region || "",
+    department: deathStore.department || "",
+    city: deathStore.city || "",
+  };
+
+  const query = Object.entries(queryParams)
+    .filter(([_, value]) => value) // remove empty query params
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join("&");
+
+  router.push(`${route.path}?${query}`);
+
+  fetchAndUpdateRecords();
 }
 
 function setSliceInStore(slice: [number, number]) {
   deathStore.setSlice(slice);
-  records.value = deathStore.records;
-  sortedRecords.value = deathStore.records;
+  fetchAndUpdateRecords();
 }
 
-//watch for changes on the region of the store
+// Watch for store updates to update local records
 watch(
   () => deathStore.records,
-  (newRegion) => {
-    if (newRegion) {
-      records.value = deathStore.records;
-      sortedRecords.value = deathStore.records;
-    }
-  }
-);
-
-//reset the pagination when the region changes
-watch(
-  () => deathStore.region,
-  () => {
-    navigateTo(`${route.path}?region=${deathStore.region}`);
-    deathStore.setDepartment("");
-    deathStore.setSlice([0, 200]);
-    records.value = deathStore.records;
-    sortedRecords.value = deathStore.records;
-    reset.value = true;
-    setTimeout(() => {
-      reset.value = false;
-    }, 100);
-  }
+  (newRecords) => {
+    records.value = Array.from(newRecords);
+    sortedRecords.value = Array.from(newRecords);
+    boxArray.value = Array(sortedRecords.value.length).fill(false);
+  },
+  { immediate: true }
 );
 
 watch(
-  () => deathStore.department,
-  () => {
-    navigateTo(
-      `${route.path}?region=${deathStore.region}&department=${deathStore.department}`
-    );
-    deathStore.setSlice([0, 200]);
-    records.value = deathStore.records;
-    sortedRecords.value = deathStore.records;
-    reset.value = true;
-    setTimeout(() => {
-      reset.value = false;
-    }, 100);
-  }
+  [() => deathStore.region, () => deathStore.department, () => deathStore.city],
+  updateUrl
 );
-// import { useToggle, onClickOutside } from "@vueuse/core";
-// const target = ref<HTMLElement | null>(null);
-// onClickOutside(target, () => toggleMenu());
-
-// const [showMenu, toggleMenu] = useToggle();
-
-const boxArray = ref<boolean[]>([]);
 
 function updateBox(index: number, newValue: boolean) {
   boxArray.value.splice(index, 1, !newValue);
 }
 
-const isBoxChecked = ref(false);
-
 function selectTenBoxes() {
-  if (isBoxChecked.value === false) {
-    // Set the first 10 elements to true
+  if (!isBoxChecked.value) {
     boxArray.value = boxArray.value.map((_, i) =>
       i < 10 ? true : boxArray.value[i]
     );
     isBoxChecked.value = true;
   } else {
-    // Set the first 10 elements to false
     boxArray.value = boxArray.value.map((_, i) =>
       i < deathStore.slice[1] ? false : boxArray.value[i]
     );
@@ -168,26 +150,25 @@ const selectedRecords = computed(() =>
 );
 
 async function savePersons() {
-  if (!isUserLoggedIn?.value || selectedRecords.value.length === 0) {
-    return;
-  }
+  if (!isUserLoggedIn?.value || selectedRecords.value.length === 0) return;
+
   try {
     await addDeadPersonInfoToDB(
       isUserLoggedIn?.value.user.id,
-      selectedRecords.value
+      selectedRecords.value as DeadPerson[]
     );
   } catch (error) {
     console.error("Failed to add family member info:", error);
+    return;
   }
 
-  for (let i = 0; i < selectedRecords.value.length; i++) {
-    await updateUnlockedStatusOfDeceasedPerson(selectedRecords.value[i].id);
-    // console.log(selectedRecords.value[i].id);
+  for (let record of selectedRecords.value) {
+    await updateUnlockedStatusOfDeceasedPerson(record.id);
+    await removeOneCredit(isUserLoggedIn?.value.user.id, 1);
   }
+
   buttonState.value = "success";
-  setTimeout(() => {
-    location.reload();
-  }, 1000);
+  setTimeout(() => location.reload(), 1000);
 }
 </script>
 
@@ -203,7 +184,10 @@ async function savePersons() {
             @set-city="handleCityFilter"
           />
           <Sorting :order="sortOrder" @sort-by="handleSort" />
-          <PrimaryButton @click="savePersons" :buttonState
+          <PrimaryButton
+            v-if="userCredits > 0"
+            @click="savePersons"
+            :buttonState
             >Débloquer {{ selectedRecords.length }} contact(s)</PrimaryButton
           >
         </div></Transition

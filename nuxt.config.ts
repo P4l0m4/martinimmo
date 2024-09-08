@@ -25,6 +25,7 @@ export default defineNuxtConfig({
       ABSTRACT_API_KEY: process.env.ABSTRACT_API_KEY,
       SUPABASE_KEY: process.env.SUPABASE_KEY,
       SUPABASE_URL: process.env.SUPABASE_URL,
+      STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
     },
   },
   dayjs: {

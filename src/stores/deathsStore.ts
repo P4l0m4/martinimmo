@@ -57,7 +57,7 @@ export const useDeathStore = defineStore({
   actions: {
     async fetchData() {
       try {
-        if (this.city.length > 0) {
+        if (this.city && this.city.length > 0) {
           const data = await fetchDeadPeopleByCity(this.city);
           this.records = data;
           return;
@@ -87,14 +87,17 @@ export const useDeathStore = defineStore({
     },
     setRegion(region: string) {
       this.region = region;
+
       this.fetchData();
     },
     setDepartment(department: string) {
       this.department = department;
+
       this.fetchData();
     },
     setCity(city: string) {
       this.city = city;
+
       this.fetchData();
     },
     setSelectedRecords(records: any) {

@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { onClickOutside } from "@vueuse/core";
 import { fetchCitiesList } from "@/utils/supabase";
+import { useRoute, useRouter } from "vue-router";
+
+const route = useRoute();
+const router = useRouter();
 
 interface Props {
   regions: any;
@@ -66,6 +70,7 @@ const handleRegion = (region: any) => {
 const handleDepartment = async (department: any) => {
   displayDepartment.value = false;
   selectedDepartment.value = department.department_name;
+
   if (
     filterBy.value === "default" ||
     filterBy.value !== department.department_name
@@ -81,8 +86,40 @@ const handleDepartment = async (department: any) => {
   } else {
     departmentLabel.value = "Filtrer par département";
   }
+
   citiesList.value = await fetchCitiesList(department.department_name);
 };
+
+onMounted(async () => {
+  const { region, department, city } = route.query;
+
+  if (region) {
+    const selectedRegionFromQuery = regionsList.value.find(
+      (r: any) => r.region_name === region
+    );
+    if (selectedRegionFromQuery) {
+      handleRegion(selectedRegionFromQuery);
+    }
+  }
+
+  if (department && selectedRegion.value) {
+    const selectedDepartmentFromQuery = selectedRegion.value.departments.find(
+      (d: any) => d.department_name === department
+    );
+    if (selectedDepartmentFromQuery) {
+      await handleDepartment(selectedDepartmentFromQuery);
+    }
+  }
+
+  if (city && citiesList.value.length > 0) {
+    const selectedCityFromQuery = citiesList.value[0].cities.find(
+      (c: any) => c === city
+    );
+    if (selectedCityFromQuery) {
+      handleCity(selectedCityFromQuery);
+    }
+  }
+});
 
 const handleCity = (city: string) => {
   displayCity.value = false;
@@ -90,8 +127,15 @@ const handleCity = (city: string) => {
     filterBy.value = city;
     cityLabel.value = city;
 
-    const cityData = city;
-    emit("setCity", cityData);
+    emit("setCity", city);
+
+    router.push({
+      query: {
+        region: selectedRegion.value.region_name,
+        department: selectedDepartment.value.department_name,
+        city: city,
+      },
+    });
   } else {
     cityLabel.value = "Filtrer par ville";
   }
@@ -179,7 +223,7 @@ onClickOutside(target, (event) => (displayCity.value = false));
             :class="{
               disabled: filterBy === city,
             }"
-            @click="handleCity(city)"
+            @click="handleCity(city as string)"
             >{{ city }}</span
           >
         </div>

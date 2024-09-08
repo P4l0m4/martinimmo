@@ -311,6 +311,24 @@ export async function removeOneCredit(user_id: string) {
   }
 }
 
+export async function addCredits(user_id: string, creditsToAdd: number) {
+  let user = await fetchUserById(user_id);
+
+  const newCredits = user.credits + creditsToAdd;
+  const { data, error: updateError } = await supabase
+    .from("users")
+    .update({ credits: newCredits })
+    .eq("user_id", user_id)
+    .single();
+
+  if (updateError) {
+    console.error("Error updating data:", updateError.message);
+  } else {
+    // console.log("User updated successfully:", data);
+    location.reload();
+  }
+}
+
 export async function addDeadPersonInfoToDB(
   user_id: string,
   selectedPersons: DeadPerson[]
@@ -490,7 +508,6 @@ export async function updateUnlockedStatusOfDeceasedPerson(deceasedId: string) {
 }
 
 export async function generateUser() {
-  console.log("Generating user...");
   const isUserLoggedIn = await checkExistingToken();
   const currentDate = new Date();
   const dateISOString = currentDate.toISOString();
