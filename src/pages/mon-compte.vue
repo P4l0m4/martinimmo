@@ -30,6 +30,7 @@ interface DeadPerson {
 }
 
 const [showConfirmation, toggleConfirmation] = useToggle();
+const [showOverloadPopUp, toggleOverloadPopUp] = useToggle();
 const accountStore = useAccountStore();
 
 const isUserLoggedIn = ref();
@@ -201,18 +202,29 @@ function getRelativesCount(deceasedId: string): number {
   return personCount ? personCount.count : 0;
 }
 
-function generateCSV() {
-  const csv = persons.value
-    .map((person) => {
-      return `${person.firstnames},${person.lastname},${person.current_death_com_name},${person.current_death_dep_code}`;
-    })
-    .join("\n");
+async function generateCSV() {
+  let csvContent =
+    "Firstname,Lastname,Death Region,Death Department Code,Community,Family Member Firstname,Family Member Lastname,Family Member Email, Family Member Sex\n";
 
-  const blob = new Blob([csv], { type: "text/csv" });
+  for (const person of persons.value) {
+    const familyMembers = await getFamillyByDeceasedId(person.id);
+
+    // If the person has no family members, we still want to include their info
+    if (familyMembers.length === 0) {
+      csvContent += `${person.firstnames},${person.lastname},${person.current_death_com_name},${person.current_death_dep_code},,\n`;
+    } else {
+      // For each family member, add their information to the CSV row along with the deceased person’s details
+      familyMembers.forEach((familyMember: any) => {
+        csvContent += `${person.firstnames},${person.lastname},${person.current_death_com_name},${person.current_death_dep_code},${familyMember.firstnameS},${familyMember.lastname},${familyMember.email},${familyMember.sex}\n`;
+      });
+    }
+  }
+
+  const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "contacts.csv";
+  a.download = "contacts_with_family_members.csv";
   a.click();
 }
 
@@ -247,6 +259,10 @@ function deleteSelectedContactsWithFamilyMembers() {
   });
 }
 
+const isLoading = computed(() => {
+  return persons.value.some((person) => person.status === "loading");
+});
+
 onMounted(async () => {
   loading.value = true;
   isUserLoggedIn.value = await checkExistingToken();
@@ -256,7 +272,11 @@ onMounted(async () => {
   }
   await getPersonsFromDB();
   loading.value = false;
-  await findFamily();
+
+  if (allFamilyMembers.value.length > 50) {
+    toggleOverloadPopUp();
+  }
+
   await getAllFamilyMembers();
 
   boxArray.value = persons.value.map(() => false);
@@ -276,14 +296,25 @@ onMounted(async () => {
           >
             <span class="header__text">
               <span style="opacity: 0.6"><IconComponent icon="unlock" /></span>
-              Vos contacts débloqués
+              Contacts débloqués
             </span>
+            <PrimaryButton
+              button-type="dark"
+              v-if="!isLoading"
+              @click="findFamily"
+              >Trouver des proches</PrimaryButton
+            ><span
+              style="display: flex; gap: 0.5rem; align-items: center"
+              v-else
+              >Recherche en cours, gardez cette page ouverte<IconComponent
+                icon="loader"
+            /></span>
             <SecondaryButton
               button-type="dark"
               @click="generateCSV()"
               :button-state="loading"
             >
-              <IconComponent icon="download" /> Exporter
+              <IconComponent icon="download" />Exporter
             </SecondaryButton>
 
             <ConfirmationPopUp
@@ -301,6 +332,19 @@ onMounted(async () => {
                   Oui, supprimer
                 </PrimaryButton>
               </template>
+            </ConfirmationPopUp>
+            <ConfirmationPopUp
+              v-if="showOverloadPopUp"
+              @close-confirmation="toggleOverloadPopUp"
+            >
+              Vous avez {{ allFamilyMembers.length }} contacts débloqué(s),
+              téléchargez puis les supprimez les afin d'améliorer le chargement
+              de la page.
+              <template #button>
+                <PrimaryButton button-type="dark" @click="generateCSV">
+                  Télécharger
+                </PrimaryButton></template
+              >
             </ConfirmationPopUp>
           </div>
 
@@ -341,7 +385,13 @@ onMounted(async () => {
                 v-for="(person, index) in persons"
                 :key="person.id"
                 :class="{ 'table__body__row--selected': boxArray[index] }"
-                @click="navigateTo(person.id)"
+                @click="
+                  navigateTo(person.id, {
+                    open: {
+                      target: '_blank',
+                    },
+                  })
+                "
               >
                 <span
                   class="checkbox"
@@ -437,10 +487,10 @@ onMounted(async () => {
               <IconComponent icon="credit-card" />
               {{ accountStore.$state.credits }} Crédits disponibles
             </li>
-            <li class="account-info__element">
+            <!-- <li class="account-info__element">
               <IconComponent icon="star" />
               Compte {{ isUserLoggedIn?.user.user_metadata.accountType }}
-            </li>
+            </li> -->
             <li class="account-info__element">
               <IconComponent icon="mail" />
               {{ isUserLoggedIn?.user.email }}
@@ -505,14 +555,6 @@ onMounted(async () => {
     gap: 2rem;
     width: 100%;
     list-style: none;
-
-    // .fetching-status-indicator {
-    //   display: flex;
-    //   width: 1.5rem;
-    //   height: 1.5rem;
-    //   justify-content: center;
-    //   align-items: center;
-    // }
 
     .empty {
       display: flex;

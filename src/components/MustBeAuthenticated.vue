@@ -7,8 +7,8 @@ const [showSignIn, toggleSignIn] = useToggle();
 <template>
   <Container class="centered-content" style="height: calc(100dvh - 70px)">
     <h1 class="titles">
-      Trouvez des biens <br /><span class="secondary-color">à vendre</span> en
-      un clic
+      Ils ont des <span class="secondary-color">biens à vendre</span>,
+      trouvez-les en un clic 🖱️
     </h1>
     <div class="buttons">
       <SecondaryButton button-type="dark" @click="toggleSignIn"
@@ -27,8 +27,9 @@ const [showSignIn, toggleSignIn] = useToggle();
 </template>
 <style lang="scss" scoped>
 .titles {
-  max-width: 600px;
+  max-width: 1000px;
   text-align: center;
+  text-wrap: balance;
 }
 .buttons {
   display: flex;

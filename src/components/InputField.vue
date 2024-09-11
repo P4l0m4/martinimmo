@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useToggle } from "@vueuse/core";
+
 interface Props {
   id: string;
   label: string;
@@ -22,6 +24,12 @@ withDefaults(defineProps<Props>(), {
 
 const model = defineModel<string | number>();
 const inputRef = ref<HTMLInputElement | null>(null);
+
+const showPassword = ref(false);
+
+function toggleShowPassword() {
+  showPassword.value = !showPassword.value;
+}
 </script>
 <template>
   <div class="input-field" :class="{ shake: error }">
@@ -40,7 +48,7 @@ const inputRef = ref<HTMLInputElement | null>(null);
       ref="inputRef"
       :id="id"
       class="input-field__input"
-      :type="type"
+      :type="type === 'password' && showPassword ? 'text' : type"
       :placeholder="placeholder"
       :autocomplete="autocomplete"
       :autofocus="autofocus"
@@ -50,6 +58,21 @@ const inputRef = ref<HTMLInputElement | null>(null);
       :aria-placeholder="placeholder"
       :name="name"
       :value="model"
+    />
+
+    <IconComponent
+      icon="eye"
+      class="input-field__icon"
+      style="cursor: pointer"
+      v-if="type === 'password' && showPassword"
+      @click="toggleShowPassword"
+    />
+    <IconComponent
+      icon="eye-off"
+      class="input-field__icon"
+      style="cursor: pointer"
+      v-if="type === 'password' && !showPassword"
+      @click="toggleShowPassword"
     />
   </div>
   <!-- <span class="input-error" v-if="error"></span> -->

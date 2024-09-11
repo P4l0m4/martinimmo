@@ -14,6 +14,7 @@ const [showCreditsPopUp, toggleCreditsPopUp] = useToggle();
 const route = useRoute();
 const router = useRouter();
 const deathStore = useDeathStore();
+const loading = ref(false);
 
 const isUserLoggedIn = ref();
 const records = ref([]);
@@ -39,6 +40,7 @@ async function fetchAndUpdateRecords() {
 }
 
 onMounted(async () => {
+  loading.value = true;
   isUserLoggedIn.value = await checkExistingToken();
   if (!isUserLoggedIn.value) {
     await router.push({ path: "/" });
@@ -52,6 +54,7 @@ onMounted(async () => {
   if (city) deathStore.setCity(city as string);
 
   await fetchAndUpdateRecords();
+  loading.value = false;
 });
 
 function handleSort(order: string) {
@@ -181,7 +184,7 @@ async function savePersons() {
 </script>
 
 <template>
-  <template v-if="isUserLoggedIn?.user.aud">
+  <template v-if="isUserLoggedIn?.user.aud && !loading">
     <Container>
       <Transition name="expand">
         <div class="sorting-and-filtering" ref="target">
@@ -287,7 +290,7 @@ async function savePersons() {
     </Container>
   </template>
 
-  <SkeletonsSearchSkeleton v-else />
+  <SkeletonsSearchSkeleton v-else-if="loading" />
 </template>
 
 <style scoped lang="scss">

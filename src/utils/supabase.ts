@@ -211,7 +211,7 @@ export async function signOut() {
   }
 }
 
-export async function addUser(user_id: string, last_credit_update: any) {
+export async function addUser(user_id: string) {
   const { data: existingUsers, error: fetchError } = await supabase
     .from("users")
     .select("*")
@@ -219,23 +219,12 @@ export async function addUser(user_id: string, last_credit_update: any) {
     .single();
 
   if (fetchError) {
-    // console.error("Error checking for existing user:", fetchError);
     const isUserLoggedIn = await checkExistingToken();
-    //check account type
-    const accountType = await isUserLoggedIn.user.user_metadata.accountType;
-    let defaultCredits;
-
-    if (accountType === "gratuit") {
-      defaultCredits = 10;
-    } else if (accountType === "premium") {
-      defaultCredits = 100;
-    }
 
     const { data, error } = await supabase.from("users").insert([
       {
         user_id,
-        last_credit_update,
-        credits: defaultCredits,
+        credits: 10,
       },
     ]);
     if (error) {
@@ -250,7 +239,7 @@ export async function addUser(user_id: string, last_credit_update: any) {
 export async function fetchUserById(user_id: string) {
   const { data, error } = await supabase
     .from("users")
-    .select("")
+    .select("*")
     .eq("user_id", user_id)
     .single();
 
@@ -498,7 +487,6 @@ export async function getFamillyByDeceasedId(deceasedId: string) {
     console.error("Error fetching data:", error);
     return [];
   } else {
-    console.log("Family members fetched successfully!", data);
     return data;
   }
 }

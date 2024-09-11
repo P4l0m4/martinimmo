@@ -170,6 +170,7 @@ const buttonState = computed(() => {
         icon="mail"
         :error="emailErrors[0]"
         name="email"
+        aurofocus="true"
       />
       <InputField
         v-model="passwordRef"

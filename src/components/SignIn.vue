@@ -132,12 +132,13 @@ const buttonState = computed(() => {
         icon="mail"
         name="email"
         :error="emailErrors[0]"
+        aurofocus="true"
       />
       <InputField
         v-model="passwordRef"
         id="password"
         label="Mot de passe"
-        type="text"
+        type="password"
         placeholder="Ax1fy9@kzV3"
         icon="key"
         name="password"

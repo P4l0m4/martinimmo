@@ -20,7 +20,8 @@ const errors = ref<string[]>([]);
 async function createPaymentIntent() {
   try {
     const response = await fetch(
-      "https://martinimmo-backend.vercel.app/create-payment-intent",
+      "http://localhost:3001/create-payment-intent/" +
+        isUserLoggedIn.value.user.id,
       {
         method: "POST",
         headers: {
@@ -78,13 +79,14 @@ async function confirmPayment() {
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
   createPaymentIntent();
+
   setupStripe();
 });
 </script>
 
 <template>
-  <Container class="c">
-    <div id="card-element"></div>
+  <Container>
+    <div id="card-element" v-if="errors.length"></div>
     <div class="form">
       <PrimaryButton
         button-type="dark"
@@ -94,6 +96,7 @@ onMounted(async () => {
         Acheter 100 crédits
       </PrimaryButton>
       <span v-if="errors.length">{{ errors[0] }}</span>
+      <span v-else>{{ errors[0] }}</span>
     </div></Container
   >
 </template>
