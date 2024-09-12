@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { loadStripe } from "@stripe/stripe-js";
-import { checkExistingToken } from "@/utils/supabase";
+import { checkExistingToken, addCredits } from "@/utils/supabase";
 
 const isUserLoggedIn = ref();
 
@@ -20,7 +20,7 @@ const errors = ref<string[]>([]);
 async function createPaymentIntent() {
   try {
     const response = await fetch(
-      "http://martinimmo-backend.vercel.app/create-payment-intent/" +
+      "https://martinimmo-backend.vercel.app/create-payment-intent/" +
         isUserLoggedIn.value.user.id,
       {
         method: "POST",
@@ -313,8 +313,9 @@ async function confirmPayment() {
   if (error) {
     console.error("Payment failed:", error.message);
     errors.value.push(error.message);
-  } else if (paymentIntent) {
+  } else if (paymentIntent && paymentIntent.status === "succeeded") {
     console.log("Payment succeeded:", paymentIntent);
+    // addCredits(isUserLoggedIn.value.user.id, 100);
   }
 }
 
@@ -338,8 +339,7 @@ onMounted(async () => {
       >
         Acheter 100 crédits
       </PrimaryButton>
-      <span v-if="errors.length">{{ errors[0] }}</span>
-      <span v-else>{{ errors[0] }}</span>
+      <span v-for="error in errors">{{ error }}</span>
     </div></Container
   >
 </template>
