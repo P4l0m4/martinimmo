@@ -315,7 +315,7 @@ async function confirmPayment() {
     errors.value.push(error.message);
   } else if (paymentIntent && paymentIntent.status === "succeeded") {
     console.log("Payment succeeded:", paymentIntent);
-    // addCredits(isUserLoggedIn.value.user.id, 100);
+    addCredits(isUserLoggedIn.value.user.id, 100);
   }
 }
 
