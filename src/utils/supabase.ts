@@ -224,7 +224,6 @@ export async function addUser(user_id: string) {
     const { data, error } = await supabase.from("users").insert([
       {
         user_id,
-        credits: 10,
       },
     ]);
     if (error) {
@@ -520,13 +519,9 @@ export async function updateUnlockedStatusOfDeceasedPerson(deceasedId: string) {
 
 export async function generateUser() {
   const isUserLoggedIn = await checkExistingToken();
-  const currentDate = new Date();
-  const dateISOString = currentDate.toISOString();
-  let user;
-  if (isUserLoggedIn.value.user.id) {
-    addUser(isUserLoggedIn.value.user.id, dateISOString);
-    user = await fetchUserById(isUserLoggedIn.value.user.id);
-    accountStore.updateLastCreditUpdate(user.last_credit_update);
+
+  if (isUserLoggedIn.user.id) {
+    addUser(isUserLoggedIn.user.id);
   } else {
     console.log("No user logged in");
   }
