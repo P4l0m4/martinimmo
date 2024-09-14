@@ -426,12 +426,12 @@ details > summary::-webkit-details-marker /* Safari */ {
 }
 
 .titles {
-  font-size: calc($titles - 0.7rem);
+  font-size: $titles;
   font-weight: $thick;
 
-  @media (min-width: $tablet-screen) {
-    font-size: $titles;
-  }
+  // @media (min-width: $tablet-screen) {
+  //   font-size: $titles;
+  // }
   @media (min-width: $laptop-screen) {
     font-size: calc($titles + 1rem);
   }

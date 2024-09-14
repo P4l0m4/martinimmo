@@ -21,7 +21,7 @@ initSupabase(supabase);
 
 onMounted(() => {
   accountStore.updateCredits();
-  generateUser();
+  // generateUser();
 });
 </script>
 <template>

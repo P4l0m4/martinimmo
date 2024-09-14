@@ -10,6 +10,11 @@ const [showSignIn, toggleSignIn] = useToggle();
       Ils ont des <span class="secondary-color">biens à vendre</span>,
       trouvez-les en un clic 🖱️
     </h1>
+    <h2>
+      Accédez à un répertoire de plus de
+      <span class="secondary-color">2 millions de contacts qualifiés</span>
+      partout en France métropolitaine
+    </h2>
     <div class="buttons">
       <SecondaryButton button-type="dark" @click="toggleSignIn"
         >Connexion</SecondaryButton
@@ -27,11 +32,16 @@ const [showSignIn, toggleSignIn] = useToggle();
 </template>
 <style lang="scss" scoped>
 .titles {
+  margin-top: -72px;
   max-width: 1000px;
-  text-align: center;
   text-wrap: balance;
+
+  @media (min-width: $big-tablet-screen) {
+    text-align: center;
+  }
 }
 .buttons {
+  margin-top: 1rem;
   display: flex;
   gap: 1rem;
   width: 100%;

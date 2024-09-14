@@ -229,6 +229,7 @@ export async function addUser(user_id: string) {
     if (error) {
       console.error("Error inserting data:", error);
     }
+
     return;
   } else if (existingUsers && existingUsers.length > 0) {
     return;

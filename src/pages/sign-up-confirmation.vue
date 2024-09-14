@@ -1,7 +1,13 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useToggle } from "@vueuse/core";
+import { generateUser } from "@/utils/supabase";
 
 const [showSignIn, toggleSignIn] = useToggle();
+
+onMounted(async () => {
+  await generateUser();
+});
 </script>
 <template>
   <Container class="centered-content">
