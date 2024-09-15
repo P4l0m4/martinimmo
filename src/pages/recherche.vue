@@ -77,11 +77,14 @@ function handleDepartmentFilter(filter: {
   url_part: string;
 }) {
   deathStore.setDepartment(filter.department_name);
+  deathStore.setCity("");
   updateUrl();
 }
 
 function handleRegionFilter(filter: { region_name: string; url_part: string }) {
   deathStore.setRegion(filter.region_name);
+  deathStore.setDepartment("");
+  deathStore.setCity("");
   updateUrl();
 }
 
@@ -103,8 +106,7 @@ function updateUrl() {
     .join("&");
 
   router.push(`${route.path}?${query}`);
-
-  fetchAndUpdateRecords();
+  setSliceInStore([0, 200]);
 }
 
 function setSliceInStore(slice: [number, number]) {
@@ -144,6 +146,13 @@ function selectTenBoxes() {
     isBoxChecked.value = false;
   }
 }
+
+watch(
+  () => deathStore.totalDeadPeople,
+  () => {
+    console.log("totalDeadPeople changed: ", deathStore.totalDeadPeople);
+  }
+);
 
 const selectedRecords = computed(() =>
   boxArray.value
@@ -286,7 +295,9 @@ async function savePersons() {
         :totalDeadPeople="deathStore.totalDeadPeople"
         @slice-selected="setSliceInStore"
         v-if="deathStore.totalDeadPeople > 200 && !reset"
-      />
+      /><span style="font-weight: 300; margin: 0 auto" v-else
+        >{{ deathStore.totalDeadPeople }} résultats disponibles</span
+      >
     </Container>
   </template>
 

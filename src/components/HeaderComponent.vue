@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { checkExistingToken } from "@/utils/supabase";
+import { checkExistingToken, generateUser } from "@/utils/supabase";
 import { useAccountStore } from "@/stores/accountStore";
 import { debounce } from "@/utils/debounce";
 
@@ -24,6 +24,10 @@ onMounted(async () => {
     );
     accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
     credits.value = await getCredits(isUserLoggedIn.value.user.id);
+
+    if (credits.value.credits) {
+      generateUser();
+    }
   }
 });
 </script>

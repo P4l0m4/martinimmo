@@ -13,7 +13,7 @@ const [showSignIn, toggleSignIn] = useToggle();
     <h2>
       Accédez à un répertoire de plus de
       <span class="secondary-color">2 millions de contacts qualifiés</span>
-      partout en France métropolitaine
+      partout en France
     </h2>
     <div class="buttons">
       <SecondaryButton button-type="dark" @click="toggleSignIn"
