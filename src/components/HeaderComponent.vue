@@ -41,9 +41,9 @@ onMounted(async () => {
         <li class="header__nav__ul__li">
           <NuxtLink to="/recherche" exact>Recherche</NuxtLink>
         </li>
-        <!-- <li class="header__nav__ul__li">
+        <li class="header__nav__ul__li">
           <NuxtLink to="/FAQ" exact>FAQ</NuxtLink>
-        </li> -->
+        </li>
 
         <AuthButtons v-if="isUserLoggedIn?.user.credits" />
         <li

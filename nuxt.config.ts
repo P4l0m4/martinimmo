@@ -4,7 +4,17 @@ export default defineNuxtConfig({
   ssr: false,
   srcDir: "src/",
   css: ["@/styles/global.scss"],
-  modules: ["dayjs-nuxt", "@pinia/nuxt"],
+  modules: [
+    "dayjs-nuxt",
+    "@pinia/nuxt",
+    [
+      "@storyblok/nuxt",
+      {
+        accessToken: process.env.STORYBLOK_KEY,
+        cacheProvider: "memory",
+      },
+    ],
+  ],
   vite: {
     css: {
       preprocessorOptions: {
@@ -26,6 +36,7 @@ export default defineNuxtConfig({
       SUPABASE_KEY: process.env.SUPABASE_KEY,
       SUPABASE_URL: process.env.SUPABASE_URL,
       STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
+      STORYBLOK_KEY: process.env.STORYBLOK_KEY,
     },
   },
   dayjs: {
