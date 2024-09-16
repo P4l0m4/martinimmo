@@ -7,6 +7,6 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <MustBeAuthenticated v-if="isUserLoggedIn?.user.aud" />
+  <MustBeAuthenticated v-if="!isUserLoggedIn?.user.aud" />
   <StartBrowsing v-else />
 </template>
