@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
+import { useAccountStore } from "@/stores/accountStore";
 import {
   checkExistingToken,
   removeCredits,
@@ -14,6 +15,7 @@ const [showCreditsPopUp, toggleCreditsPopUp] = useToggle();
 const route = useRoute();
 const router = useRouter();
 const deathStore = useDeathStore();
+const accountStore = useAccountStore();
 const loading = ref(false);
 
 const isUserLoggedIn = ref();
@@ -183,9 +185,15 @@ async function savePersons() {
       selectedRecords.value.length
     );
 
-    // Indicate success
     buttonState.value = "success";
-    setTimeout(() => location.reload(), 1000);
+    localStorage.setItem("notification", "true");
+    setTimeout(
+      () => {
+        location.reload();
+      },
+
+      2000
+    );
   } catch (error) {
     console.error("Failed to unlock profiles and deduct credits:", error);
   }
@@ -193,6 +201,17 @@ async function savePersons() {
 </script>
 
 <template>
+  <template v-if="buttonState === 'success'">
+    <span class="moving-notification"
+      ><IconComponent icon="mail" color="#9600de"
+    /></span>
+    <span class="moving-notification"
+      ><IconComponent icon="at-sign" color="#9600de"
+    /></span>
+    <span class="moving-notification"
+      ><IconComponent icon="info" color="#9600de" /></span
+  ></template>
+
   <template v-if="isUserLoggedIn?.user.aud && !loading">
     <Container>
       <Transition name="expand">
@@ -304,7 +323,46 @@ async function savePersons() {
   <SkeletonsSearchSkeleton v-else-if="loading" />
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
+.moving-notification {
+  gap: 0.25rem;
+  position: absolute;
+  top: 7rem;
+  right: 7rem;
+  z-index: 4;
+  animation: move 1s infinite ease;
+
+  @media (min-width: $big-tablet-screen) {
+    top: 6rem;
+    right: 7rem;
+  }
+
+  &:nth-of-type(2) {
+    animation-delay: 1s;
+    animation: move 1.5s infinite ease;
+  }
+  &:nth-of-type(3) {
+    animation-delay: 2s;
+    animation: move 0.75s infinite ease;
+  }
+}
+
+@keyframes move {
+  from {
+    opacity: 0;
+    transform: translate(0, 0) rotate(-180deg);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(3.5rem, -5rem) rotate(0deg);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(4.5rem, -4.5rem) rotate(0deg);
+  }
+}
+
 .sorting-and-filtering {
   display: flex;
   gap: 1rem;

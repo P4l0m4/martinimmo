@@ -41,9 +41,6 @@ export const useAccountStore = defineStore({
           }
         }
       }
-      // else {
-      //   console.log("No need to update credits");
-      // }
     },
   },
 });

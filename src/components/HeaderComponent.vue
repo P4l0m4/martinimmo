@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onUnmounted } from "vue";
 import { checkExistingToken, generateUser } from "@/utils/supabase";
 import { useAccountStore } from "@/stores/accountStore";
 import { debounce } from "@/utils/debounce";
@@ -15,6 +15,14 @@ const updateCredits = debounce(async () => {
 
 document.addEventListener("click", updateCredits);
 
+const notification = ref(localStorage.getItem("notification") === "true");
+
+const checkLocalStorage = () => {
+  notification.value = localStorage.getItem("notification") === "true";
+};
+
+let intervalId: any;
+
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
 
@@ -22,13 +30,20 @@ onMounted(async () => {
     accountStore.updateAccountType(
       isUserLoggedIn.value.user.user_metadata.accountType
     );
+
     accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
     credits.value = await getCredits(isUserLoggedIn.value.user.id);
 
     if (credits.value.credits) {
       generateUser();
     }
+
+    intervalId = setInterval(checkLocalStorage, 1000);
   }
+});
+
+onUnmounted(() => {
+  clearInterval(intervalId);
 });
 </script>
 <template>
@@ -56,6 +71,9 @@ onMounted(async () => {
           /></span>
           <NuxtLink
             to="/mon-compte"
+            :class="{
+              'notification-circle': notification === true,
+            }"
             exact
             aria-label="Mon compte"
             v-tooltip:bottom="'Mon compte'"
@@ -67,6 +85,23 @@ onMounted(async () => {
   </header>
 </template>
 <style lang="scss" scoped>
+.notification-circle {
+  // border: $secondary-color 2px solid !important;
+  animation: bump 1s infinite;
+}
+
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .router-link-exact-active {
   border-bottom: 2px solid $secondary-color;
 }

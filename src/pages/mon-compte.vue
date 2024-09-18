@@ -265,6 +265,7 @@ const isLoading = computed(() => {
 
 onMounted(async () => {
   loading.value = true;
+  localStorage.setItem("notification", "false");
   isUserLoggedIn.value = await checkExistingToken();
 
   if (isUserLoggedIn.value) {
