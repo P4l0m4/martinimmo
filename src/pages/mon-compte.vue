@@ -204,22 +204,24 @@ function getRelativesCount(deceasedId: string): number {
 
 async function generateCSV() {
   let csvContent =
-    "Firstname,Lastname,Death Region,Death Department Code,Community,Family Member Firstname,Family Member Lastname,Family Member Email, Family Member Sex\n";
+    "Firstname,Lastname,Death Region,Community,Death Department Code,Family Member Firstname,Family Member Lastname,Family Member Email,Family Member Sex\n";
 
   for (const person of persons.value) {
+    // Safely retrieve family members by awaiting the async function
     const familyMembers = await getFamillyByDeceasedId(person.id);
 
-    // If the person has no family members, we still want to include their info
-    if (familyMembers.length === 0) {
-      csvContent += `${person.firstnames},${person.lastname},${person.current_death_com_name},${person.current_death_dep_code},,\n`;
+    // If no family members, include the person details
+    if (!familyMembers || familyMembers.length === 0) {
+      csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_birth_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},,,,\n`;
     } else {
-      // For each family member, add their information to the CSV row along with the deceased person’s details
-      familyMembers.forEach((familyMember: any) => {
-        csvContent += `${person.firstnames},${person.lastname},${person.current_death_com_name},${person.current_death_dep_code},${familyMember.firstnameS},${familyMember.lastname},${familyMember.email},${familyMember.sex}\n`;
-      });
+      // Use for...of loop to ensure proper async handling
+      for (const familyMember of familyMembers) {
+        csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_birth_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},${familyMember.firstnames ?? ""},${familyMember.lastname ?? ""},${familyMember.email ?? ""},${familyMember.sex ?? ""}\n`;
+      }
     }
   }
 
+  // Create and download the CSV file
   const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
