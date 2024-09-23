@@ -71,6 +71,18 @@ const handleDepartment = async (department: any) => {
   displayDepartment.value = false;
   selectedDepartment.value = department.department_name;
 
+  if (departmentLabel.value === department.department_name) {
+    departmentLabel.value = "Filtrer par département";
+    filterBy.value = "default";
+    emit("setDepartment", "");
+    router.push({
+      query: {
+        region: selectedRegion.value.region_name,
+      },
+    });
+    return;
+  }
+
   if (
     filterBy.value === "default" ||
     filterBy.value !== department.department_name
@@ -123,6 +135,20 @@ onMounted(async () => {
 
 const handleCity = (city: string) => {
   displayCity.value = false;
+
+  if (cityLabel.value === city) {
+    cityLabel.value = "Filtrer par ville";
+    filterBy.value = "default";
+    emit("setCity", "");
+    router.push({
+      query: {
+        region: selectedRegion.value.region_name,
+        department: selectedDepartment.value.department_name,
+      },
+    });
+    return;
+  }
+
   if (filterBy.value === "default" || filterBy.value !== city) {
     filterBy.value = city;
     cityLabel.value = city;
@@ -192,7 +218,7 @@ onClickOutside(target, (event) => (displayCity.value = false));
             v-for="department in departmentsList"
             :key="department.department_name"
             :class="{
-              disabled: filterBy.department_name === department.department_name,
+              grey: filterBy.department_name === department.department_name,
             }"
             @click="handleDepartment(department)"
             >{{ department.department_name }}</span
@@ -221,7 +247,7 @@ onClickOutside(target, (event) => (displayCity.value = false));
             v-for="(city, i) in citiesList[0].cities"
             :key="i"
             :class="{
-              disabled: filterBy === city,
+              grey: filterBy === city,
             }"
             @click="handleCity(city as string)"
             >{{ city }}</span
@@ -232,6 +258,9 @@ onClickOutside(target, (event) => (displayCity.value = false));
   </div>
 </template>
 <style scoped lang="scss">
+.grey {
+  opacity: 0.5;
+}
 .filtering {
   display: flex;
   gap: 0.5rem;

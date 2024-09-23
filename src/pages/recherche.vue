@@ -149,12 +149,12 @@ function selectTenBoxes() {
   }
 }
 
-watch(
-  () => deathStore.totalDeadPeople,
-  () => {
-    console.log("totalDeadPeople changed: ", deathStore.totalDeadPeople);
-  }
-);
+// watch(
+//   () => deathStore.totalDeadPeople,
+//   () => {
+//     console.log("totalDeadPeople changed: ", deathStore.totalDeadPeople);
+//   }
+// );
 
 const selectedRecords = computed(() =>
   boxArray.value
@@ -314,7 +314,7 @@ async function savePersons() {
         :totalDeadPeople="deathStore.totalDeadPeople"
         @slice-selected="setSliceInStore"
         v-if="deathStore.totalDeadPeople > 200 && !reset"
-      /><span style="font-weight: 300; margin: 0 auto" v-else
+      /><span v-else style="font-weight: 300; margin: 0 auto"
         >{{ deathStore.totalDeadPeople }} résultats disponibles</span
       >
     </Container>

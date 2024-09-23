@@ -70,7 +70,7 @@ onMounted(() => {
       </button>
     </ul>
 
-    <span class="pagination__results"
+    <span class="pagination__results" v-if="totalDeadPeople !== 3000"
       >{{ totalDeadPeople }} résultats disponibles</span
     >
   </div>
