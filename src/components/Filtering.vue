@@ -81,9 +81,7 @@ const handleDepartment = async (department: any) => {
       },
     });
     return;
-  }
-
-  if (
+  } else if (
     filterBy.value === "default" ||
     filterBy.value !== department.department_name
   ) {
@@ -147,9 +145,7 @@ const handleCity = (city: string) => {
       },
     });
     return;
-  }
-
-  if (filterBy.value === "default" || filterBy.value !== city) {
+  } else if (filterBy.value === "default" || filterBy.value !== city) {
     filterBy.value = city;
     cityLabel.value = city;
 
