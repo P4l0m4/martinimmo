@@ -7,13 +7,19 @@ const [showSignIn, toggleSignIn] = useToggle();
 <template>
   <footer>
     <GridContainer>
-      <div class="title-section">
-        <img
-          class="title-section__logo"
-          src="@/assets/images/immo-logo.svg"
-          alt="logo martinimmo"
-        />
-        <h4 class="title-section__title">Martinimmo</h4>
+      <div class="first-box">
+        <div class="title-section">
+          <img
+            class="title-section__logo"
+            src="@/assets/images/immo-logo.svg"
+            alt="logo martinimmo"
+          />
+          <h4 class="title-section__title">Martinimmo</h4>
+        </div>
+        <p class="paragraphs">
+          Facilitez votre recherche de biens à vendre. Accédez à plus de 2
+          millions de contacts qualifiés.
+        </p>
       </div>
       <ul class="links">
         <h5 class="links__title">Liens utiles</h5>
@@ -47,6 +53,7 @@ const [showSignIn, toggleSignIn] = useToggle();
         <SignIn v-if="showSignIn" @close-sign-in="showSignIn = !showSignIn" />
       </div>
     </GridContainer>
+
     <div class="bottom-links">
       <NuxtLink to="tekilawebfactory.com">CGV</NuxtLink
       ><NuxtLink to="tekilawebfactory.com">RGPD</NuxtLink
@@ -63,20 +70,27 @@ footer {
   display: flex;
   flex-direction: column;
 
-  .title-section {
+  .first-box {
     display: flex;
-    gap: 0.5rem;
-    height: fit-content;
-    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+    color: $text-color-alt;
 
-    &__logo {
-      width: 40px;
-      height: 40px;
-    }
+    .title-section {
+      display: flex;
+      gap: 0.5rem;
+      height: fit-content;
+      align-items: center;
 
-    &__title {
-      color: $text-color-alt;
-      font-size: $titles;
+      &__logo {
+        width: 40px;
+        height: 40px;
+      }
+
+      &__title {
+        color: $text-color-alt;
+        font-size: $titles;
+      }
     }
   }
 
@@ -118,6 +132,7 @@ footer {
     border-top: 1px solid $primary-color-faded;
     width: 100%;
     padding-top: 2rem;
+    margin-left: 2rem;
 
     & a {
       color: $primary-color-faded;
