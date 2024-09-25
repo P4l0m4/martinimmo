@@ -70,6 +70,7 @@ function toggleQuestion(i: number) {
     &__button {
       background-color: $secondary-color;
       width: 40px;
+      min-width: 40px;
       max-width: 40px;
       height: 40px;
       max-height: 40px;

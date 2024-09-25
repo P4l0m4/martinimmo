@@ -7,12 +7,13 @@ $super-big-screen: 2400px;
 //COLORS
 $base-color: #f7f7f7;
 $primary-color: #fffdfa;
-$secondary-color: #6800ba;
+$secondary-color: #44008d;
+//6800ba
 $text-color: #232323;
 $text-color-alt: $primary-color;
 $error-color: #bb0025;
 $success-color: #00a86b;
-$loading-color: #9600de;
+$loading-color: $secondary-color;
 $pink-color: #ff91af;
 $blue-color: #008ed5;
 

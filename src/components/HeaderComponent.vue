@@ -67,7 +67,7 @@ onUnmounted(() => {
         >
           <span class="credits"
             >{{ credits?.credits
-            }}<IconComponent icon="credit-card" color="#6800ba"
+            }}<IconComponent icon="credit-card" color="#44008d"
           /></span>
           <NuxtLink
             to="/mon-compte"
