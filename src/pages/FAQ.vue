@@ -42,6 +42,7 @@ function toggleQuestion(i: number) {
       ></div>
     </div>
   </GridContainer>
+  <LastArticles />
 </template>
 <style lang="scss" scoped>
 .titles,
