@@ -198,6 +198,8 @@ async function savePersons() {
     console.error("Failed to unlock profiles and deduct credits:", error);
   }
 }
+
+const isMobile = computed(() => window.innerWidth < 768);
 </script>
 
 <template>
@@ -275,7 +277,7 @@ async function savePersons() {
           <div class="table__header__cell">
             <IconComponent icon="map-pin" />Commune
           </div>
-          <div class="table__header__cell">
+          <div class="table__header__cell" v-if="!isMobile">
             <IconComponent icon="user" color="#232323" />Prénom
           </div>
           <div class="table__header__cell">

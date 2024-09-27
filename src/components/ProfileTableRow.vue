@@ -40,6 +40,8 @@ const isBoxChecked = computed({
   get: () => props.boxArray[props.index],
   set: (value: boolean) => emit("update-box", value),
 });
+
+const isMobile = computed(() => window.innerWidth < 768);
 </script>
 <template>
   <Transition>
@@ -58,7 +60,7 @@ const isBoxChecked = computed({
         {{ death.city }}
         <!-- <span>{{ death.departmentName }} ({{ death.departmentCode }})</span> -->
       </span>
-      <span class="table__body__row__cell">
+      <span class="table__body__row__cell" v-if="!isMobile">
         {{ name.first }}
       </span>
       <span class="table__body__row__cell">

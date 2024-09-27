@@ -265,6 +265,12 @@ const isLoading = computed(() => {
   return persons.value.some((person) => person.status === "loading");
 });
 
+window.addEventListener("beforeunload", function (e) {
+  if (isLoading.value === true) {
+    e.preventDefault();
+  }
+});
+
 onMounted(async () => {
   loading.value = true;
   localStorage.setItem("notification", "false");
@@ -307,7 +313,12 @@ onMounted(async () => {
               @click="findFamily"
               >Trouver des proches</PrimaryButton
             ><span
-              style="display: flex; gap: 0.5rem; align-items: center"
+              style="
+                display: flex;
+                gap: 0.5rem;
+                align-items: center;
+                text-wrap: balance;
+              "
               v-else
               >Recherche en cours, gardez cette page ouverte<IconComponent
                 icon="loader"
