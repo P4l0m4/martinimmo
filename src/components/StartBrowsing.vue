@@ -5,11 +5,11 @@
       trouvez-les en un clic 🖱️
     </h1>
     <div class="buttons">
-      <SecondaryButton button-type="dark"
-        >Commencer ma recherche</SecondaryButton
+      <NuxtLink class="button secondary--dark" to="/recherche"
+        >Commencer ma recherche</NuxtLink
       >
-      <PrimaryButton button-type="dark"
-        >Voir mes contacts débloqués</PrimaryButton
+      <NuxtLink class="button primary--dark" to="/mon-compte"
+        >Voir mes contacts débloqués</NuxtLink
       >
     </div></Container
   >
