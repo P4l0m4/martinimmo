@@ -42,7 +42,7 @@ function closeAndDisplayPasswordReset() {
       />
     </div>
 
-    <PasswordReset v-if="showPasswordReset"
+    <PasswordReset v-if="showPasswordReset" @email-sent="togglePasswordReset"
   /></Container>
 </template>
 <style lang="scss" scoped>

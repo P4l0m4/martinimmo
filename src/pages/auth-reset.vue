@@ -29,18 +29,26 @@ const resetPassword = async () => {
 </script>
 
 <template>
-  <div>
-    <h2>Reset Password</h2>
-    <form @submit.prevent="resetPassword">
+  <Container>
+    <h2>Renseignez votre nouveau mot de passe</h2>
+    <form class="form" @submit.prevent="resetPassword">
       <InputField
         type="password"
         v-model="newPassword"
-        placeholder="Nouveau mot de passe"
+        placeholder="!Vq0h2@8RHi"
+        label="Nouveau mot de passe"
         required
       />
       <button type="submit" class="button primary--dark">
         Update Password
       </button>
     </form>
-  </div>
+  </Container>
 </template>
+<style scoped lang="scss">
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+</style>
