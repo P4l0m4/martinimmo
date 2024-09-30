@@ -527,3 +527,39 @@ export async function generateUser() {
     console.log("No user logged in");
   }
 }
+
+//PASSWORD RECOVERY
+
+export const updateUserPassword = async (
+  accessToken: any,
+  newPassword: string
+) => {
+  try {
+    const { error } = await supabase.auth.api.updateUser(accessToken, {
+      password: newPassword,
+    });
+
+    if (error) throw error;
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating user:", error.message);
+    return { success: false, error: error.message };
+  }
+};
+
+export const sendPasswordResetEmail = async (email: string) => {
+  try {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://martinimmo.netlify.app/auth-reset",
+    });
+
+    if (error) throw error;
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error sending password reset email:", error.message);
+
+    return { success: false, error: error.message };
+  }
+};

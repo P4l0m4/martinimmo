@@ -111,9 +111,12 @@ onUnmounted(() => {
   padding: 1rem;
   background-color: $primary-color;
   box-shadow: $shadow-black;
+  height: 72px;
 
   &__nav {
     width: 100%;
+    display: flex;
+    align-items: center;
 
     &__ul {
       list-style: none;

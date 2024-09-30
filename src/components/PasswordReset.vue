@@ -1,30 +1,25 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { onClickOutside } from "@vueuse/core";
-import { authenticateUser, checkExistingToken } from "@/utils/supabase";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import { sendPasswordResetEmail } from "@/utils/supabase";
 
 const isSubmitting = ref("default");
 const emailRef = ref("");
-const passwordRef = ref("");
 const target = ref<HTMLElement | null>(null);
 const invalidCredentialsMessage = ref(null as string | null);
-const isUserLoggedIn = ref();
-isUserLoggedIn.value = await checkExistingToken();
 
-const emit = defineEmits(["closeSignIn", "closePasswordReset"]);
+const emit = defineEmits(["emailSent"]);
 
-onClickOutside(target, () => emit("closeSignIn"));
+onClickOutside(target, () => emit("emailSent"));
 
 const rules = {
   email: { required, email },
-  password: { required },
 };
 
 const state = {
   email: emailRef,
-  password: passwordRef,
 };
 
 const v$ = useVuelidate(rules, state);
@@ -33,12 +28,11 @@ function confirmSubmission() {
   isSubmitting.value = "success";
   v$.value.$reset();
   emailRef.value = "";
-  passwordRef.value = "";
   invalidCredentialsMessage.value = null;
 
   setTimeout(() => {
     isSubmitting.value = "default";
-    emit("closeSignIn");
+    emit("emailSent");
   }, 2000);
 }
 
@@ -54,16 +48,6 @@ const emailErrors = computed(() => {
   return errors;
 });
 
-const passwordErrors = computed(() => {
-  const errors: string[] = [];
-  if (!v$.value.password.$dirty) return errors;
-  if (v$.value.password.required.$invalid) {
-    errors.push("Mot de passe vide");
-  }
-
-  return errors;
-});
-
 async function submitForm() {
   isSubmitting.value = "loading";
   v$.value.$touch();
@@ -72,7 +56,8 @@ async function submitForm() {
     return;
   }
   try {
-    await authenticateUser(emailRef.value, passwordRef.value);
+    await sendPasswordResetEmail(emailRef.value);
+
     invalidCredentialsMessage.value = "Vous êtes connecté";
     confirmSubmission();
   } catch (error) {
@@ -86,15 +71,15 @@ async function submitForm() {
 }
 
 const buttonLabel = computed(() => {
-  if (isSubmitting.value === "default") return "Me connecter";
-  else if (isSubmitting.value === "loading") return "Me connecter";
-  else if (isSubmitting.value === "success") return "Vous êtes connecté";
+  if (isSubmitting.value === "default") return "Réinitialiser mon mot de passe";
+  else if (isSubmitting.value === "loading")
+    return "Réinitialiser mon mot de passe";
+  else if (isSubmitting.value === "success") return "Lien envoyé par mail";
   else if (isSubmitting.value === "error")
     return (
       emailErrors.value[0] ||
-      passwordErrors.value[0] ||
       invalidCredentialsMessage.value ||
-      "Me connecter"
+      "Réinitialiser mon mot de passe"
     );
 });
 
@@ -105,15 +90,12 @@ const buttonState = computed(() => {
   else if (
     isSubmitting.value === "error" &&
     !invalidCredentialsMessage.value &&
-    !emailErrors.value[0] &&
-    !passwordErrors.value[0]
+    !emailErrors.value[0]
   )
     return "default";
   else if (
     isSubmitting.value === "error" &&
-    (emailErrors.value[0] ||
-      invalidCredentialsMessage.value !== null ||
-      passwordErrors.value[0])
+    (emailErrors.value[0] || invalidCredentialsMessage.value !== null)
   )
     return "error";
   else if (isSubmitting.value === "error") return "error";
@@ -121,8 +103,12 @@ const buttonState = computed(() => {
 </script>
 
 <template>
-  <section class="sign-in">
-    <form class="sign-in__form" ref="target" @submit.prevent="submitForm">
+  <section class="password-reset">
+    <form
+      class="password-reset__form"
+      ref="target"
+      @submit.prevent="submitForm"
+    >
       <InputField
         v-model="emailRef"
         id="email"
@@ -134,16 +120,6 @@ const buttonState = computed(() => {
         :error="emailErrors[0]"
         aurofocus="true"
       />
-      <InputField
-        v-model="passwordRef"
-        id="password"
-        label="Mot de passe"
-        type="password"
-        placeholder="Ax1fy9@kzV3"
-        icon="key"
-        name="password"
-        :error="passwordErrors[0]"
-      />
 
       <PrimaryButton
         button-type="dark"
@@ -152,20 +128,14 @@ const buttonState = computed(() => {
       >
         {{ buttonLabel }}
       </PrimaryButton>
-      <button
-        type="button"
-        class="button--tertiary-dark"
-        @click="emit('closePasswordReset')"
-      >
-        Mot de passe oublié
-      </button>
     </form>
   </section>
 </template>
 <style lang="scss" scoped>
-.sign-in {
+.password-reset {
+  z-index: 2;
   position: fixed;
-  inset: 0;
+  inset: 4rem 0 0 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -174,7 +144,6 @@ const buttonState = computed(() => {
   background-color: $secondary-color-faded;
   backdrop-filter: blur(4px);
   padding: 1rem;
-  z-index: 1;
 
   &__form {
     max-width: 400px;

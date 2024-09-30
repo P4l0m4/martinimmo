@@ -3,6 +3,14 @@ import { useToggle } from "@vueuse/core";
 
 const [showSignUp, toggleSignUp] = useToggle();
 const [showSignIn, toggleSignIn] = useToggle();
+
+const [showPasswordReset, togglePasswordReset] = useToggle();
+
+function closeAndDisplayPasswordReset() {
+  toggleSignIn();
+  console.log("closeAndDisplayPasswordReset");
+  togglePasswordReset();
+}
 </script>
 <template>
   <footer>
@@ -50,7 +58,15 @@ const [showSignIn, toggleSignIn] = useToggle();
         >
 
         <SignUp v-if="showSignUp" @close-sign-up="showSignUp = !showSignUp" />
-        <SignIn v-if="showSignIn" @close-sign-in="showSignIn = !showSignIn" />
+        <SignIn
+          v-if="showSignIn"
+          @close-sign-in="showSignIn = !showSignIn"
+          @close-password-reset="closeAndDisplayPasswordReset"
+        />
+        <PasswordReset
+          v-if="showPasswordReset"
+          @email-sent="togglePasswordReset"
+        />
       </div>
     </GridContainer>
 

@@ -22,6 +22,13 @@ const slices = computed(() => {
 
 function selectSlice(index: number) {
   selectedSliceIndex.value = index;
+
+  //if more than 20 slices, don't scroll
+  if (slices.value.length > 15 && index > slices.value.length - 10) {
+    return;
+  } else if (slices.value.length > 25 && index > slices.value.length - 15) {
+    return;
+  }
   document.querySelectorAll(".pagination-button")[index].scrollIntoView({
     behavior: "smooth",
     block: "nearest",
@@ -50,27 +57,30 @@ onMounted(() => {
 
 <template>
   <div class="pagination">
-    <ul>
+    <div class="wrapper">
       <button class="arrow" @click="prevSlice">
         <IconComponent icon="chevron-up" size="1.5rem" />
       </button>
-      <li v-for="(slice, index) in slices" :key="slice.start">
-        <button
-          @click="selectSlice(index)"
-          class="pagination-button"
-          :class="{
-            'pagination-button--selected': selectedSliceIndex === index,
-          }"
-        >
-          {{ index + 1 }}
-        </button>
-      </li>
+      <ul>
+        <li v-for="(slice, index) in slices" :key="slice.start">
+          <button
+            @click="selectSlice(index)"
+            class="pagination-button"
+            :class="{
+              'pagination-button--selected': selectedSliceIndex === index,
+            }"
+          >
+            {{ index + 1 }}
+          </button>
+        </li>
+      </ul>
       <button class="arrow" @click="nextSlice">
         <IconComponent icon="chevron-up" size="1.5rem" />
       </button>
-    </ul>
-
-    <span class="pagination__results" v-if="totalDeadPeople !== 3000"
+    </div>
+    <span
+      class="pagination__results"
+      v-if="totalDeadPeople !== 3000 && totalDeadPeople !== 6000"
       >{{ totalDeadPeople }} résultats disponibles</span
     >
   </div>
@@ -101,6 +111,17 @@ onMounted(() => {
   align-items: center;
   gap: 1rem;
   flex-direction: column;
+
+  .wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    overflow-x: hidden;
+    max-width: 100%;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 
   ul {
     display: flex;
