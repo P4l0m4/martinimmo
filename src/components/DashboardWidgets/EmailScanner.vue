@@ -11,6 +11,7 @@ const emailObject = ref("");
 const emailBody = ref("");
 const scanResults = ref();
 const sanitizedScanResults = ref<any[]>([]);
+const loading = ref(false);
 
 const segments = computed<Segment[]>(() => {
   if (
@@ -52,6 +53,7 @@ const scanResultsDetails = computed(() => {
 });
 
 async function sendEmailScanData() {
+  loading.value = true;
   try {
     scanResults.value = await perplexityEmailScan(
       emailObject.value,
@@ -67,6 +69,7 @@ async function sendEmailScanData() {
 
     const jsonString = match[1].trim();
     sanitizedScanResults.value = JSON.parse(jsonString);
+    loading.value = false;
   } catch (error) {
     console.error("Error parsing JSON or fetching scan data:", error);
   }
@@ -98,7 +101,7 @@ async function sendEmailScanData() {
 
     <div class="scan__results">
       <h4 class="subtitles">Résultats du scan</h4>
-      <pre>{{ scanResults.choices[0].message.content }}</pre>
+      <pre v-if="scanResults">{{ scanResults.choices[0].message.content }}</pre>
       <DashboardWidgetsDonutChart
         :segments="segments"
         :max-value="20"
