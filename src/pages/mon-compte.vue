@@ -516,6 +516,7 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+        <DashboardWidgetsEmailScanner />
         <ul class="account-info">
           <div class="header">
             <span class="header__text">

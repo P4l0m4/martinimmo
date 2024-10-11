@@ -56,3 +56,104 @@ export function validateEmail(email: string) {
       throw err;
     });
 }
+
+export async function perplexityEmailScan(
+  emailObject: string,
+  emailBody: string
+): Promise<any> {
+  const options = {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      authorization: `Bearer ${perplexityAPIKey}`,
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-sonar-small-128k-online",
+      messages: [
+        { role: "system", content: "Be precise and concise." },
+        {
+          role: "user",
+          content: `Voici l\'objet d\'un mail ${emailObject} et voici le contenu du mail ${emailBody}. Je veux que tu notes cet email selon les critères figurant dans le code json suivant.
+          {
+  "criteria": [
+    {
+      "category": "Contenu et structure",
+      "sub_criteria": {
+        "Objet accrocheur et pertinent au sujet": true,
+        "Longueur de l'objet entre 40 et 60 caractères": true,
+        "Introduction claire et concise": true,
+        "Identification explicite du problème": true,
+        "Proposition de valeur clairement énoncée": true,
+        "Appel à l'action clair pour le rendez-vous": true
+      }
+    },
+    {
+      "category": "Pertinence et ciblage",
+      "sub_criteria": {
+        "Référence à la situation spécifique du prospect": true,
+        "Langage adapté au contexte immobilier": true,
+        "Absence de généralités ou de contenu hors-sujet": true
+      }
+    },
+    {
+      "category": "Crédibilité et confiance",
+      "sub_criteria": {
+        "Présentation concise de vos qualifications ou expertise": true,
+        "Mention d'éléments démontrant votre connaissance du marché local": true,
+        "Explication brève de votre méthode ou approche": true
+      }
+    },
+    {
+      "category": "Style et lisibilité",
+      "sub_criteria": {
+        "Longueur appropriée (entre 50 et 200 mots pour le corps de l'email)": true,
+        "Message clair": true,
+        "Peu de paragraphes, de 2 à 4 phrases chacun": true,
+        "Pas d'excès de ponctuation (trop de points d'exclamation ou de majuscules)": true
+      }
+    },
+    {
+      "category": "Langue et ton",
+      "sub_criteria": {
+        "Absence de fautes d'orthographe et de grammaire": true,
+        "Ton professionnel mais sympathique": true,
+        "Langage simple et direct": true
+      }
+    },
+    {
+      "category": "Anti SPAM",
+      "sub_criteria": {
+        "Absence de termes susceptibles de déclencher les filtres anti-spam ou de promotion": true
+      }
+    },
+    {
+      "category": "Persuasion",
+      "sub_criteria": {
+        "Anticipation et réponse aux objections potentielles": true,
+        "Résumé des bénéfices clés en fin de message": true
+      }
+    }
+  ]
+}
+
+          Par défault les valeurs sont à true, tu dois les passer à false si le critère n'est pas respecté. Renvoie moi le code json tel qu\'il t'a été donné en y apportant les modifications nécessaires. Tu ne dois en aucun cas modifier la syntaxe des critères, tu dois juste les passer à false si le critère n'est pas respecté. Assure toi de renvoyer les données dans un format json valide.
+          
+`,
+        },
+      ],
+    }),
+  };
+  return fetch("https://api.perplexity.ai/chat/completions", options)
+    .then((response) => {
+      // console.log("Response:", response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .catch((err) => {
+      console.error("Error fetching data:", err);
+      throw err;
+    });
+}
