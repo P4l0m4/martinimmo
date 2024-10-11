@@ -92,7 +92,6 @@ export async function perplexityEmailScan(
       "category": "Pertinence et ciblage",
       "sub_criteria": {
         "Référence à la situation spécifique du prospect": true,
-        "Langage adapté au contexte immobilier": true,
         "Absence de généralités ou de contenu hors-sujet": true
       }
     },
@@ -108,7 +107,6 @@ export async function perplexityEmailScan(
       "category": "Style et lisibilité",
       "sub_criteria": {
         "Longueur appropriée (entre 50 et 200 mots pour le corps de l'email)": true,
-        "Message clair": true,
         "Peu de paragraphes, de 2 à 4 phrases chacun": true,
         "Pas d'excès de ponctuation (trop de points d'exclamation ou de majuscules)": true
       }

@@ -13,7 +13,6 @@
       r="40"
     />
   </svg>
-
   <span
     class="valid-segments-count"
     v-if="validSegmentsColor"
@@ -94,7 +93,6 @@ const validSegmentsColor = computed(() => {
 .donut-chart {
   width: 100px;
   height: 100px;
-  position: relative;
 }
 
 .segment {

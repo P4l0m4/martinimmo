@@ -44,14 +44,17 @@ const segments = computed<Segment[]>(() => {
     return [];
   }
 
-  return sanitizedScanResults.value.criteria.map((criterion: any) => {
-    console.log(criterion);
-    return {
-      value: Object.values(criterion.sub_criteria).filter((value) => !value)
-        .length,
-      color: "green",
-    };
-  });
+  return sanitizedScanResults.value.criteria
+    .map((criterion: any) => {
+      console.log(criterion);
+      return {
+        value: Object.values(criterion.sub_criteria).filter(
+          (value) => value === true
+        ).length,
+        color: "green",
+      };
+    })
+    .filter((segment: Segment[]) => segment.value > 0);
 });
 async function sendEmailScanData() {
   loading.value = true;
@@ -108,8 +111,7 @@ async function sendEmailScanData() {
       <DashboardWidgetsDonutChart
         :segments="segments"
         :max-value="20"
-        :valid-segments="20 - segments.length"
-        v-if="segments.length > 0"
+        :valid-segments="segments.length"
       />
       <div class="scan__results__details" v-for="element in scanResultsDetails">
         <h5 class="scan__results__details__category paragraphs">
@@ -118,6 +120,7 @@ async function sendEmailScanData() {
         <ul class="scan__results__details__sub-criterion">
           <li class="paragraphs" v-for="subCriterion in element.subCriteria">
             {{ subCriterion.subCriterion }}
+            <IconComponent icon="alert-circle" color="red" />
           </li>
         </ul>
       </div>
@@ -139,6 +142,7 @@ async function sendEmailScanData() {
 
   &__inputs {
     width: 100%;
+    height: fit-content;
     display: flex;
     flex-direction: column;
     gap: 1rem;
