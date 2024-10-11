@@ -22,6 +22,7 @@ function closeAndDisplayPasswordReset() {
       <span class="secondary-color">2 millions de contacts qualifiés</span>
       partout en France
     </h2>
+
     <div class="buttons">
       <SecondaryButton button-type="dark" @click="toggleSignIn"
         >Connexion</SecondaryButton
