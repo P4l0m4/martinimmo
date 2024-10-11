@@ -74,7 +74,7 @@ export async function perplexityEmailScan(
         { role: "system", content: "Be precise and concise." },
         {
           role: "user",
-          content: `Voici l\'objet d\'un mail ${emailObject} et voici le contenu du mail ${emailBody}. Je veux que tu notes cet email selon les critères figurant dans le code json suivant.
+          content: `Voici l\'objet d\'un mail: ( ${emailObject} ) et voici le contenu du mail: ( ${emailBody} ). Je veux que tu notes cet email selon les critères figurant dans le code json suivant.
           {
   "criteria": [
     {
@@ -137,7 +137,7 @@ export async function perplexityEmailScan(
   ]
 }
 
-          Par défault les valeurs sont à true, tu dois les passer à false si le critère n'est pas respecté. Renvoie moi le code json tel qu\'il t'a été donné en y apportant les modifications nécessaires. Tu ne dois en aucun cas modifier la syntaxe des critères, tu dois juste les passer à false si le critère n'est pas respecté. Assure toi de renvoyer les données dans un format json valide.
+          Par défault les valeurs sont à true, tu dois les passer à false si le critère n'est pas respecté. Renvoie moi le code json tel qu\'il t'a été donné en y apportant les modifications nécessaires. Tu ne dois en aucun cas modifier la syntaxe des critères, tu dois juste les passer à false si le critère n'est pas respecté. Assure toi de renvoyer les données dans un format json valide. Je ne veux aucune explication.
           
 `,
         },

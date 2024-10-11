@@ -13,31 +13,18 @@ const scanResults = ref();
 const sanitizedScanResults = ref<any[]>([]);
 const loading = ref(false);
 
-const segments = computed<Segment[]>(() => {
-  if (
-    !sanitizedScanResults.value.length ||
-    !sanitizedScanResults.value[0].criteria
-  ) {
-    return [];
-  }
-
-  return sanitizedScanResults.value[0].criteria.map((criterion: any) => {
-    return {
-      value: Object.values(criterion.sub_criteria).filter(Boolean).length,
-      color: "green",
-    };
-  });
-});
-
 const scanResultsDetails = computed(() => {
-  if (
-    !sanitizedScanResults.value.length ||
-    !sanitizedScanResults.value[0].criteria
-  ) {
+  if (!sanitizedScanResults.value) {
+    console.log("no criteria found");
+    return [];
+  } else if (!sanitizedScanResults.value.criteria) {
+    console.log("no criteria found");
     return [];
   }
 
-  return sanitizedScanResults.value[0].criteria.map((criterion) => {
+  //   return sanitizedScanResults.value;
+
+  return sanitizedScanResults.value.criteria.map((criterion: any) => {
     return {
       category: criterion.category,
       subCriteria: Object.entries(criterion.sub_criteria)
@@ -51,7 +38,21 @@ const scanResultsDetails = computed(() => {
     };
   });
 });
+const segments = computed<Segment[]>(() => {
+  if (!sanitizedScanResults.value || !sanitizedScanResults.value.criteria) {
+    console.log("no criteria found");
+    return [];
+  }
 
+  return sanitizedScanResults.value.criteria.map((criterion: any) => {
+    console.log(criterion);
+    return {
+      value: Object.values(criterion.sub_criteria).filter((value) => !value)
+        .length,
+      color: "green",
+    };
+  });
+});
 async function sendEmailScanData() {
   loading.value = true;
   try {
@@ -96,16 +97,18 @@ async function sendEmailScanData() {
         label="Corps du mail"
         required
       ></textarea>
-      <PrimaryButton @click="sendEmailScanData">Lancer le scan</PrimaryButton>
+      <PrimaryButton v-if="emailBody && emailObject" @click="sendEmailScanData"
+        >Lancer le scan</PrimaryButton
+      >
     </div>
 
     <div class="scan__results">
       <h4 class="subtitles">Résultats du scan</h4>
-      <pre v-if="scanResults">{{ scanResults.choices[0].message.content }}</pre>
+
       <DashboardWidgetsDonutChart
         :segments="segments"
         :max-value="20"
-        :valid-segments="20 - scanResultsDetails.length"
+        :valid-segments="20 - segments.length"
         v-if="segments.length > 0"
       />
       <div class="scan__results__details" v-for="element in scanResultsDetails">
