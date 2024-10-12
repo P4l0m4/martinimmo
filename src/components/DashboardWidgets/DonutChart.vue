@@ -1,25 +1,23 @@
 <template>
-  <svg class="donut-chart" viewBox="0 0 100 100">
-    <circle class="segment" cx="50" cy="50" r="40" />
-    <circle
-      v-for="(segment, index) in computedSegments"
-      :key="index"
-      :class="segment.color"
-      :stroke-dasharray="`${segment.percent} ${circumference - segment.percent}`"
-      :stroke-dashoffset="segment.offset"
-      class="segment"
-      cx="50"
-      cy="50"
-      r="40"
-    />
-  </svg>
-  <span
-    class="valid-segments-count"
-    v-if="validSegmentsColor"
-    :style="{ color: validSegmentsColor }"
-  >
-    {{ validSegments }}/{{ maxValue }}
-  </span>
+  <div class="wrapper">
+    <svg class="donut-chart" viewBox="0 0 100 100">
+      <circle class="segment" cx="50" cy="50" r="40" />
+      <circle
+        v-for="(segment, index) in computedSegments"
+        :key="index"
+        :class="segment.color"
+        :stroke-dasharray="`${segment.percent} ${circumference - segment.percent}`"
+        :stroke-dashoffset="segment.offset"
+        class="segment"
+        cx="50"
+        cy="50"
+        r="40"
+      />
+    </svg>
+    <span class="valid-segments-count" v-if="validSegments !== undefined">
+      {{ validSegments }}/{{ maxValue }}
+    </span>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -65,31 +63,14 @@ const computedSegments = computed<ComputedSegment[]>(() => {
     return currentSegment;
   });
 });
-
-const validSegmentsColor = computed(() => {
-  const { validSegments, maxValue } = props;
-
-  if (validSegments == null || maxValue == null) {
-    console.error("Missing validSegments or maxValue props");
-    return null; // Return null to explicitly indicate an error state
-  }
-
-  const percentage = (validSegments / maxValue) * 100;
-  console.log(percentage);
-
-  if (percentage <= 30) {
-    return "red";
-  } else if (percentage >= 30 && percentage <= 70) {
-    return "orange";
-  } else if (percentage >= 70) {
-    return "green";
-  } else {
-    return null;
-  }
-});
 </script>
 
 <style scoped lang="scss">
+.wrapper {
+  position: relative;
+  transform: scale(1.5);
+}
+
 .donut-chart {
   width: 100px;
   height: 100px;
@@ -123,5 +104,10 @@ const validSegmentsColor = computed(() => {
 .valid-segments-count {
   font-size: 1.5rem;
   font-weight: $thick;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  width: fit-content;
 }
 </style>
