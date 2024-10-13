@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { perplexityEmailScan } from "@/utils/APIData";
+import { email } from "@vuelidate/validators";
 
 type Segment = {
   value: number;
@@ -12,6 +13,7 @@ const emailBody = ref("");
 const scanResults = ref();
 const sanitizedScanResults = ref<any[]>([]);
 const loading = ref(false);
+const showFields = ref(true);
 
 const scanResultsDetails = computed(() => {
   if (!sanitizedScanResults.value) {
@@ -83,6 +85,9 @@ async function sendEmailScanData() {
     const jsonString = match[1].trim();
     sanitizedScanResults.value = JSON.parse(jsonString);
     loading.value = false;
+    showFields.value = false;
+    emailObject.value = "";
+    emailBody.value = "";
   } catch (error) {
     console.error("Error parsing JSON or fetching scan data:", error);
     loading.value = false;
@@ -92,8 +97,9 @@ async function sendEmailScanData() {
 
 <template>
   <div class="scan">
-    <div class="scan__inputs">
+    <div class="scan__inputs" v-if="showFields">
       <h3 class="subtitles">Testez votre email</h3>
+      <h4 class="paragraphs">Augmentez votre taux d'ouverture et de réponse</h4>
       <InputField
         id="email-object"
         type="text"
@@ -123,11 +129,11 @@ async function sendEmailScanData() {
             !loading
           "
           @click="sendEmailScanData"
-          >Lancer le scan</PrimaryButton
+          >Lancer l'analyse</PrimaryButton
         ></Transition
       >
-      <h4 class="subtitles" v-if="scanResultsDetails.length > 0">
-        Résultats du scan
+      <h4 class="subtitles" v-if="scanResultsDetails.length > 0 && !showFields">
+        Résultats de l'analyse
       </h4>
 
       <Transition>
@@ -135,12 +141,21 @@ async function sendEmailScanData() {
           :segments="segments"
           :max-value="20"
           :valid-segments="totalValue"
-          v-if="scanResultsDetails.length > 0"
+          v-if="scanResultsDetails.length > 0 && !showFields"
       /></Transition>
+
       <Transition
         ><DashboardWidgetsUiLoader v-if="loading" color="#00065c66"
       /></Transition>
-      <GridContainer>
+
+      <PrimaryButton
+        button-type="dark"
+        @click="(showFields = true), (scanResultsDetails = [])"
+        v-if="!showFields"
+        >Nouvelle analyse</PrimaryButton
+      >
+
+      <template v-if="!showFields">
         <div
           class="scan__results__details"
           v-for="element in scanResultsDetails"
@@ -154,7 +169,7 @@ async function sendEmailScanData() {
               <IconComponent icon="alert-circle" color="red" />
             </li>
           </ul></div
-      ></GridContainer>
+      ></template>
     </div>
   </div>
 </template>
@@ -177,17 +192,12 @@ async function sendEmailScanData() {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding: 1rem;
     border-radius: $radius;
-
-    @media (min-width: $big-tablet-screen) {
-      padding: 2rem;
-    }
 
     &__input {
       background-color: $primary-color;
 
-      &:nth-child(3) {
+      &:nth-child(4) {
         height: 400px;
         border-radius: 20px;
         font-size: 1rem;
@@ -196,6 +206,7 @@ async function sendEmailScanData() {
         padding: 0.75rem;
         font-family: "Figtree", sans-serif;
         resize: none;
+        box-shadow: $shadow-black;
 
         &::placeholder {
           color: $text-color-faded;
@@ -208,6 +219,7 @@ async function sendEmailScanData() {
   &__results {
     width: 100%;
     height: 100%;
+    min-height: 554px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -224,6 +236,7 @@ async function sendEmailScanData() {
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      height: 100%;
 
       &__category {
         font-weight: $skinny-thick;

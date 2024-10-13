@@ -86,7 +86,7 @@ function toggleShowPassword() {
   background-color: $primary-color;
   border-radius: 24px;
   padding: 0 0.75rem;
-  box-shadow: $shadow-secondary;
+  box-shadow: $shadow-black;
   overflow: hidden;
   position: relative;
 
