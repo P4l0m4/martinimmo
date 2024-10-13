@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { perplexityEmailScan } from "@/utils/APIData";
-import { email } from "@vuelidate/validators";
 
 type Segment = {
   value: number;
@@ -14,13 +13,17 @@ const scanResults = ref();
 const sanitizedScanResults = ref<any[]>([]);
 const loading = ref(false);
 const showFields = ref(true);
+const cardOpened = ref<number>();
+const showStartScan = computed(() => {
+  return (
+    emailBody.value.length > 0 && emailObject.value.length > 0 && !loading.value
+  );
+});
 
 const scanResultsDetails = computed(() => {
   if (!sanitizedScanResults.value) {
-    console.log("no criteria found");
     return [];
   } else if (!sanitizedScanResults.value.criteria) {
-    console.log("no criteria found");
     return [];
   }
 
@@ -65,6 +68,25 @@ const totalValue = computed(() => {
   );
   return sumOfValues;
 });
+
+// function toggleCard(i: number) {
+//   if (cardOpened.value === i) {
+//     cardOpened.value = undefined;
+//   } else {
+//     cardOpened.value = i;
+//   }
+// }
+
+function toggleCard(index: number) {
+  console.log(cardOpened.value, index);
+  if (cardOpened.value === index) {
+    cardOpened.value = undefined;
+  } else {
+    cardOpened.value = index;
+  }
+  //   cardOpened.value = cardOpened.value === index ? undefined : index;
+}
+
 async function sendEmailScanData() {
   loading.value = true;
   try {
@@ -122,12 +144,7 @@ async function sendEmailScanData() {
       <Transition>
         <PrimaryButton
           button-type="dark"
-          v-if="
-            emailBody &&
-            emailObject &&
-            scanResultsDetails.length === 0 &&
-            !loading
-          "
+          v-if="showStartScan"
           @click="sendEmailScanData"
           >Lancer l'analyse</PrimaryButton
         ></Transition
@@ -156,20 +173,46 @@ async function sendEmailScanData() {
       >
 
       <template v-if="!showFields">
-        <div
-          class="scan__results__details"
-          v-for="element in scanResultsDetails"
-        >
-          <h5 class="scan__results__details__category paragraphs">
-            {{ element.category }}
-          </h5>
-          <ul class="scan__results__details__sub-criterion">
-            <li class="paragraphs" v-for="subCriterion in element.subCriteria">
-              {{ subCriterion.subCriterion }}
-              <IconComponent icon="alert-circle" color="red" />
-            </li>
-          </ul></div
-      ></template>
+        <div class="scan__results__details">
+          <CollapsibleCard
+            v-for="(element, index) in scanResultsDetails"
+            :key="index"
+            :preview="element.category"
+            :details="element.subCriteria"
+            :index="index"
+            :cardOpened="cardOpened"
+            @open-card-emit="toggleCard(index)"
+          >
+            <ul class="scan__results__details__card__sub-criterion">
+              <li
+                class="paragraphs"
+                v-for="subCriterion in element.subCriteria"
+              >
+                {{ subCriterion.subCriterion }}
+                <IconComponent icon="alert-circle" color="red" />
+              </li></ul
+          ></CollapsibleCard>
+          <!-- <div
+            class="scan__results__details__card"
+            v-for="element in scanResultsDetails"
+          >
+          
+            <h5 class="scan__results__details__card__category paragraphs">
+              {{ element.category }}
+            </h5>
+
+            <ul class="scan__results__details__card__sub-criterion">
+              <li
+                class="paragraphs"
+                v-for="subCriterion in element.subCriteria"
+              >
+                {{ subCriterion.subCriterion }}
+                <IconComponent icon="alert-circle" color="red" />
+              </li>
+            </ul>
+          </div> -->
+        </div></template
+      >
     </div>
   </div>
 </template>
@@ -219,31 +262,40 @@ async function sendEmailScanData() {
   &__results {
     width: 100%;
     height: 100%;
-    min-height: 554px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     gap: 2rem;
-    padding: 1rem;
     color: $text-color;
 
     @media (min-width: $big-tablet-screen) {
-      padding: 2rem;
+      justify-content: center;
+      min-height: 554px;
     }
-
     &__details {
-      display: flex;
-      flex-direction: column;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 1rem;
-      height: 100%;
 
-      &__category {
-        font-weight: $skinny-thick;
+      @media (min-width: $big-tablet-screen) {
+        gap: 2rem;
       }
 
-      &__sub-criterion {
-        list-style: none;
+      &__card {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        height: 100%;
+        width: 100%;
+
+        &__category {
+          font-weight: $skinny-thick;
+        }
+
+        &__sub-criterion {
+          list-style: none;
+        }
       }
     }
   }
