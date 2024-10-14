@@ -19,7 +19,6 @@ const showStartScan = computed(() => {
     emailBody.value.length > 0 && emailObject.value.length > 0 && !loading.value
   );
 });
-
 const scanResultsDetails = computed(() => {
   if (!sanitizedScanResults.value) {
     return [];
@@ -27,22 +26,47 @@ const scanResultsDetails = computed(() => {
     return [];
   }
 
-  //   return sanitizedScanResults.value;
-
-  return sanitizedScanResults.value.criteria.map((criterion: any) => {
-    return {
-      category: criterion.category,
-      subCriteria: Object.entries(criterion.sub_criteria)
+  return sanitizedScanResults.value.criteria
+    .map((criterion: any) => {
+      const subCriteria = Object.entries(criterion.sub_criteria)
         .map(([subCriterion, value]) => {
           return {
             subCriterion,
             value,
           };
         })
-        .filter((sub) => !sub.value), // only keep subCriteria with value false
-    };
-  });
+        .filter((sub) => !sub.value); // only keep subCriteria with value false
+
+      return {
+        category: criterion.category,
+        subCriteria,
+      };
+    })
+    .filter((criterion) => criterion.subCriteria.length > 0); // only keep criteria with non-empty subCriteria
 });
+// const scanResultsDetails = computed(() => {
+//   if (!sanitizedScanResults.value) {
+//     return [];
+//   } else if (!sanitizedScanResults.value.criteria) {
+//     return [];
+//   }
+
+//   //   return sanitizedScanResults.value;
+
+//   return sanitizedScanResults.value.criteria.map((criterion: any) => {
+//     return {
+//       category: criterion.category,
+//       subCriteria: Object.entries(criterion.sub_criteria)
+//         .map(([subCriterion, value]) => {
+//           return {
+//             subCriterion,
+//             value,
+//           };
+//         })
+//         .filter((sub) => !sub.value), // only keep subCriteria with value false
+//     };
+//   });
+// });
 const segments = computed<Segment[]>(() => {
   if (!sanitizedScanResults.value || !sanitizedScanResults.value.criteria) {
     console.log("no criteria found");
@@ -69,22 +93,8 @@ const totalValue = computed(() => {
   return sumOfValues;
 });
 
-// function toggleCard(i: number) {
-//   if (cardOpened.value === i) {
-//     cardOpened.value = undefined;
-//   } else {
-//     cardOpened.value = i;
-//   }
-// }
-
 function toggleCard(index: number) {
-  console.log(cardOpened.value, index);
-  if (cardOpened.value === index) {
-    cardOpened.value = undefined;
-  } else {
-    cardOpened.value = index;
-  }
-  //   cardOpened.value = cardOpened.value === index ? undefined : index;
+  cardOpened.value = cardOpened.value === index ? undefined : index;
 }
 
 async function sendEmailScanData() {
@@ -164,7 +174,15 @@ async function sendEmailScanData() {
       <Transition
         ><DashboardWidgetsUiLoader v-if="loading" color="#00065c66"
       /></Transition>
-
+      <span
+        class="paragraphs"
+        v-if="totalValue < 20 && !showFields"
+        style="display: flex; gap: 0.5rem; align-items: center"
+        ><IconComponent icon="alert-circle" color="red" />{{
+          20 - totalValue
+        }}
+        problèmes détectés</span
+      >
       <PrimaryButton
         button-type="dark"
         @click="(showFields = true), (scanResultsDetails = [])"
@@ -191,28 +209,8 @@ async function sendEmailScanData() {
                 {{ subCriterion.subCriterion }}
                 <IconComponent icon="alert-circle" color="red" />
               </li></ul
-          ></CollapsibleCard>
-          <!-- <div
-            class="scan__results__details__card"
-            v-for="element in scanResultsDetails"
-          >
-          
-            <h5 class="scan__results__details__card__category paragraphs">
-              {{ element.category }}
-            </h5>
-
-            <ul class="scan__results__details__card__sub-criterion">
-              <li
-                class="paragraphs"
-                v-for="subCriterion in element.subCriteria"
-              >
-                {{ subCriterion.subCriterion }}
-                <IconComponent icon="alert-circle" color="red" />
-              </li>
-            </ul>
-          </div> -->
-        </div></template
-      >
+          ></CollapsibleCard></div
+      ></template>
     </div>
   </div>
 </template>

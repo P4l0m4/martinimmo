@@ -355,7 +355,7 @@ onMounted(async () => {
               @click="generateCSV()"
               :button-state="loading"
             >
-              <IconComponent icon="download" />Exporter
+              <IconComponent icon="download" />Tout exporter
             </SecondaryButton>
 
             <ConfirmationPopUp

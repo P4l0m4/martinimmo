@@ -2,35 +2,35 @@
   <Container>
     <SkeletonsSkeleton />
     <div class="grid">
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
-      <SkeletonsSkeleton :height="82" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
+      <SkeletonsSkeleton :height="40" />
     </div>
   </Container>
 </template>
