@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { stringToSlug } from "@/utils/slugify.js";
 
 const story = await useAsyncStoryblok("blog", {
   version: "published",
@@ -44,7 +45,8 @@ const prevSlide = () => {
           transform: `translateX(-${currentSlide * 308}px)`,
         }"
       >
-        <div
+        <NuxtLink
+          :to="'/blog/' + stringToSlug(article.title)"
           class="slide"
           v-for="(article, index) in story.content.articles"
           :key="index"
@@ -52,7 +54,7 @@ const prevSlide = () => {
           <img :src="article.preview.filename" :alt="article.preview.alt" />
           <h4 class="subtitles">{{ article.title }}</h4>
           <p class="paragraphs">{{ article.description }}</p>
-        </div>
+        </NuxtLink>
       </div>
     </div>
     <div class="slides-pagination">
@@ -86,7 +88,7 @@ const prevSlide = () => {
   gap: 2rem;
   padding: 2rem 1rem;
   background-color: $secondary-color;
-  color: $text-color-alt;
+  color: $text-color-alt !important;
 
   @media (min-width: $big-tablet-screen) {
     padding: 4rem 2rem;
@@ -117,6 +119,7 @@ const prevSlide = () => {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    color: $text-color-alt !important;
 
     img {
       width: 100%;
