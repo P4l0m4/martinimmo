@@ -148,12 +148,13 @@ onMounted(() => {
     background-color: $primary-color;
     box-shadow: $shadow-black;
     font-weight: 500;
+    color: $text-color !important;
     transition: background-color 0.3s;
   }
 
   &-button--selected {
     background-color: $secondary-color;
-    color: $text-color-alt;
+    color: $text-color-alt !important;
   }
 }
 </style>

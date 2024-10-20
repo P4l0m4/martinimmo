@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { useDeathStore } from "@/stores/deathsStore";
-import { useAccountStore } from "@/stores/accountStore";
+// import { useAccountStore } from "@/stores/accountStore";
+import { onClickOutside } from "@vueuse/core";
 import {
   checkExistingToken,
   removeCredits,
@@ -12,10 +13,14 @@ import { computedAsync, useToggle } from "@vueuse/core";
 
 const [showCreditsPopUp, toggleCreditsPopUp] = useToggle();
 
+const target = ref(null);
+const showDate = ref(false);
+onClickOutside(target, (event) => (showDate.value = false));
+
 const route = useRoute();
 const router = useRouter();
 const deathStore = useDeathStore();
-const accountStore = useAccountStore();
+// const accountStore = useAccountStore();
 const loading = ref(false);
 
 const isUserLoggedIn = ref();
@@ -61,6 +66,7 @@ onMounted(async () => {
 
 function handleSort(order: string) {
   sortOrder.value = order;
+
   if (order === "default") {
     sortedRecords.value = Array.from(records.value);
   } else if (order === "date-latest") {
@@ -72,6 +78,9 @@ function handleSort(order: string) {
       a.death_date < b.death_date ? -1 : 1
     );
   }
+  setTimeout(() => {
+    showDate.value = false;
+  }, 400);
 }
 
 function handleDepartmentFilter(filter: {
@@ -149,13 +158,6 @@ function selectTenBoxes() {
   }
 }
 
-// watch(
-//   () => deathStore.totalDeadPeople,
-//   () => {
-//     console.log("totalDeadPeople changed: ", deathStore.totalDeadPeople);
-//   }
-// );
-
 const selectedRecords = computed(() =>
   boxArray.value
     .map((value, index) => (value ? sortedRecords.value[index] : null))
@@ -217,14 +219,14 @@ const isMobile = computed(() => window.innerWidth < 768);
   <template v-if="isUserLoggedIn?.user.aud && !loading">
     <Container>
       <Transition name="expand">
-        <div class="sorting-and-filtering" ref="target">
+        <div class="sorting-and-filtering">
           <Filtering
             :regions="deathStore.regions"
             @set-department="handleDepartmentFilter"
             @set-region="handleRegionFilter"
             @set-city="handleCityFilter"
           />
-          <Sorting :order="sortOrder" @sort-by="handleSort" />
+          <!-- <Sorting :order="sortOrder" @sort-by="handleSort" /> -->
 
           <PrimaryButton
             v-if="
@@ -259,7 +261,7 @@ const isMobile = computed(() => window.innerWidth < 768);
     </Container>
     <Container>
       <div class="table">
-        <div class="table__header">
+        <div class="table__header" ref="target">
           <div>
             <span
               class="checkbox"
@@ -271,8 +273,22 @@ const isMobile = computed(() => window.innerWidth < 768);
                 v-if="isBoxChecked"
             /></span>
           </div>
-          <div class="table__header__cell">
+          <div class="table__header__cell" @click="showDate = !showDate">
             <IconComponent icon="clock" color="#232323" />Date de décès
+
+            <span
+              class="table__header__cell__button"
+              :class="{
+                'table__header__cell__button--selected': showDate,
+              }"
+            >
+              <IconComponent icon="chevron-up" color="#232323" />
+            </span>
+
+            <ul class="table__header__cell__options" v-if="showDate">
+              <li @click="handleSort('date-latest')">Les plus récents</li>
+              <li @click="handleSort('date-oldest')">Les plus anciens</li>
+            </ul>
           </div>
           <div class="table__header__cell">
             <IconComponent icon="map-pin" />Commune

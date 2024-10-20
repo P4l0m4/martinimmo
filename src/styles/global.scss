@@ -291,8 +291,43 @@ input[type="checkbox"] {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-
       width: 240px;
+      position: relative;
+
+      &__button {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        width: 100%;
+        transform: rotate(180deg);
+
+        &--selected {
+          transform: rotate(0deg);
+        }
+      }
+
+      &__options {
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        justify-content: center;
+        position: absolute;
+        background-color: $primary-color;
+        border-radius: 0 0 $radius $radius;
+        overflow: hidden;
+        width: 100%;
+        top: 1.8rem;
+        box-shadow: $shadow-black;
+
+        & li {
+          padding: 0.5rem;
+          font-weight: $skinny;
+          &:hover {
+            background-color: $secondary-color-faded;
+            cursor: pointer;
+          }
+        }
+      }
     }
   }
 
