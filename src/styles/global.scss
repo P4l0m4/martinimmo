@@ -293,16 +293,17 @@ input[type="checkbox"] {
       gap: 0.5rem;
       width: 240px;
       position: relative;
+      cursor: pointer;
 
       &__button {
         display: flex;
         align-items: center;
-        justify-content: end;
         width: 100%;
         transform: rotate(180deg);
 
-        &--selected {
+        &--active {
           transform: rotate(0deg);
+          justify-content: end;
         }
       }
 

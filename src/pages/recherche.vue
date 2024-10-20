@@ -273,21 +273,32 @@ const isMobile = computed(() => window.innerWidth < 768);
                 v-if="isBoxChecked"
             /></span>
           </div>
+
           <div class="table__header__cell" @click="showDate = !showDate">
             <IconComponent icon="clock" color="#232323" />Date de décès
 
             <span
               class="table__header__cell__button"
               :class="{
-                'table__header__cell__button--selected': showDate,
+                'table__header__cell__button--active': showDate,
               }"
             >
               <IconComponent icon="chevron-up" color="#232323" />
             </span>
 
             <ul class="table__header__cell__options" v-if="showDate">
-              <li @click="handleSort('date-latest')">Les plus récents</li>
-              <li @click="handleSort('date-oldest')">Les plus anciens</li>
+              <li
+                @click="handleSort('date-latest')"
+                :class="{ disabled: sortOrder === 'date-latest' }"
+              >
+                Les plus récents
+              </li>
+              <li
+                @click="handleSort('date-oldest')"
+                :class="{ disabled: sortOrder === 'date-oldest' }"
+              >
+                Les plus anciens
+              </li>
             </ul>
           </div>
           <div class="table__header__cell">
