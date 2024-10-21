@@ -56,14 +56,20 @@ const isMobile = computed(() => window.innerWidth < 768);
         /></span>
       </div>
       <span class="table__body__row__cell">{{ formattedDeathDate }}</span>
+      <span class="table__body__row__cell" v-if="!isMobile">{{
+        death?.regionName
+      }}</span>
+      <span class="table__body__row__cell" v-if="!isMobile"
+        >{{ death.departmentName }} ({{ death.departmentCode }})</span
+      >
       <span class="table__body__row__cell">
         {{ death.city }}
-        <!-- <span>{{ death.departmentName }} ({{ death.departmentCode }})</span> -->
       </span>
-      <span class="table__body__row__cell" v-if="!isMobile">
+
+      <!-- <span class="table__body__row__cell" v-if="!isMobile">
         {{ name.first }}
-      </span>
-      <span class="table__body__row__cell">
+      </span> -->
+      <span class="table__body__row__cell" v-if="!isMobile">
         {{ name.last }}
       </span>
     </div>

@@ -7,6 +7,7 @@ import {
   checkExistingToken,
   removeCredits,
   getCredits,
+  fetchCitiesList,
 } from "@/utils/supabase";
 import { useRoute, useRouter } from "vue-router";
 import { computedAsync, useToggle } from "@vueuse/core";
@@ -15,7 +16,13 @@ const [showCreditsPopUp, toggleCreditsPopUp] = useToggle();
 
 const target = ref(null);
 const showDate = ref(false);
+const showRegion = ref(false);
+const showDepartment = ref(false);
+const showCity = ref(false);
 onClickOutside(target, (event) => (showDate.value = false));
+onClickOutside(target, (event) => (showRegion.value = false));
+onClickOutside(target, (event) => (showDepartment.value = false));
+onClickOutside(target, (event) => (showCity.value = false));
 
 const route = useRoute();
 const router = useRouter();
@@ -46,6 +53,9 @@ async function fetchAndUpdateRecords() {
   boxArray.value = Array(sortedRecords.value.length).fill(false);
 }
 
+const departmentsList = ref([]);
+const citiesList = ref([]);
+
 onMounted(async () => {
   loading.value = true;
   isUserLoggedIn.value = await checkExistingToken();
@@ -56,8 +66,16 @@ onMounted(async () => {
   await deathStore.getAllDeadPeople();
   const { region, department, city } = route.query;
 
-  if (region) deathStore.setRegion(region as string);
-  if (department) deathStore.setDepartment(department as string);
+  if (region) {
+    deathStore.setRegion(region as string);
+    departmentsList.value = deathStore.regions.find(
+      (r) => r.region_name === region
+    )?.departments;
+  }
+  if (department) {
+    deathStore.setDepartment(department as string);
+    citiesList.value = await fetchCitiesList(department as string);
+  }
   if (city) deathStore.setCity(city as string);
 
   await fetchAndUpdateRecords();
@@ -83,17 +101,19 @@ function handleSort(order: string) {
   }, 400);
 }
 
-function handleDepartmentFilter(filter: {
+async function handleDepartmentFilter(filter: {
   department_name: string;
   url_part: string;
 }) {
   deathStore.setDepartment(filter.department_name);
   deathStore.setCity("");
   updateUrl();
+  citiesList.value = await fetchCitiesList(filter.department_name);
 }
 
 function handleRegionFilter(filter: { region_name: string; url_part: string }) {
   deathStore.setRegion(filter.region_name);
+  departmentsList.value = filter.departments;
   deathStore.setDepartment("");
   deathStore.setCity("");
   updateUrl();
@@ -225,6 +245,7 @@ const isMobile = computed(() => window.innerWidth < 768);
             @set-department="handleDepartmentFilter"
             @set-region="handleRegionFilter"
             @set-city="handleCityFilter"
+            v-if="isMobile"
           />
           <!-- <Sorting :order="sortOrder" @sort-by="handleSort" /> -->
 
@@ -301,13 +322,86 @@ const isMobile = computed(() => window.innerWidth < 768);
               </li>
             </ul>
           </div>
-          <div class="table__header__cell">
+          <div
+            class="table__header__cell"
+            v-if="!isMobile"
+            @click="showRegion = !showRegion"
+          >
+            <IconComponent icon="map-pin" />Région
+            <span
+              class="table__header__cell__button"
+              :class="{
+                'table__header__cell__button--active': showRegion,
+              }"
+            >
+              <IconComponent icon="chevron-up" color="#232323" />
+            </span>
+            <ul class="table__header__cell__options" v-if="showRegion">
+              <li
+                v-for="region in deathStore.regions"
+                :key="region.region_name"
+                @click="handleRegionFilter(region)"
+                :class="{ disabled: region.region_name === deathStore.region }"
+              >
+                {{ region.region_name }}
+              </li>
+            </ul>
+          </div>
+          <div
+            class="table__header__cell"
+            v-if="!isMobile"
+            @click="showDepartment = !showDepartment"
+          >
+            <IconComponent icon="map-pin" />Département
+
+            <span
+              class="table__header__cell__button"
+              :class="{
+                'table__header__cell__button--active': showDepartment,
+              }"
+            >
+              <IconComponent icon="chevron-up" color="#232323" />
+            </span>
+            <ul class="table__header__cell__options" v-if="showDepartment">
+              <li
+                v-for="department in departmentsList"
+                :key="department"
+                @click="handleDepartmentFilter(department)"
+                :class="{ disabled: department === deathStore.department }"
+              >
+                {{ department.department_name }}
+              </li>
+            </ul>
+          </div>
+          <div class="table__header__cell" @click="showCity = !showCity">
             <IconComponent icon="map-pin" />Commune
+
+            <span
+              class="table__header__cell__button"
+              :class="{
+                'table__header__cell__button--active': showCity,
+              }"
+            >
+              <IconComponent icon="chevron-up" color="#232323" />
+            </span>
+            <ul
+              class="table__header__cell__options"
+              v-if="showCity && citiesList.length > 0"
+            >
+              <li
+                v-for="city in citiesList[0].cities"
+                :key="city"
+                @click="handleCityFilter(city)"
+                :class="{ disabled: city === deathStore.city }"
+              >
+                {{ city }}
+              </li>
+            </ul>
           </div>
-          <div class="table__header__cell" v-if="!isMobile">
+          <!-- <div class="table__header__cell" v-if="!isMobile">
             <IconComponent icon="user" color="#232323" />Prénom
-          </div>
-          <div class="table__header__cell">
+          </div> -->
+          <div class="table__header__cell" v-if="!isMobile">
             <IconComponent icon="user" color="#232323" />Nom
           </div>
         </div>
@@ -400,6 +494,7 @@ const isMobile = computed(() => window.innerWidth < 768);
   padding: 1rem;
   border-radius: $radius;
   flex-direction: column;
+  min-height: 76px;
 
   @media (min-width: $big-tablet-screen) {
     flex-direction: row;
