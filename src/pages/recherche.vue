@@ -237,6 +237,48 @@ const isMobile = computed(() => window.innerWidth < 768);
   ></template>
 
   <template v-if="isUserLoggedIn?.user.aud && !loading">
+    <!-- <Container>
+      <Transition name="expand">
+        <div class="sorting-and-filtering">
+          <Filtering
+            :regions="deathStore.regions"
+            @set-department="handleDepartmentFilter"
+            @set-region="handleRegionFilter"
+            @set-city="handleCityFilter"
+            v-if="isMobile"
+          />
+
+          <PrimaryButton
+            v-if="
+              selectedRecords.length > 0 &&
+              selectedRecords.length <= userCredits
+            "
+            @click="savePersons"
+            :buttonState
+            >Débloquer {{ selectedRecords.length }} contact(s)</PrimaryButton
+          >
+          <PrimaryButton
+            v-else-if="
+              selectedRecords.length > 0 && selectedRecords.length > userCredits
+            "
+            @click="toggleCreditsPopUp"
+            :buttonState
+            >Débloquer {{ selectedRecords.length }} contact(s)</PrimaryButton
+          >
+          <ConfirmationPopUp
+            v-if="showCreditsPopUp"
+            @closeConfirmation="toggleCreditsPopUp"
+          >
+            Vous n'avez pas assez de crédits
+            <template #button>
+              <NuxtLink to="/credits" class="button primary--dark">
+                Acheter des crédits
+              </NuxtLink>
+            </template>
+          </ConfirmationPopUp>
+        </div></Transition
+      >
+    </Container> -->
     <Container>
       <Transition name="expand">
         <div class="sorting-and-filtering">
@@ -279,8 +321,6 @@ const isMobile = computed(() => window.innerWidth < 768);
           </ConfirmationPopUp>
         </div></Transition
       >
-    </Container>
-    <Container>
       <div class="table">
         <div class="table__header" ref="target">
           <div>
