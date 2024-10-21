@@ -37,9 +37,8 @@ onMounted(async () => {
 
     <div class="article-content" v-html="renderRichText(article?.text)"></div>
   </Container>
-  <Container>
-    <LastArticles />
-  </Container>
+
+  <LastArticles />
 </template>
 <style scoped lang="scss">
 .article-preview-image {
