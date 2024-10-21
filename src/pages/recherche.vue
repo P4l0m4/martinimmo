@@ -481,6 +481,20 @@ const isMobile = computed(() => window.innerWidth < 768);
         >{{ deathStore.totalDeadPeople }} résultats disponibles</span
       >
     </Container>
+    <Container>
+      <div class="disclaimer">
+        <span class="subtitles">Comment utiliser ces données au mieux ?</span>
+        <span
+          >Des conseils vous attendent sur notre
+          <NuxtLink to="/blog" class="button--tertiary-light">blog</NuxtLink>.
+          Vous pouvez aussi
+          <NuxtLink to="/mon-compte#scanner" class="button--tertiary-light"
+            >tester vos emails</NuxtLink
+          >
+          avant de les envoyer !</span
+        >
+      </div>
+    </Container>
   </template>
 
   <SkeletonsSearchSkeleton v-else-if="loading" />

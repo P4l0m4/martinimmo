@@ -385,6 +385,17 @@ input[type="checkbox"] {
   }
 }
 
+.disclaimer {
+  display: flex;
+  flex-direction: column;
+  background-color: $secondary-color-faded;
+  color: $text-color-alt;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  border-radius: $radius;
+}
+
 @keyframes spin {
   from {
   }

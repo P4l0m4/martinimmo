@@ -469,6 +469,18 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+        <div class="disclaimer">
+          <span class="subtitles">Comment utiliser ces données au mieux ?</span>
+          <span
+            >Des conseils vous attendent sur notre
+            <NuxtLink to="/blog" class="button--tertiary-light">blog</NuxtLink>.
+            Vous pouvez aussi
+            <NuxtLink to="/mon-compte#scanner" class="button--tertiary-light"
+              >tester vos emails</NuxtLink
+            >
+            avant de les envoyer !</span
+          >
+        </div>
         <div class="table" v-if="allFamilyMembers.length > 0">
           <div class="table__body">
             <div
@@ -500,7 +512,7 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <DashboardWidgetsEmailScanner />
+        <DashboardWidgetsEmailScanner id="scanner" />
         <div class="statistics">
           <div class="statistics__card">
             <span class="titles">
