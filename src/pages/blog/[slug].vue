@@ -25,21 +25,37 @@ onMounted(async () => {
 <template>
   <template v-if="loading"><SkeletonsBlogSkeleton /></template>
   <Container v-else>
-    <h1 class="titles">{{ article?.title }}</h1>
-    <img
+    <div
       class="article-preview-image"
-      :src="article?.preview.filename"
-      :alt="article?.preview.alt"
-    />
-    <p class="subtitles">{{ article?.description }}</p>
+      :style="{
+        backgroundImage: `linear-gradient(45deg, #00065c, transparent 90%), url('${article?.preview.filename}')`,
+      }"
+    >
+      <h1 class="titles" style="max-width: 600px">{{ article?.title }}</h1>
+      <p class="paragraphs">{{ article?.description }}</p>
+    </div>
+
     <div class="article-content" v-html="renderRichText(article?.text)"></div>
   </Container>
 </template>
 <style scoped lang="scss">
 .article-preview-image {
   width: 100%;
-  height: 400px;
-  object-fit: cover;
+  height: calc(100dvh - 9rem);
+  background-size: cover;
+  background-position: center;
+  padding: 1rem;
+  color: $text-color-alt;
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  justify-content: end;
+  text-wrap: balance;
+
+  @media (min-width: $big-tablet-screen) {
+    padding: 2rem;
+    gap: 2rem;
+  }
 }
 .article-content {
   width: 100%;
@@ -56,6 +72,7 @@ onMounted(async () => {
   & :deep(h2) {
     font-size: $subtitles;
     padding-bottom: 1rem;
+    padding-top: 2rem;
   }
   & :deep(a) {
     color: $secondary-color;
@@ -87,6 +104,11 @@ onMounted(async () => {
     border-radius: $radius;
     box-shadow: $shadow-black;
     word-break: break-all;
+  }
+  & :deep(blockquote) {
+    padding: 1rem;
+    margin-top: 1rem;
+    border-left: $secondary-color-faded 4px solid;
   }
 }
 </style>
