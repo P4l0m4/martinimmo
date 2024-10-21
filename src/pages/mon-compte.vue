@@ -202,33 +202,17 @@ function getRelativesCount(deceasedId: string): number {
   return personCount ? personCount.count : 0;
 }
 
-// async function generateCSV() {
-//   let csvContent =
-//     "Firstname,Lastname,Death Region,Community,Death Department Code,Family Member Firstname,Family Member Lastname,Family Member Email,Family Member Sex\n";
+const averageRelativesPerPerson = computed(() => {
+  if (relativesCountByPerson.value.length === 0) return 0;
 
-//   for (const person of persons.value) {
-//     // Safely retrieve family members by awaiting the async function
-//     const familyMembers = await getFamillyByDeceasedId(person.id);
+  const totalRelatives = relativesCountByPerson.value.reduce(
+    (acc, entry) => acc + entry.count,
+    0
+  );
 
-//     // If no family members, include the person details
-//     if (!familyMembers || familyMembers.length === 0) {
-//       csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_birth_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},,,,\n`;
-//     } else {
-//       // Use for...of loop to ensure proper async handling
-//       for (const familyMember of familyMembers) {
-//         csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_birth_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},${familyMember.firstnames ?? ""},${familyMember.lastname ?? ""},${familyMember.email ?? ""},${familyMember.sex ?? ""}\n`;
-//       }
-//     }
-//   }
+  return totalRelatives / relativesCountByPerson.value.length;
+});
 
-//   // Create and download the CSV file
-//   const blob = new Blob([csvContent], { type: "text/csv" });
-//   const url = URL.createObjectURL(blob);
-//   const a = document.createElement("a");
-//   a.href = url;
-//   a.download = "contacts_with_family_members.csv";
-//   a.click();
-// }
 async function generateCSV() {
   let csvContent =
     "Firstname,Lastname,Death Region,Community,Death Department Code,Family Member Firstname,Family Member Lastname,Family Member Email,Family Member Sex\n";
@@ -517,6 +501,17 @@ onMounted(async () => {
           </div>
         </div>
         <DashboardWidgetsEmailScanner />
+        <div class="statistics">
+          <div class="statistics__card">
+            <span class="titles">
+              {{ averageRelativesPerPerson.toFixed(2) }}
+            </span>
+            <span class="paragraphs">
+              <IconComponent icon="user" /> Contacts trouvés par personne en
+              moyenne</span
+            >
+          </div>
+        </div>
         <ul class="account-info">
           <div class="header">
             <span class="header__text">
@@ -643,6 +638,22 @@ onMounted(async () => {
   padding-top: 1rem;
   max-height: 40dvh;
   overflow-y: scroll;
+}
+
+.statistics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: $radius;
+    background-color: $primary-color;
+    text-align: center;
+  }
 }
 
 .button--tertiary-dark {
