@@ -9,6 +9,7 @@ const newPassword = ref("");
 
 const resetPassword = async () => {
   const token = route.query.token;
+  console.log(token, route.query);
   if (!token) {
     alert("Invalid or expired reset token.");
     return;
