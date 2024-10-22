@@ -8,22 +8,19 @@ const router = useRouter();
 const newPassword = ref("");
 
 const resetPassword = async () => {
-  const accessToken = route.query.access_token;
-  if (!accessToken) {
+  const token = route.query.token;
+  if (!token) {
     alert("Invalid or expired reset token.");
     return;
   }
 
-  const { success, error } = await updateUserPassword(
-    accessToken,
-    newPassword.value
-  );
+  const { success, error } = await updateUserPassword(token, newPassword.value);
 
   if (success) {
-    alert("Password updated successfully!");
+    alert("Mot de passe mis à jour avec succès");
     router.push("/mon-compte");
   } else {
-    alert("Error updating password: " + error);
+    alert("Erreur: " + error);
   }
 };
 </script>
@@ -45,6 +42,7 @@ const resetPassword = async () => {
     </form>
   </Container>
 </template>
+
 <style scoped lang="scss">
 .form {
   display: flex;
