@@ -6,8 +6,9 @@ import { updateUserPassword } from "@/utils/supabase";
 const route = useRoute();
 const router = useRouter();
 const newPassword = ref("");
-console.log(route);
+
 const resetPassword = async () => {
+  console.log(route);
   const token = route.query.token;
 
   if (!token) {
