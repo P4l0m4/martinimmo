@@ -27,10 +27,6 @@ const resetPassword = async () => {
     alert("Erreur: " + error);
   }
 };
-
-onMounted(() => {
-  console.log("Route query parameters:", route.query);
-});
 </script>
 
 <template>
@@ -40,10 +36,13 @@ onMounted(() => {
       <InputField
         type="password"
         v-model="newPassword"
+        name="new-password"
+        id="new-password"
         placeholder="!Vq0h2@8RHi"
         label="Nouveau mot de passe"
         required
       />
+      <p v-if="newPassword">{{ newPassword }}</p>
       <button type="submit" class="button primary--dark">
         Update Password
       </button>
