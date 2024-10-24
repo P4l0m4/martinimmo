@@ -8,20 +8,21 @@ const router = useRouter();
 const newPassword = ref("");
 
 const resetPassword = async () => {
-  const token = route.query.token as string; // Correctly extract the token
-  console.log("Extracted token:", token);
+  console.log("Route query parameters:", route.query);
+  const token = route.query.token as string;
 
   if (!token) {
     alert("Invalid or expired reset token.");
     return;
   }
 
-  const { success, error } = await updateUserPassword(token, newPassword.value);
+  const { success, error } = await updateUserPassword(newPassword.value);
 
   if (success) {
     alert("Mot de passe mis à jour avec succès");
-    await signOut();
+    await signOut(); // Déconnectez l'utilisateur après la mise à jour
     console.log("User signed out");
+    router.push("/mon-compte"); // Rediriger vers la page de connexion ou compte
   } else {
     alert("Erreur: " + error);
   }
