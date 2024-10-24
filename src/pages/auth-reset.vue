@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { updateUserPassword, signOut } from "@/utils/supabase";
+import {
+  updateUserPassword,
+  signOut,
+  authenticateUserWithToken,
+} from "@/utils/supabase";
 
 const route = useRoute();
 const router = useRouter();
@@ -13,6 +17,15 @@ const resetPassword = async () => {
 
   if (!token) {
     alert("Invalid or expired reset token.");
+    return;
+  }
+
+  // Crée une session temporaire avec le token
+  const { error: signInError } = await authenticateUserWithToken(token);
+
+  if (signInError) {
+    console.error("Erreur lors de la connexion avec le token:", signInError);
+    alert("Erreur: " + signInError.message);
     return;
   }
 
