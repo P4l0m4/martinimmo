@@ -5,6 +5,7 @@ import {
   updateUserPassword,
   signOut,
   createTempSession,
+  checkSession,
 } from "@/utils/supabase";
 
 const route = useRoute();
@@ -18,8 +19,8 @@ const resetPassword = async () => {
     alert("Invalid or expired reset token.");
     return;
   }
-
-  await createTempSession(token); // Créez une session temporaire pour mettre à jour le mot de passe
+  await checkSession(); // Vérifiez si la session est valide
+  // await createTempSession(token); // Créez une session temporaire pour mettre à jour le mot de passe
 
   const { success, error } = await updateUserPassword(newPassword.value);
 

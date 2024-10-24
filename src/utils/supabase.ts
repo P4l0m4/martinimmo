@@ -574,3 +574,14 @@ export const createTempSession = async (token: string) => {
     console.error("Error setting temporary session:", error.message);
   }
 };
+
+export const checkSession = async () => {
+  const session = supabase.auth.getSession();
+  if (session) {
+    console.log("session", session);
+    return session;
+  } else {
+    console.log("no session");
+    return null;
+  }
+};
