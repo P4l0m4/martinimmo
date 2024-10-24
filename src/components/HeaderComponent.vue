@@ -10,7 +10,9 @@ const isUserLoggedIn = ref();
 const credits = ref(0);
 
 const updateCredits = debounce(async () => {
-  credits.value = await getCredits(isUserLoggedIn.value.user.id);
+  if (isUserLoggedIn.value.user.id) {
+    credits.value = await getCredits(isUserLoggedIn.value.user.id);
+  }
 }, 800);
 
 document.addEventListener("click", updateCredits);
