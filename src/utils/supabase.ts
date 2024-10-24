@@ -555,7 +555,7 @@ export const sendPasswordResetEmail = async (email: string) => {
     });
 
     if (error) throw error;
-
+    console.log("data", data);
     return { success: true };
   } catch (error: any) {
     console.error("Error sending password reset email:", error.message);
