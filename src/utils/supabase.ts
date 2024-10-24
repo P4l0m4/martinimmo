@@ -530,19 +530,17 @@ export async function generateUser() {
 
 //PASSWORD RECOVERY
 
-export const updateUserPassword = async (newPassword: string) => {
+export const updateUserPassword = async (password: string) => {
   try {
     const { data, error } = await supabase.auth.updateUser({
-      password: newPassword,
+      password: password,
     });
-
-    if (error) {
-      throw error;
-    }
-    return { success: true };
+    if (error) throw error;
+    console.log("data", data);
+    return { error: error };
   } catch (error: any) {
-    console.error("Error updating user:", error.message);
-    return { success: false, error: error.message };
+    console.error("Error updating password", error.message);
+    return { success: false };
   }
 };
 

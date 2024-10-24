@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { updateUserPassword, signOut } from "@/utils/supabase";
 
@@ -8,7 +8,6 @@ const router = useRouter();
 const newPassword = ref("");
 
 const resetPassword = async () => {
-  console.log("Route query parameters:", route.query);
   const token = route.query.token as string;
 
   if (!token) {
