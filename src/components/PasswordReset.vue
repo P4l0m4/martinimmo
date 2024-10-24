@@ -135,7 +135,7 @@ const buttonState = computed(() => {
 .password-reset {
   z-index: 2;
   position: fixed;
-  inset: 4rem 0 0 0;
+  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
