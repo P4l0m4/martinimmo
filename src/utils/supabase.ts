@@ -187,17 +187,17 @@ export async function authenticateUser(email: string, password: string) {
   }
 }
 
-export async function authenticateUserWithToken(token: string) {
-  const { data, error } = await supabase.auth.signIn({ accessToken: token });
+// export async function authenticateUserWithToken(token: string) {
+//   const { data, error } = await supabase.auth.signIn({ accessToken: token });
 
-  if (error) {
-    console.error("Error signing in:", error);
-    throw new Error("Authentication failed: " + error.message);
-  } else {
-    console.log("Authentication successful!", data);
-    return data;
-  }
-}
+//   if (error) {
+//     console.error("Error signing in:", error);
+//     throw new Error("Authentication failed: " + error.message);
+//   } else {
+//     console.log("Authentication successful!", data);
+//     return data;
+//   }
+// }
 
 export async function checkExistingToken() {
   const token = localStorage.getItem("sb-ddjxlmqtddwruodawjnx-auth-token");
