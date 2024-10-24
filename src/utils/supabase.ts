@@ -535,7 +535,7 @@ export const updateUserPassword = async (
   newPassword: string
 ) => {
   try {
-    const { error } = await supabase.auth.api.updateUser(accessToken, {
+    const { error } = await supabase.auth.updateUser(accessToken, {
       password: newPassword,
     });
 
