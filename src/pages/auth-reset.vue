@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { updateUserPassword } from "@/utils/supabase";
 
@@ -8,9 +8,7 @@ const router = useRouter();
 const newPassword = ref("");
 
 const resetPassword = async () => {
-  console.log("Route object:", route);
-
-  const token = route.query.token;
+  const token = route.query.token as string; // Correctly extract the token
   console.log("Extracted token:", token);
 
   if (!token) {
@@ -27,6 +25,10 @@ const resetPassword = async () => {
     alert("Erreur: " + error);
   }
 };
+
+onMounted(() => {
+  console.log("Route query parameters:", route.query);
+});
 </script>
 
 <template>
