@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { updateUserPassword, signOut } from "@/utils/supabase";
+import {
+  updateUserPassword,
+  signOut,
+  createTempSession,
+} from "@/utils/supabase";
 
 const route = useRoute();
 const router = useRouter();
@@ -14,6 +18,8 @@ const resetPassword = async () => {
     alert("Invalid or expired reset token.");
     return;
   }
+
+  await createTempSession(token); // Créez une session temporaire pour mettre à jour le mot de passe
 
   const { success, error } = await updateUserPassword(newPassword.value);
 
