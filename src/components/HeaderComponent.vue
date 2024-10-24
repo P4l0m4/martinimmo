@@ -31,8 +31,10 @@ onMounted(async () => {
       isUserLoggedIn.value.user.user_metadata.accountType
     );
 
-    accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
-    credits.value = await getCredits(isUserLoggedIn.value.user.id);
+    if (isUserLoggedIn.value.user) {
+      accountStore.creditsFromDB(isUserLoggedIn.value.user.id);
+      credits.value = await getCredits(isUserLoggedIn.value.user.id);
+    }
 
     if (credits.value.credits) {
       generateUser();
