@@ -551,7 +551,7 @@ export const updateUserPassword = async (
 export const sendPasswordResetEmail = async (email: string) => {
   try {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://martinimmo.netlify.app/auth-reset?token=",
+      redirectTo: "https://martinimmo.netlify.app/auth-reset",
     });
 
     if (error) throw error;
