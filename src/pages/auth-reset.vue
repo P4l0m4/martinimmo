@@ -8,8 +8,10 @@ const router = useRouter();
 const newPassword = ref("");
 
 const resetPassword = async () => {
-  console.log(route);
+  console.log("Route object:", route);
+
   const token = route.query.token;
+  console.log("Extracted token:", token);
 
   if (!token) {
     alert("Invalid or expired reset token.");

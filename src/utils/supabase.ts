@@ -531,7 +531,7 @@ export async function generateUser() {
 //PASSWORD RECOVERY
 
 export const updateUserPassword = async (
-  accessToken: any,
+  accessToken: string,
   newPassword: string
 ) => {
   try {
