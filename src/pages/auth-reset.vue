@@ -48,7 +48,7 @@ const resetPassword = async () => {
         label="Nouveau mot de passe"
         required
       />
-      <p v-if="newPassword">{{ newPassword }}</p>
+
       <button type="submit" class="button primary--dark">
         Update Password
       </button>
