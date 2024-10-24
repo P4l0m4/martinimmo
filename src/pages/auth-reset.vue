@@ -21,7 +21,7 @@ const resetPassword = async () => {
   if (success) {
     alert("Mot de passe mis à jour avec succès");
     await signOut();
-    router.push("/");
+    console.log("User signed out");
   } else {
     alert("Erreur: " + error);
   }
