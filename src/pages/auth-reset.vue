@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { updateUserPassword } from "@/utils/supabase";
+import { updateUserPassword, signOut } from "@/utils/supabase";
 
 const route = useRoute();
 const router = useRouter();
@@ -20,7 +20,8 @@ const resetPassword = async () => {
 
   if (success) {
     alert("Mot de passe mis à jour avec succès");
-    router.push("/mon-compte");
+    await signOut();
+    router.push("/");
   } else {
     alert("Erreur: " + error);
   }

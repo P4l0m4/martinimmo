@@ -539,8 +539,9 @@ export const updateUserPassword = async (
       password: newPassword,
     });
 
-    if (error) throw error;
-
+    if (error) {
+      throw error;
+    }
     return { success: true };
   } catch (error: any) {
     console.error("Error updating user:", error.message);
