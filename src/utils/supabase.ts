@@ -562,11 +562,14 @@ export const sendPasswordResetEmail = async (email: string) => {
 
 //set temporary session
 export const createTempSession = async (token: string) => {
+  console.log("création temp session");
   try {
     const { data, error } = await supabase.auth.setSession({
       access_token: token,
       refresh_token: token, // Le refresh_token est le même que l'access_token pour une session temporaire
     });
+    if (error) throw error;
+    console.log("temp session ok");
   } catch (error: any) {
     console.error("Error setting temporary session:", error.message);
   }
