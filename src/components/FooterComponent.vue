@@ -8,7 +8,6 @@ const [showPasswordReset, togglePasswordReset] = useToggle();
 
 function closeAndDisplayPasswordReset() {
   toggleSignIn();
-  console.log("closeAndDisplayPasswordReset");
   togglePasswordReset();
 }
 </script>
