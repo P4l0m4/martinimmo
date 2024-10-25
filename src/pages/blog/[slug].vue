@@ -76,6 +76,10 @@ onMounted(async () => {
     padding-bottom: 1rem;
     padding-top: 2rem;
   }
+  & :deep(h3) {
+    padding-top: 2rem;
+  }
+
   & :deep(a) {
     color: $secondary-color;
     text-decoration: underline;
@@ -87,7 +91,7 @@ onMounted(async () => {
     margin: 1rem 0;
     object-fit: cover;
   }
-  & :deep(ul) {
+  & :deep(ul, ol) {
     padding: 1rem 0;
     width: 100%;
     max-width: 100%;
@@ -96,6 +100,10 @@ onMounted(async () => {
   & :deep(li) {
     max-width: 100%;
     width: 100%;
+
+    & p {
+      display: inline;
+    }
   }
   & :deep(code) {
     display: block;
