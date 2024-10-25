@@ -69,7 +69,6 @@ const scanResultsDetails = computed(() => {
 // });
 const segments = computed<Segment[]>(() => {
   if (!sanitizedScanResults.value || !sanitizedScanResults.value.criteria) {
-    console.log("no criteria found");
     return [];
   }
 

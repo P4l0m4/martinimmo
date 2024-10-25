@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
+import { useRoute } from "vue-router";
+
 import {
   checkExistingToken,
   signOut,
@@ -8,7 +10,7 @@ import {
   addFamillyToDB,
   getFamillyByDeceasedId,
 } from "@/utils/supabase";
-// import { copyToClipboard } from "@/utils/copyToClipboard";
+import { copyToClipboard } from "@/utils/copyToClipboard";
 import { fetchPerplexityData, validateEmail } from "@/utils/APIData";
 import { useAccountStore } from "@/stores/accountStore";
 import { useToggle } from "@vueuse/core";
@@ -28,6 +30,7 @@ interface DeadPerson {
   hasFamilyInDB: boolean;
   status: "idle" | "loading" | "success" | "error";
 }
+const route = useRoute();
 
 const [showConfirmation, toggleConfirmation] = useToggle();
 const [showOverloadPopUp, toggleOverloadPopUp] = useToggle();
@@ -46,6 +49,8 @@ const relativesCountByPerson = ref<Count[]>([]);
 const loading = ref(false);
 const dataExportLoading = ref<"success" | "error" | "loading">();
 const APIData = ref([]);
+
+const sponsorMessage = ref<string>("");
 
 const allFamilyMembers = ref<FamilyMember[]>([]);
 
@@ -310,6 +315,33 @@ onMounted(async () => {
   await getAllFamilyMembers();
 
   boxArray.value = persons.value.map(() => false);
+  sponsorMessage.value = `Rendez-vous sur https://martinimmo.com, rentrez en contact avec des millions de particuliers cherchant à vendre, nettoyer ou débarasser un bien immobillier. 
+  10 crédits offers et 10 crédits suplémentaires en renseignant le code de votre parrain à l'inscription:
+  ${isUserLoggedIn.value?.user.id}
+  `;
+});
+
+useHead({
+  title: "MartinImmo | Mon compte",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Gérez vos profils débloqués et générez des contacts qualifiés, testez vos emails avant de les envoyer.",
+    },
+    { property: "og:title", content: "MartinImmo | Mon compte" },
+    {
+      property: "og:description",
+      content: `Rentrez en contact avec des millions de particuliers cherchant à vendre, nettoyer ou débarasser un bien immobillier. 
+  10 crédits offers et 10 crédits suplémentaires en renseignant le code de votre parrain à l'inscription.`,
+    },
+    {
+      property: "og:url",
+      content: `https://martinimmo.netlify.app${route.path}`,
+    },
+    { property: "og:type", content: "website" },
+    { property: "og:locale", content: "fr_FR" },
+  ],
 });
 </script>
 
@@ -556,6 +588,25 @@ onMounted(async () => {
               moyenne</span
             >
           </div>
+
+          <div class="statistics__sponsor">
+            <span class="subtitles"
+              >Gagnez 10 crédits
+              <span class="paragraphs">en parrainant vos amis</span></span
+            >
+
+            <div class="statistics__sponsor__wrapper">
+              <span class="statistics__sponsor__wrapper__code">
+                {{ isUserLoggedIn?.user.id }}
+              </span>
+              <PrimaryButton
+                button-type="dark"
+                @click="copyToClipboard(sponsorMessage)"
+              >
+                Partager <IconComponent icon="share-2" />
+              </PrimaryButton>
+            </div>
+          </div>
         </div>
         <ul class="account-info">
           <div class="header">
@@ -698,6 +749,45 @@ onMounted(async () => {
     border-radius: $radius;
     background-color: $primary-color;
     text-align: center;
+  }
+
+  &__sponsor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    // text-align: center;
+    grid-column: span 2;
+    text-align: center;
+    text-wrap: balance;
+    background-color: $primary-color;
+    border-radius: $radius;
+    box-shadow: $shadow-black;
+
+    &__wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+      flex-direction: column;
+      padding: 0.5rem;
+
+      @media (min-width: $big-tablet-screen) {
+        flex-direction: row;
+      }
+
+      &__code {
+        padding: 0.5rem;
+        font-size: $small-text;
+
+        @media (min-width: $big-tablet-screen) {
+          background-color: none;
+          box-shadow: none;
+          border-radius: none;
+          padding: 0;
+        }
+      }
+    }
   }
 }
 

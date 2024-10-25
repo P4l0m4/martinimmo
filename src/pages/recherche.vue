@@ -222,6 +222,32 @@ async function savePersons() {
 }
 
 const isMobile = computed(() => window.innerWidth < 768);
+
+useHead({
+  title: "MartinImmo | Recherchez des biens à vendre",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Rentrez en contact avec des millions de particuliers cherchant à vendre, nettoyer ou débarasser un bien immobillier. 10 crédits offers et 10 crédits suplémentaires en renseignant le code de votre parrain à l'inscription.",
+    },
+    {
+      property: "og:title",
+      content: "MartinImmo | Recherchez des biens à vendre",
+    },
+    {
+      property: "og:description",
+      content: `Rentrez en contact avec des millions de particuliers cherchant à vendre, nettoyer ou débarasser un bien immobillier. 
+  10 crédits offers et 10 crédits suplémentaires en renseignant le code de votre parrain à l'inscription.`,
+    },
+    {
+      property: "og:url",
+      content: `https://martinimmo.netlify.app${route.path}`,
+    },
+    { property: "og:type", content: "website" },
+    { property: "og:locale", content: "fr_FR" },
+  ],
+});
 </script>
 
 <template>
