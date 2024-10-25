@@ -5,6 +5,7 @@ import { checkExistingToken } from "@/utils/supabase";
 
 const route = useRoute();
 const isUserLoggedIn = ref();
+
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
 });
