@@ -481,7 +481,7 @@ onMounted(async () => {
             avant de les envoyer !</span
           >
         </div>
-        <div class="table" v-if="allFamilyMembers.length > 0">
+        <!-- <div class="table" v-if="allFamilyMembers.length > 0">
           <div class="table__body">
             <div
               v-for="member in allFamilyMembers"
@@ -511,7 +511,7 @@ onMounted(async () => {
               </span>
             </div>
           </div>
-        </div>
+        </div> -->
         <DashboardWidgetsEmailScanner id="scanner" />
         <div class="statistics">
           <div class="statistics__card">

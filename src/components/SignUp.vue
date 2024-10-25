@@ -191,7 +191,10 @@ const buttonState = computed(() => {
         />
         <label for="terms"
           >J'accepte les
-          <NuxtLink to="/" class="button--tertiary-dark"
+          <NuxtLink
+            to="https://docs.google.com/document/d/e/2PACX-1vTOGTdv866qLzIX4H8alMu0WlN-CeYjKNgtsEIJiimH1npT3ypGF3KCcu3eN0h9zmYpVWgK8wzcQqyi/pub"
+            target="_blank"
+            class="button--tertiary-dark"
             >conditions d'utilisation</NuxtLink
           >
           et conscent à recevoir des communications commerciales de Tekila Web
