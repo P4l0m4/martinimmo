@@ -11,7 +11,7 @@ onClickOutside(target, () => emit("closeConfirmation"));
 <template>
   <section class="pop-up">
     <div class="pop-up__content" ref="target">
-      <span class="paragraphs"> <slot /></span>
+      <span class="paragraphs"><slot /></span>
       <slot name="button" />
     </div>
   </section>
@@ -44,6 +44,11 @@ onClickOutside(target, () => emit("closeConfirmation"));
     align-items: center;
     text-align: center;
     white-space: pre-wrap;
+
+    & :deep(a) {
+      color: $secondary-color !important;
+      text-decoration: underline !important;
+    }
   }
 }
 </style>

@@ -197,10 +197,10 @@ const buttonState = computed(() => {
             target="_blank"
             class="button--tertiary-dark"
           >
-            Conditions Générales d'Utilisation (CGU)</NuxtLink
+            Conditions Générales d'Utilisation</NuxtLink
           >
-          et vous engagez à respecter les réglementations en vigueur concernant
-          la protection des données personnelles (RGPD).
+          (CGU) et vous engagez à respecter les réglementations en vigueur
+          concernant la protection des données personnelles (RGPD).
         </label>
       </div>
       <PrimaryButton

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-defineProps({
-  buttonState: "success" | "error" | "loading",
-  buttonType: "light" | "dark" | "",
-});
+defineProps<{
+  buttonState?: "success" | "error" | "loading";
+  buttonType?: "light" | "dark";
+}>();
 </script>
 <template>
   <button

@@ -8,7 +8,7 @@ import {
   addFamillyToDB,
   getFamillyByDeceasedId,
 } from "@/utils/supabase";
-import { copyToClipboard } from "@/utils/copyToClipboard";
+// import { copyToClipboard } from "@/utils/copyToClipboard";
 import { fetchPerplexityData, validateEmail } from "@/utils/APIData";
 import { useAccountStore } from "@/stores/accountStore";
 import { useToggle } from "@vueuse/core";
@@ -31,6 +31,8 @@ interface DeadPerson {
 
 const [showConfirmation, toggleConfirmation] = useToggle();
 const [showOverloadPopUp, toggleOverloadPopUp] = useToggle();
+const [showRGPDPopUp, toggleRGPDPopUp] = useToggle();
+
 const accountStore = useAccountStore();
 
 const isUserLoggedIn = ref();
@@ -42,6 +44,7 @@ const persons = ref<DeadPerson[]>([]);
 const relativesCountByPerson = ref<Count[]>([]);
 
 const loading = ref(false);
+const dataExportLoading = ref<"success" | "error" | "loading">();
 const APIData = ref([]);
 
 const allFamilyMembers = ref<FamilyMember[]>([]);
@@ -214,6 +217,7 @@ const averageRelativesPerPerson = computed(() => {
 });
 
 async function generateCSV() {
+  dataExportLoading.value = "loading";
   let csvContent =
     "Firstname,Lastname,Death Region,Community,Death Department Code,Family Member Firstname,Family Member Lastname,Family Member Email,Family Member Sex\n";
 
@@ -239,6 +243,12 @@ async function generateCSV() {
   a.href = url;
   a.download = "contacts_with_family_members.csv";
   a.click();
+
+  dataExportLoading.value = "success";
+
+  setTimeout(() => {
+    toggleRGPDPopUp(false);
+  }, 2000);
 }
 
 async function getAllFamilyMembers() {
@@ -334,13 +344,36 @@ onMounted(async () => {
               >Recherche en cours, gardez cette page ouverte<IconComponent
                 icon="loader"
             /></span>
-            <SecondaryButton
-              button-type="dark"
-              @click="generateCSV()"
-              :button-state="loading"
-            >
-              <IconComponent icon="download" />Tout exporter
+
+            <SecondaryButton button-type="dark" @click="toggleRGPDPopUp"
+              ><IconComponent icon="download" />Exporter les données
             </SecondaryButton>
+
+            <ConfirmationPopUp
+              v-if="showRGPDPopUp"
+              @close-confirmation="toggleRGPDPopUp"
+              >Attention, l'usage des données générées est strictement réservé
+              aux finalités permises par la
+              <NuxtLink
+                to="https://docs.google.com/document/d/e/2PACX-1vRl0b5T5OmciZCyENe13NQgpoZH2g7YlzJUzgwiQwjbwLoOAvtbgrQDE-xVRqncwj8pHzeM8XxDEvMF/pub"
+                target="_blank"
+                >loi</NuxtLink
+              >
+              et précisées dans nos
+              <NuxtLink
+                to="https://docs.google.com/document/d/e/2PACX-1vTOGTdv866qLzIX4H8alMu0WlN-CeYjKNgtsEIJiimH1npT3ypGF3KCcu3eN0h9zmYpVWgK8wzcQqyi/pub"
+                target="_blank"
+                >CGU</NuxtLink
+              >.<template #button>
+                <PrimaryButton
+                  button-type="dark"
+                  @click="generateCSV()"
+                  :button-state="dataExportLoading"
+                >
+                  <IconComponent icon="download" />J'ai compris, exporter
+                </PrimaryButton></template
+              >
+            </ConfirmationPopUp>
 
             <ConfirmationPopUp
               v-if="showConfirmation"
