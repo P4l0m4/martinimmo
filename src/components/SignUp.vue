@@ -190,16 +190,18 @@ const buttonState = computed(() => {
           :class="{ shake: termsErrors[0] }"
         />
         <label for="terms"
-          >J'accepte les
+          >En utilisant notre plateforme, vous confirmez avoir pris connaissance
+          des
           <NuxtLink
             to="https://docs.google.com/document/d/e/2PACX-1vTOGTdv866qLzIX4H8alMu0WlN-CeYjKNgtsEIJiimH1npT3ypGF3KCcu3eN0h9zmYpVWgK8wzcQqyi/pub"
             target="_blank"
             class="button--tertiary-dark"
-            >conditions d'utilisation</NuxtLink
           >
-          et conscent à recevoir des communications commerciales de Tekila Web
-          Factory</label
-        >
+            Conditions Générales d'Utilisation (CGU)</NuxtLink
+          >
+          et vous engagez à respecter les réglementations en vigueur concernant
+          la protection des données personnelles (RGPD).
+        </label>
       </div>
       <PrimaryButton
         button-type="dark"
