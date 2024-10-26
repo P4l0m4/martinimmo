@@ -199,8 +199,8 @@ const buttonState = computed(() => {
           >
             Conditions Générales d'Utilisation</NuxtLink
           >
-          (CGU) et vous engagez à respecter les réglementations en vigueur
-          concernant la protection des données personnelles (RGPD).
+          (CGU) et vous engagez à utiliser la plateforme et les données
+          receuillies uniquement à des fins statistiques et non commerciales.
         </label>
       </div>
       <PrimaryButton

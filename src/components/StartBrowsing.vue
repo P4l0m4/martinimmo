@@ -27,7 +27,7 @@ onMounted(() => {
         >Commencer ma recherche</NuxtLink
       >
       <NuxtLink class="button primary--dark" to="/mon-compte"
-        >Voir mes contacts débloqués</NuxtLink
+        >Voir mes profils débloqués</NuxtLink
       >
     </div></Container
   >

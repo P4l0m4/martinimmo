@@ -35,7 +35,7 @@ onMounted(() => {
     </h1>
     <h2>
       Accédez à un répertoire de plus de
-      <span class="secondary-color">2 millions de contacts qualifiés</span>
+      <span class="secondary-color">2 millions de profils qualifiés</span>
       partout en France
     </h2>
 

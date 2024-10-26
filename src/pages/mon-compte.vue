@@ -224,7 +224,7 @@ const averageRelativesPerPerson = computed(() => {
 async function generateCSV() {
   dataExportLoading.value = "loading";
   let csvContent =
-    "Firstname,Lastname,Death Region,Community,Death Department Code,Family Member Firstname,Family Member Lastname,Family Member Email,Family Member Sex\n";
+    "Firstname,Lastname,Death Region,Community,Death Department Code,Family Member Firstname,Family Member Email,Family Member Sex\n";
 
   for (const person of persons.value) {
     // Safely retrieve family members by awaiting the async function
@@ -234,9 +234,8 @@ async function generateCSV() {
     if (!familyMembers || familyMembers.length === 0) {
       csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_death_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},,,,\n`;
     } else {
-      // Use for...of loop to ensure proper async handling
       for (const familyMember of familyMembers) {
-        csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_death_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},${familyMember.firstnames ?? ""},${familyMember.lastname ?? ""},${familyMember.email ?? ""},${familyMember.sex ?? ""}\n`;
+        csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_death_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},${familyMember.firstnames ?? ""},${familyMember.email ?? ""},${familyMember.sex ?? ""}\n`;
       }
     }
   }
@@ -246,7 +245,7 @@ async function generateCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "contacts_with_family_members.csv";
+  a.download = "profiles_with_relatives.csv";
   a.click();
 
   dataExportLoading.value = "success";
@@ -315,7 +314,7 @@ onMounted(async () => {
   await getAllFamilyMembers();
 
   boxArray.value = persons.value.map(() => false);
-  sponsorMessage.value = `Rendez-vous sur https://martinimmo.com, rentrez en contact avec des millions de particuliers cherchant à vendre, nettoyer ou débarasser un bien immobillier. 
+  sponsorMessage.value = `Rendez-vous sur https://martinimmo.netlify.app, rentrez en contact avec des millions de particuliers cherchant à vendre, nettoyer ou débarasser un bien immobillier. 
   10 crédits offers et 10 crédits suplémentaires en renseignant le code de votre parrain à l'inscription:
   ${isUserLoggedIn.value?.user.id}
   `;
@@ -327,7 +326,7 @@ useHead({
     {
       name: "description",
       content:
-        "Gérez vos profils débloqués et générez des contacts qualifiés, testez vos emails avant de les envoyer.",
+        "Gérez vos profils débloqués et générez des profils qualifiés, testez vos emails avant de les envoyer.",
     },
     { property: "og:title", content: "MartinImmo | Mon compte" },
     {
@@ -358,7 +357,7 @@ useHead({
           >
             <span class="header__text">
               <span style="opacity: 0.6"><IconComponent icon="unlock" /></span>
-              Contacts débloqués
+              Profils débloqués
             </span>
             <PrimaryButton
               button-type="dark"
@@ -427,7 +426,7 @@ useHead({
               v-if="showOverloadPopUp"
               @close-confirmation="toggleOverloadPopUp"
             >
-              Vous avez {{ allFamilyMembers.length }} contacts débloqué(s),
+              Vous avez {{ allFamilyMembers.length }} profils débloqué(s),
               téléchargez puis les supprimez les afin d'améliorer le chargement
               de la page.
               <template #button>
@@ -440,10 +439,10 @@ useHead({
 
           <div v-else class="empty">
             <span
-              >Quand vous débloquerez des contacts, ils apparaîtront ici.</span
+              >Quand vous débloquerez des profils, ils apparaîtront ici.</span
             >
             <PrimaryButton button-type="dark" @click="navigateTo('/recherche')">
-              Débloquer des contacts
+              Débloquer des profils
             </PrimaryButton>
           </div>
 
@@ -584,7 +583,7 @@ useHead({
               {{ averageRelativesPerPerson.toFixed(2) }}
             </span>
             <span class="paragraphs">
-              <IconComponent icon="user" /> Contacts trouvés par personne en
+              <IconComponent icon="user" /> Proches trouvés par personne en
               moyenne</span
             >
           </div>

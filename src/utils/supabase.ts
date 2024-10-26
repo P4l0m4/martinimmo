@@ -356,7 +356,7 @@ export async function addDeadPersonInfoToDB(
     .select();
 
   if (error) {
-    console.error("Error inserting saved_contacts data:", error);
+    console.error("Error inserting saved_profiles data:", error);
     return [];
   }
 }

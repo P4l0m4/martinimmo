@@ -25,7 +25,7 @@ function closeAndDisplayPasswordReset() {
         </div>
         <p class="paragraphs">
           Facilitez votre recherche de biens à vendre. Accédez à plus de 2
-          millions de contacts qualifiés.
+          millions de profils qualifiés.
         </p>
       </div>
       <ul class="links">

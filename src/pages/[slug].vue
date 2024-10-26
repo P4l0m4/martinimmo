@@ -43,6 +43,27 @@ async function initProfileData() {
 }
 </script>
 <template>
+  <Container
+    ><div class="disclaimer">
+      <span class="subtitles">Que représentent ces données ?</span>
+      <span>
+        Les emails présentés ici sont des exemples représentant la structure la
+        plus probable pour une combinaison nom-prénom donnée. Elles sont
+        destinées à un usage purement statistique et analytique. pour vous
+        guider. Consultez notre
+        <NuxtLink to="/faq" class="button--tertiary-light">FAQ</NuxtLink>
+        et nos
+        <NuxtLink
+          to="https://docs.google.com/document/d/e/2PACX-1vTOGTdv866qLzIX4H8alMu0WlN-CeYjKNgtsEIJiimH1npT3ypGF3KCcu3eN0h9zmYpVWgK8wzcQqyi/pub"
+          target="_blank"
+          class="button--tertiary-light"
+          >CGU</NuxtLink
+        >
+        pour plus d'informations sur la provenance, la pertinence et
+        l'utilisation de ces données.
+      </span>
+    </div></Container
+  >
   <Container v-if="profile">
     <div class="profile">
       <img
@@ -95,13 +116,13 @@ async function initProfileData() {
             v-else
           />
           <div class="family__member__info">
-            <span>{{ member.firstnames }} {{ member.lastname }}</span>
+            <span>{{ member.firstnames }} {{ member.lastname[0] }}.</span>
             <span>{{ member.email }}</span>
           </div>
         </div>
       </div>
-    </div></Container
-  >
+    </div>
+  </Container>
 </template>
 <style scoped lang="scss">
 .profile {

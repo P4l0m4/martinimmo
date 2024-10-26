@@ -129,7 +129,7 @@ async function sendEmailScanData() {
 <template>
   <div class="scan">
     <div class="scan__inputs" v-if="showFields">
-      <h3 class="subtitles">Testez votre email</h3>
+      <h3 class="subtitles">Testez vos emails B2B</h3>
       <h4 class="paragraphs">Augmentez votre taux d'ouverture et de réponse</h4>
       <InputField
         id="email-object"
