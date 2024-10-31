@@ -224,7 +224,7 @@ const averageRelativesPerPerson = computed(() => {
 async function generateCSV() {
   dataExportLoading.value = "loading";
   let csvContent =
-    "Firstname,Lastname,Death Region,Community,Death Department Code,Family Member Firstname,Family Member Email,Family Member Sex\n";
+    "Firstname;Lastname;Death Region;Community;Death Department Code;Family Member Firstname;Family Member Email;Family Member Sex\n";
 
   for (const person of persons.value) {
     // Safely retrieve family members by awaiting the async function
@@ -232,10 +232,10 @@ async function generateCSV() {
 
     // If no family members, include the person details
     if (!familyMembers || familyMembers.length === 0) {
-      csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_death_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},,,,\n`;
+      csvContent += `${person.firstnames ?? ""};${person.lastname ?? ""};${person.current_death_reg_name ?? ""};${person.current_death_com_name ?? ""};${person.current_death_dep_code ?? ""},,,,\n`;
     } else {
       for (const familyMember of familyMembers) {
-        csvContent += `${person.firstnames ?? ""},${person.lastname ?? ""},${person.current_death_reg_name ?? ""},${person.current_death_com_name ?? ""},${person.current_death_dep_code ?? ""},${familyMember.firstnames ?? ""},${familyMember.email ?? ""},${familyMember.sex ?? ""}\n`;
+        csvContent += `${person.firstnames ?? ""};${person.lastname ?? ""};${person.current_death_reg_name ?? ""};${person.current_death_com_name ?? ""};${person.current_death_dep_code ?? ""};${familyMember.firstnames ?? ""};${familyMember.email ?? ""};${familyMember.sex ?? ""}\n`;
       }
     }
   }
