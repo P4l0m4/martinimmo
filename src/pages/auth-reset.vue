@@ -73,6 +73,7 @@ const passwordErrors = computed(() => {
 });
 
 const resetPassword = async () => {
+  console.log("resetPassword");
   v$.value.$touch();
   if (v$.value.$invalid) {
     buttonState.value = "error";
