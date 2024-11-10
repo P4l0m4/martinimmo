@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { updateUserPassword, checkExistingToken } from "@/utils/supabase";
 import { useVuelidate } from "@vuelidate/core";
@@ -43,9 +43,9 @@ const passwordComplexity = {
 const rules = {
   password: passwordComplexity,
 };
-const state = {
+const state = reactive({
   password: newPassword.value,
-};
+});
 
 const v$ = useVuelidate(rules, state);
 const passwordErrors = computed(() => {
