@@ -9,7 +9,8 @@ import {
 
 const router = useRouter();
 const newPassword = ref("");
-const mail = "paloma";
+const isUserLoggedIn = await checkExistingToken();
+const mail = isUserLoggedIn.user.email;
 const buttonState = ref<"default" | "success" | "error" | "loading">("default");
 const resetPassword = async () => {
   const { success } = await updateUserPassword(mail, newPassword.value);
@@ -22,12 +23,10 @@ const resetPassword = async () => {
     alert("Erreur");
   }
 };
-let isUserLoggedIn = await checkExistingToken();
 </script>
 
 <template>
   <Container>
-    {{ isUserLoggedIn }}
     <h2>Votre nouveau mot de passe</h2>
     <p>{{ mail }}</p>
     <form class="form" @submit.prevent="resetPassword">
