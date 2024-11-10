@@ -1,5 +1,6 @@
 import { useAccountStore } from "@/stores/accountStore";
 import type { FamilyMember, DeadPerson } from "@/components/FamilyMember.vue";
+import { email } from "@vuelidate/validators";
 let accountStore: any;
 export default {
   asyncData({ $pinia }) {
@@ -530,9 +531,10 @@ export async function generateUser() {
 
 //PASSWORD RECOVERY
 
-export const updateUserPassword = async (password: string) => {
+export const updateUserPassword = async (email: string, password: string) => {
   try {
     const { data, error } = await supabase.auth.updateUser({
+      email: email,
       password: password,
     });
     if (error) throw error;

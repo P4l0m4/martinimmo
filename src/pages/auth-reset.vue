@@ -7,6 +7,7 @@ import {
   createTempSession,
   checkSession,
 } from "@/utils/supabase";
+import { email } from "@vuelidate/validators";
 
 const route = useRoute();
 const router = useRouter();
@@ -21,14 +22,14 @@ const resetPassword = async () => {
   }
   await checkSession(); // Vérifiez si la session est valide
   // await createTempSession(token); // Créez une session temporaire pour mettre à jour le mot de passe
-
-  const { success, error } = await updateUserPassword(newPassword.value);
+  const mail = route.query.email as string;
+  const { success, error } = await updateUserPassword(mail, newPassword.value);
 
   if (success) {
     alert("Mot de passe mis à jour avec succès");
-    await signOut(); // Déconnectez l'utilisateur après la mise à jour
-    console.log("User signed out");
-    router.push("/mon-compte"); // Rediriger vers la page de connexion ou compte
+    // await signOut(); // Déconnectez l'utilisateur après la mise à jour
+    // console.log("User signed out");
+    // router.push("/mon-compte"); // Rediriger vers la page de connexion ou compte
   } else {
     alert("Erreur: " + error);
   }
@@ -37,7 +38,7 @@ const resetPassword = async () => {
 
 <template>
   <Container>
-    <h2>Renseignez votre nouveau mot de passe</h2>
+    <h2>Votre nouveau mot de passe</h2>
     <form class="form" @submit.prevent="resetPassword">
       <InputField
         type="password"
