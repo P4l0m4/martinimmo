@@ -94,6 +94,8 @@ const resetPassword = async () => {
 <template>
   <Container>
     {{ passwordErrors }}
+    {{ newPassword }}
+    {{ state.password }}
     <h2>Votre nouveau mot de passe</h2>
     <form class="form" @submit.prevent="resetPassword">
       <InputField
