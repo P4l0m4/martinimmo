@@ -537,7 +537,7 @@ export const updateUserPassword = async (email: string, password: string) => {
       email: email,
       password: password,
     });
-    if (error) throw error;
+    if (error) return { success: false, error: error.message };
     else {
       return { success: true };
     }
