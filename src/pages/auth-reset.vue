@@ -10,23 +10,14 @@ import {
 
 const route = useRoute();
 const newPassword = ref("");
-const mail = route.query.email as string;
+// const mail = route.query.email as string;
+const mail = "palomatejeda81@gmail.com";
 const resetPassword = async () => {
-  const token = route.query.token as string;
-
-  if (!token) {
-    alert("Invalid or expired reset token.");
-    return;
-  }
-  await checkSession(); // Vérifiez si la session est valide
-  // await createTempSession(token); // Créez une session temporaire pour mettre à jour le mot de passe
-
   const { success, error } = await updateUserPassword(mail, newPassword.value);
 
   if (success) {
     alert("Mot de passe mis à jour avec succès");
     // await signOut(); // Déconnectez l'utilisateur après la mise à jour
-    // console.log("User signed out");
     // router.push("/mon-compte"); // Rediriger vers la page de connexion ou compte
   } else {
     alert("Erreur: " + error);
