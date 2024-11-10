@@ -78,6 +78,7 @@ const resetPassword = async () => {
   const { success } = await updateUserPassword(mail, newPassword.value);
 
   if (success) {
+    buttonState.value = "success";
     alert("Mot de passe mis à jour avec succès");
     router.push("/mon-compte");
   } else {
