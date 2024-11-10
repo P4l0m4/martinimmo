@@ -1,32 +1,33 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import {
   updateUserPassword,
   signOut,
-  createTempSession,
-  checkSession,
+  checkExistingToken,
 } from "@/utils/supabase";
 
-const route = useRoute();
+const router = useRouter();
 const newPassword = ref("");
-// const mail = route.query.email as string;
-const mail = "palomatejeda81@gmail.com";
+const mail = "paloma";
+const buttonState = ref<"default" | "success" | "error" | "loading">("default");
 const resetPassword = async () => {
-  const { success, error } = await updateUserPassword(mail, newPassword.value);
+  const { success } = await updateUserPassword(mail, newPassword.value);
 
   if (success) {
     alert("Mot de passe mis à jour avec succès");
-    // await signOut(); // Déconnectez l'utilisateur après la mise à jour
-    // router.push("/mon-compte"); // Rediriger vers la page de connexion ou compte
+    await signOut();
+    router.push("/mon-compte");
   } else {
-    alert("Erreur: " + error);
+    alert("Erreur");
   }
 };
+let isUserLoggedIn = await checkExistingToken();
 </script>
 
 <template>
   <Container>
+    {{ isUserLoggedIn }}
     <h2>Votre nouveau mot de passe</h2>
     <p>{{ mail }}</p>
     <form class="form" @submit.prevent="resetPassword">
@@ -40,9 +41,13 @@ const resetPassword = async () => {
         required
       />
 
-      <button type="submit" class="button primary--dark">
+      <PrimaryButton
+        button-type="dark"
+        :button-state="buttonState"
+        type="submit"
+      >
         Update Password
-      </button>
+      </PrimaryButton>
     </form>
   </Container>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  buttonState?: "success" | "error" | "loading";
+  buttonState?: "success" | "error" | "loading" | "default";
   buttonType?: "light" | "dark";
 }>();
 </script>
