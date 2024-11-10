@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import {
   updateUserPassword,
   signOut,
   createTempSession,
   checkSession,
 } from "@/utils/supabase";
-import { email } from "@vuelidate/validators";
 
 const route = useRoute();
-const router = useRouter();
 const newPassword = ref("");
-
+const mail = route.query.email as string;
 const resetPassword = async () => {
   const token = route.query.token as string;
 
@@ -22,7 +20,7 @@ const resetPassword = async () => {
   }
   await checkSession(); // Vérifiez si la session est valide
   // await createTempSession(token); // Créez une session temporaire pour mettre à jour le mot de passe
-  const mail = route.query.email as string;
+
   const { success, error } = await updateUserPassword(mail, newPassword.value);
 
   if (success) {
@@ -39,6 +37,7 @@ const resetPassword = async () => {
 <template>
   <Container>
     <h2>Votre nouveau mot de passe</h2>
+    <p>{{ mail }}</p>
     <form class="form" @submit.prevent="resetPassword">
       <InputField
         type="password"
