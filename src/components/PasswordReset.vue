@@ -55,19 +55,19 @@ async function submitForm() {
     isSubmitting.value = "error";
     return;
   }
-  try {
-    await sendPasswordResetEmail(emailRef.value);
 
-    invalidCredentialsMessage.value = "Vous êtes connecté";
-    confirmSubmission();
-  } catch (error) {
-    invalidCredentialsMessage.value = "Ce compte n'existe pas";
+  const { success } = await sendPasswordResetEmail(emailRef.value);
+
+  if (!success) {
+    invalidCredentialsMessage.value = "Erreur";
+    isSubmitting.value = "error";
     setTimeout(() => {
       invalidCredentialsMessage.value = null;
     }, 1000);
-    console.error("Failed to log in", error);
     isSubmitting.value = "error";
+    return;
   }
+  confirmSubmission();
 }
 
 const buttonLabel = computed(() => {
