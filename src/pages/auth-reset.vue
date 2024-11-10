@@ -3,12 +3,15 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { updateUserPassword, checkExistingToken } from "@/utils/supabase";
 import { useVuelidate } from "@vuelidate/core";
-import { required, email, sameAs, minLength } from "@vuelidate/validators";
+import { required, minLength } from "@vuelidate/validators";
 
 const router = useRouter();
-const newPassword = ref("");
+
 const isUserLoggedIn = await checkExistingToken();
 const mail = isUserLoggedIn.user.email;
+
+const newPassword = ref("");
+
 const buttonState = ref<"default" | "success" | "error" | "loading">("default");
 const buttonLabel = computed(() => {
   if (passwordErrors.value.length > 0) {
