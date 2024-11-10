@@ -43,11 +43,11 @@ const passwordComplexity = {
 const rules = {
   password: passwordComplexity,
 };
-const state = reactive({
-  password: newPassword.value,
-});
+// const state = reactive({
+//   password: newPassword.value,
+// });
 
-const v$ = useVuelidate(rules, state);
+const v$ = useVuelidate(rules, newPassword.value as any);
 const passwordErrors = computed(() => {
   const errors: string[] = [];
   if (!v$.value.password.$dirty) return errors;
@@ -94,8 +94,6 @@ const resetPassword = async () => {
 <template>
   <Container>
     {{ passwordErrors }}
-    {{ newPassword }}
-    {{ state.password }}
     <h2>Votre nouveau mot de passe</h2>
     <form class="form" @submit.prevent="resetPassword">
       <InputField
