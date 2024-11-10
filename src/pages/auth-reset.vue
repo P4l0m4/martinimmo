@@ -43,11 +43,11 @@ const passwordComplexity = {
 const rules = {
   password: passwordComplexity,
 };
-// const state = reactive({
-//   password: newPassword.value,
-// });
+const state = reactive({
+  password: newPassword,
+});
 
-const v$ = useVuelidate(rules, newPassword.value as any);
+const v$ = useVuelidate(rules, state);
 const passwordErrors = computed(() => {
   const errors: string[] = [];
   if (!v$.value.password.$dirty) return errors;
