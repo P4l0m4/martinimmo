@@ -56,9 +56,10 @@ async function submitForm() {
     return;
   }
 
-  const { success } = await sendPasswordResetEmail(emailRef.value);
+  const { success, error } = await sendPasswordResetEmail(emailRef.value);
 
   if (!success) {
+    alert(error);
     invalidCredentialsMessage.value = "Erreur";
     isSubmitting.value = "error";
     setTimeout(() => {

@@ -87,7 +87,7 @@ const resetPassword = async () => {
     router.push("/mon-compte");
   } else {
     if (error) {
-      passwordErrors.value.push(error.message);
+      passwordErrors.value.push(error);
     }
   }
 };
