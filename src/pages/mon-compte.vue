@@ -18,8 +18,8 @@ import { generateEmailAddresses } from "@/utils/emailPatterns";
 import { normalizeString } from "@/utils/normalize";
 import { removeMatchingNames } from "@/utils/dataSanitization";
 import { sleep } from "@/utils/sleep";
+import { deleteUserAccount } from "@/utils/supabase";
 import type { FamilyMember } from "@/components/FamilyMember.vue";
-import SecondaryButton from "~/components/SecondaryButton.vue";
 
 interface DeadPerson {
   id: string;
@@ -289,6 +289,16 @@ function deleteSelectedContactsWithFamilyMembers() {
 const isLoading = computed(() => {
   return persons.value.some((person) => person.status === "loading");
 });
+
+async function handleUserDeletion() {
+  const response = await deleteUserAccount(isUserLoggedIn.value.user.id);
+  console.log("response", response);
+  if (response?.success) {
+    signOut();
+  } else {
+    console.error("Error deleting user account");
+  }
+}
 
 window.addEventListener("beforeunload", function (e) {
   if (isLoading.value === true) {
@@ -635,6 +645,11 @@ useHead({
               >
                 Déconnexion
               </PrimaryButton>
+            </li>
+            <li class="account-info__element">
+              <SecondaryButton button-type="dark" @click="handleUserDeletion()"
+                >Supprimer mon compte</SecondaryButton
+              >
             </li>
           </ul>
         </ul>

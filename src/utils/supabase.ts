@@ -220,7 +220,7 @@ export async function addUser(user_id: string) {
     .single();
 
   if (fetchError) {
-    const isUserLoggedIn = await checkExistingToken();
+    // const isUserLoggedIn = await checkExistingToken();
 
     const { data, error } = await supabase.from("users").insert([
       {
@@ -229,6 +229,31 @@ export async function addUser(user_id: string) {
     ]);
     if (error) {
       console.error("Error inserting data:", error);
+    }
+
+    return;
+  } else if (existingUsers && existingUsers.length > 0) {
+    return;
+  }
+}
+
+export async function deleteUser(user_id: string) {
+  const { data: existingUsers, error: fetchError } = await supabase
+    .from("users")
+    .select("*")
+    .eq("user_id", user_id)
+    .single();
+
+  if (fetchError) {
+    // const isUserLoggedIn = await checkExistingToken();
+
+    const { data, error } = await supabase.from("users").delete([
+      {
+        user_id,
+      },
+    ]);
+    if (error) {
+      console.error("Error deleting data:", error);
     }
 
     return;
@@ -586,5 +611,33 @@ export const checkSession = async () => {
   } else {
     console.log("no session");
     return null;
+  }
+};
+
+export const deleteUserAccount = async (user_id: string) => {
+  try {
+    const response = await fetch(
+      "https://martinimmo-backend.vercel.app/delete-user/" + user_id,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const data = await response.json();
+    console.log("data", data);
+
+    if (data) {
+      const familyDeletion =
+        await deleteAllSavedContactsAndFamilyMembers(user_id);
+      console.log("response from contacts deletion", familyDeletion);
+      const userDeletion = await deleteUser(user_id);
+      console.log("response from user deletion", userDeletion);
+      return { success: true };
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error);
   }
 };
