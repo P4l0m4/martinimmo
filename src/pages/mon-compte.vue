@@ -328,6 +328,13 @@ function handleSharing(message: string) {
   }, 1000);
 }
 
+//watch for changes in showDeletionPopUp with a watcher
+watch(showDeletionPopUp, (newValue) => {
+  if (newValue) {
+    console.log("Deletion popup: ", newValue);
+  }
+});
+
 window.addEventListener("beforeunload", function (e) {
   if (isLoading.value === true) {
     e.preventDefault();
@@ -663,7 +670,10 @@ useHead({
               associées, sans possibilité de les récupérer. Pensez à exporter
               vos données avant de continuer.
               <template #button>
-                <PrimaryButton button-type="dark" @click="toggleDeletionPopUp">
+                <PrimaryButton
+                  button-type="dark"
+                  @click="showDeletionPopUp = !showDeletionPopUp"
+                >
                   Annuler la suppression
                 </PrimaryButton>
                 <SecondaryButton

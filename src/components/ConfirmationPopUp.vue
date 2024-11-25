@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { onClickOutside } from "@vueuse/core";
 const target = ref<HTMLElement | null>(null);
 
 const emit = defineEmits(["closeConfirmation"]);
-
-onClickOutside(target, () => emit("closeConfirmation"));
 </script>
 
 <template>
-  <section class="pop-up">
+  <section class="pop-up" @click="emit('closeConfirmation')">
     <div class="pop-up__content" ref="target">
       <span class="paragraphs"><slot /></span>
       <slot name="button" />
