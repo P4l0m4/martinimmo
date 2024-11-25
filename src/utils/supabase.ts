@@ -627,7 +627,6 @@ export const deleteUserAccount = async (user_id: string) => {
     );
 
     const data = await response.json();
-    console.log("data", data);
 
     if (data) {
       const familyDeletion =
@@ -636,8 +635,11 @@ export const deleteUserAccount = async (user_id: string) => {
       const userDeletion = await deleteUser(user_id);
       console.log("response from user deletion", userDeletion);
       return { success: true };
+    } else {
+      return { success: false };
     }
   } catch (error) {
     console.error("Error deleting user:", error);
+    return { success: false };
   }
 };

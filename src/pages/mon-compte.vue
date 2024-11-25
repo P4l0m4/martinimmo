@@ -10,10 +10,10 @@ import {
   addFamillyToDB,
   getFamillyByDeceasedId,
 } from "@/utils/supabase";
-import { copyToClipboard } from "@/utils/copyToClipboard";
+import { copyToClipboard, share } from "~/utils/otherFunctions";
 import { fetchPerplexityData, validateEmail } from "@/utils/APIData";
 import { useAccountStore } from "@/stores/accountStore";
-import { useToggle } from "@vueuse/core";
+import { set, useToggle } from "@vueuse/core";
 import { generateEmailAddresses } from "@/utils/emailPatterns";
 import { normalizeString } from "@/utils/normalize";
 import { removeMatchingNames } from "@/utils/dataSanitization";
@@ -35,6 +35,7 @@ const route = useRoute();
 const [showConfirmation, toggleConfirmation] = useToggle();
 const [showOverloadPopUp, toggleOverloadPopUp] = useToggle();
 const [showRGPDPopUp, toggleRGPDPopUp] = useToggle();
+const [showDeletionPopUp, toggleDeletionPopUp] = useToggle();
 
 const accountStore = useAccountStore();
 
@@ -56,6 +57,8 @@ const allFamilyMembers = ref<FamilyMember[]>([]);
 
 const isBoxChecked = ref(false);
 const boxArray = ref<boolean[]>([]);
+
+const isMobile = computed(() => window.innerWidth < 768);
 
 async function getDataFromPerplexity(profile: DeadPerson) {
   console.log("Fetching data for person:", profile.firstnames);
@@ -290,14 +293,39 @@ const isLoading = computed(() => {
   return persons.value.some((person) => person.status === "loading");
 });
 
+const deletionStatus = ref<"default" | "loading" | "success" | "error">(
+  "default"
+);
 async function handleUserDeletion() {
-  const response = await deleteUserAccount(isUserLoggedIn.value.user.id);
-  console.log("response", response);
+  deletionStatus.value = "loading";
+  // const response = await deleteUserAccount(isUserLoggedIn.value.user.id);
+  const response = await deleteUserAccount("hello");
   if (response?.success) {
-    signOut();
+    deletionStatus.value = "success";
+    setTimeout(() => {
+      signOut();
+    }, 1000);
   } else {
+    deletionStatus.value = "error";
     console.error("Error deleting user account");
   }
+}
+
+const sharingStatus = ref<"default" | "loading" | "success" | "error">(
+  "default"
+);
+
+function handleSharing(message: string) {
+  sharingStatus.value = "loading";
+  if (isMobile.value) {
+    return share(message);
+  }
+  copyToClipboard(message);
+  sharingStatus.value = "success";
+
+  setTimeout(() => {
+    sharingStatus.value = "default";
+  }, 1000);
 }
 
 window.addEventListener("beforeunload", function (e) {
@@ -555,37 +583,7 @@ useHead({
             avant de les envoyer !</span
           >
         </div>
-        <!-- <div class="table" v-if="allFamilyMembers.length > 0">
-          <div class="table__body">
-            <div
-              v-for="member in allFamilyMembers"
-              :key="member.id"
-              class="table__body__row"
-            >
-              <span
-                class="table__body__row__cell"
-                v-tooltip:top="'Cliquez pour copier le prénom'"
-                @click="copyToClipboard(member.firstnames)"
-              >
-                {{ member.firstnames }}
-              </span>
-              <span
-                class="table__body__row__cell"
-                v-tooltip:top="'Cliquez pour copier le nom'"
-                @click="copyToClipboard(member.lastname)"
-              >
-                {{ member.lastname }}
-              </span>
-              <span
-                class="table__body__row__cell"
-                v-tooltip:top="'Cliquez pour copier l\'email'"
-                @click="copyToClipboard(member.email)"
-              >
-                {{ member.email }}
-              </span>
-            </div>
-          </div>
-        </div> -->
+
         <DashboardWidgetsEmailScanner id="scanner" />
         <div class="statistics">
           <div class="statistics__card">
@@ -610,9 +608,14 @@ useHead({
               </span>
               <PrimaryButton
                 button-type="dark"
-                @click="copyToClipboard(sponsorMessage)"
+                :button-state="sharingStatus"
+                @click="handleSharing(sponsorMessage)"
               >
-                Partager <IconComponent icon="share-2" />
+                Partager
+                <IconComponent
+                  icon="share-2"
+                  v-if="sharingStatus === 'default'"
+                />
               </PrimaryButton>
             </div>
           </div>
@@ -647,10 +650,31 @@ useHead({
               </PrimaryButton>
             </li>
             <li class="account-info__element">
-              <SecondaryButton button-type="dark" @click="handleUserDeletion()"
+              <SecondaryButton button-type="dark" @click="toggleDeletionPopUp"
                 >Supprimer mon compte</SecondaryButton
               >
             </li>
+
+            <ConfirmationPopUp
+              v-if="showDeletionPopUp"
+              @close-confirmation="toggleDeletionPopUp"
+            >
+              En supprimant votre compte, vous perdrez toutes les données
+              associées, sans possibilité de les récupérer. Pensez à exporter
+              vos données avant de continuer.
+              <template #button>
+                <PrimaryButton button-type="dark" @click="toggleDeletionPopUp">
+                  Annuler la suppression
+                </PrimaryButton>
+                <SecondaryButton
+                  button-type="dark"
+                  :button-state="deletionStatus"
+                  @click="handleUserDeletion()"
+                >
+                  J'ai compris, supprimez mon compte
+                </SecondaryButton>
+              </template>
+            </ConfirmationPopUp>
           </ul>
         </ul>
       </div>
