@@ -37,6 +37,9 @@ function closeAndDisplayPasswordReset() {
         <li class="links__li">
           <NuxtLink to="/mon-compte">Mon compte</NuxtLink>
         </li>
+        <li class="links__li">
+          <NuxtLink to="/faq">FAQ</NuxtLink>
+        </li>
       </ul>
       <ul class="links">
         <h5 class="links__title">A propos</h5>

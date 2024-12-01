@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, onUnmounted } from "vue";
+import { onMounted, ref, onUnmounted, computed } from "vue";
 import { checkExistingToken, generateUser } from "@/utils/supabase";
 import { useAccountStore } from "@/stores/accountStore";
 import { debounce } from "@/utils/debounce";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 const accountStore = useAccountStore();
 const isUserLoggedIn = ref();
@@ -10,7 +13,7 @@ const isUserLoggedIn = ref();
 const credits = ref(0);
 
 const updateCredits = debounce(async () => {
-  if (isUserLoggedIn.value.user.id) {
+  if (isUserLoggedIn.value && isUserLoggedIn.value.user.id) {
     credits.value = await getCredits(isUserLoggedIn.value.user.id);
   }
 }, 800);
@@ -24,6 +27,10 @@ const checkLocalStorage = () => {
 };
 
 let intervalId: any;
+
+const isHome = computed(() => {
+  return route.path === "/";
+});
 
 onMounted(async () => {
   isUserLoggedIn.value = await checkExistingToken();
@@ -51,9 +58,9 @@ onUnmounted(() => {
 });
 </script>
 <template>
-  <header class="header">
+  <header class="header" :class="{ 'header--dark': isHome }">
     <nav class="header__nav">
-      <ul class="header__nav__ul">
+      <ul class="header__nav__ul" :class="{ 'header__nav__ul--dark': isHome }">
         <li class="header__nav__ul__li">
           <NuxtLink to="/" exact>Accueil</NuxtLink>
         </li>
@@ -71,7 +78,7 @@ onUnmounted(() => {
         >
           <span class="credits"
             >{{ credits?.credits
-            }}<IconComponent icon="credit-card" color="#44008d"
+            }}<IconComponent icon="credit-card" color="#4885de"
           /></span>
           <NuxtLink
             to="/mon-compte"
@@ -107,7 +114,7 @@ onUnmounted(() => {
 }
 
 .router-link-exact-active {
-  border-bottom: 2px solid $secondary-color;
+  border-bottom: 2px solid $secondary-color-alt;
 }
 
 .header {
@@ -116,6 +123,7 @@ onUnmounted(() => {
   background-color: $primary-color;
   box-shadow: $shadow-black;
   height: 72px;
+  z-index: 1000;
 
   &__nav {
     width: 100%;
@@ -141,12 +149,12 @@ onUnmounted(() => {
           gap: 0.5rem;
           font-weight: $thick;
           border-radius: $radius;
-          color: $secondary-color;
+          color: $secondary-color-alt;
         }
         a {
           display: flex;
           padding: 0.75rem;
-          background-color: $secondary-color-faded;
+          background-color: $secondary-color-alt;
           border-radius: 50%;
         }
       }
@@ -158,7 +166,17 @@ onUnmounted(() => {
         justify-content: center;
         gap: 0.25rem;
       }
+
+      &--dark {
+        a {
+          color: $base-color;
+        }
+      }
     }
+  }
+
+  &--dark {
+    background-color: $secondary-color;
   }
 }
 

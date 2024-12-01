@@ -1,8 +1,8 @@
 <script setup lang="ts">
-defineProps({
-  buttonState: "success" | "error" | "loading" | "default",
-  buttonType: "light" | "dark",
-});
+defineProps<{
+  buttonState?: "success" | "error" | "loading" | "default";
+  buttonType?: "light" | "dark";
+}>();
 </script>
 <template>
   <button
@@ -27,7 +27,11 @@ defineProps({
       color="#bb0025"
     />
   </button>
-  <button v-else class="button secondary--light" :class="buttonState">
+  <button
+    v-else
+    class="button secondary--light scale-on-hover"
+    :class="buttonState"
+  >
     <slot></slot>
     <IconComponent
       v-if="buttonState === 'loading'"
