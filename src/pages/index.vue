@@ -35,9 +35,13 @@ useHead({
 </script>
 <template>
   <div class="background">
-    <img src="@/assets/images/blob.webp" alt="blob" class="blob" />
+    <Transition>
+      <img src="@/assets/images/blob.webp" alt="blob" class="blob"
+    /></Transition>
     <img src="@/assets/images/building.svg" alt="blob" class="building" />
-    <img src="@/assets/images/blob2.webp" alt="blob" class="blob" />
+    <Transition
+      ><img src="@/assets/images/blob2.webp" alt="blob" class="blob"
+    /></Transition>
 
     <MustBeAuthenticated v-if="!isUserLoggedIn?.user.aud" />
     <StartBrowsing v-else />
@@ -61,7 +65,7 @@ useHead({
     background-image: linear-gradient(
       180deg,
       $secondary-color,
-      transparent 60%
+      transparent 30%
     );
     z-index: 1;
     width: 100%;
