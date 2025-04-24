@@ -1,4 +1,6 @@
-# Nuxt 3 Minimal Starter
+# This micro-SaaS project is available on https://martinimmo.netlify.app
+
+⚠️ It is no longer possible to create new accounts on this project as it has been permanently disabled and is no longer fed recent data.
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
