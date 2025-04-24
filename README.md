@@ -2,7 +2,6 @@
 
 ⚠️ It is no longer possible to create new accounts on this project as it has been permanently disabled and is no longer fed recent data.
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ## Setup
 
